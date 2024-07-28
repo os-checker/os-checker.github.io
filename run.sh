@@ -14,4 +14,6 @@ sh os-checker-installer.sh
 os-checker --help
 
 # run os-checker for repos.yaml
-os-checker
+mkdir check
+cd check
+os-checker --config ../repos.yaml
