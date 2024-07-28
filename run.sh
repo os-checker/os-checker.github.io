@@ -24,6 +24,8 @@ os-checker --help
 
 # run os-checker for repos.yaml
 mkdir /check
+ls -alh /check
 cp repos.yaml /check/
 cd /check
-os-checker >>summary.txt 2>&1
+apt install colorized-logs
+os-checker 2>&1 | ansi2html >summary.txt
