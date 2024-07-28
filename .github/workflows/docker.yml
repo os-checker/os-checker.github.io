@@ -44,4 +44,5 @@ jobs:
       run: |
         docker load --input ${{ env.IMAGE_TAR }}
         docker image ls -a
-        docker run ${{ env.IMAGE }}
+        # DEBUG means compiling os-checker from source
+        docker run -e DEBUG=1 ${{ env.IMAGE }}
