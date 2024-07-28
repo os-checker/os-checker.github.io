@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo $PWD
+
 # build & run Rust project
 cargo r --release
 
@@ -23,6 +25,7 @@ fi
 os-checker --help
 
 # run os-checker for repos.yaml
+cd /check
 mkdir repos
 cp repos.yaml repos
 cd repos
