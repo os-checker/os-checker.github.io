@@ -48,4 +48,6 @@ jobs:
         docker run -e DEBUG=1 -v ${{ github.workspace }}:/check ${{ env.IMAGE }}
 
     - name: Display the result of os-checker 
-      run: echo $PWD && ls -alh && cat summary.txt >> $GITHUB_STEP_SUMMARY
+      run: |
+        docker inspect 3c9b8933ed23 # 查看挂载卷的情况
+        echo $PWD && ls -alh && cat summary.txt >> $GITHUB_STEP_SUMMARY
