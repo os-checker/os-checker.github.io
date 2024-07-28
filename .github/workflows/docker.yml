@@ -39,8 +39,8 @@ jobs:
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:latest
           ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:${{ github.sha }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Fetch and Install os-checker CLI
       run: |
@@ -52,12 +52,3 @@ jobs:
         echo 'os-checker-installer.sh is downloaded'
         sh os-checker-installer.sh
         os-checker --help
-
-
-    - # Temp fix
-      # https://github.com/docker/build-push-action/issues/252
-      # https://github.com/moby/buildkit/issues/1896
-      name: Move cache
-      run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
