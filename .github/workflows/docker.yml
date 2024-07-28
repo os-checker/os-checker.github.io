@@ -40,9 +40,9 @@ jobs:
         cache-to: type=gha,mode=max
         outputs: type=docker,dest=${{ env.IMAGE_TAR }}
 
-    # - name: Load and Run Docker image
-    #   run: |
-    #     docker load --input ${{ env.IMAGE_TAR }}
-    #     docker image ls -a
-    #     # DEBUG means compiling os-checker from source
-    #     docker run -e DEBUG=1 ${{ env.IMAGE }}
+    - name: Load and Run Docker image
+      run: |
+        docker load --input ${{ env.IMAGE_TAR }}
+        docker image ls -a
+        # DEBUG means compiling os-checker from source
+        docker run -e DEBUG=1 ${{ env.IMAGE }}
