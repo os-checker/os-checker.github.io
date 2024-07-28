@@ -4,6 +4,10 @@ on:
   push:  
     branches: [ main ]  
 
+env:
+  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:latest
+  IMAGE_TAR: /tmp/os-checker.tar
+
 jobs:  
   build:  
     runs-on: ubuntu-latest  
@@ -31,13 +35,13 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags:  ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:latest
+        tags: ${{ env.IMAGE }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        outputs: type=docker,dest=/tmp/os-checker.tar
+        outputs: type=docker,dest=${{ env.IMAGE_TAR }}
 
     - name: Load and Run Docker image
       run: |
-        docker load --input /tmp/os-checker.tar
+        docker load --input ${{ env.IMAGE_TAR }}
         docker image ls -a
-        docker run ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:latest
+        docker run ${{ env.IMAGE }}
