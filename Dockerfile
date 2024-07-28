@@ -4,7 +4,7 @@ FROM rustlang/rust:nightly
 # 安装必要的软件包  
 RUN apt-get update && apt-get install -y build-essential  
 
-COPY run.sh .
+COPY ./docker/run.sh .
 
 # 指定容器启动时运行的命令  
 CMD ["./run.sh"]
