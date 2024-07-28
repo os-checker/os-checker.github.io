@@ -32,6 +32,11 @@ cp repos.yaml /check/
 cd /check
 # Current dir: /check
 
+os-checker 2>&1 >summary.out
 echo '```text' >>summary.txt
-os-checker 2>&1 | ansi2txt >>summary.txt
+ansi2txt <summary.out >>summary.txt
 echo '```' >>summary.txt
+
+# github pages dir
+mkdir /check/.gh-pages
+ansi2html <summary.out >/check/.gh-pages/index.html
