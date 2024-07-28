@@ -27,4 +27,4 @@ mkdir repos
 cp repos.yaml repos
 cd repos
 apt install -y colorized-logs
-os-checker 2>&1 | ansi2html >summary.txt
+os-checker 2>&1 | ansi2html >../summary.txt
