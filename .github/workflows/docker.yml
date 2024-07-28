@@ -4,6 +4,9 @@ on:
   push:  
     branches: [ main ]  
 
+env:
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:latest
+
 jobs:  
 
   build:  
@@ -32,8 +35,9 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         push: true
-        tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:latest
+        tags: ${{ env.IMAGE_NAME }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
+    - name: Run Docker image
+      run: docker run --name os-checker ${{ env.IMAGE_NAME }}
