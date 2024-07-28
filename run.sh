@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 # build & run Rust project
 cargo r --release
 
 # install latest os-checker
-if [[ "$DEBUG" -eq 1 ]]; then
+if [[ "$DEBUG" == 1 ]]; then
   echo 'compile os-checker from github source'
   git clone https://github.com/os-checker/os-checker.git
   cargo install --path .
