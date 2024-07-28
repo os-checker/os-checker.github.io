@@ -12,3 +12,6 @@ curl -s https://api.github.com/repos/os-checker/os-checker/releases/latest |
 echo 'os-checker-installer.sh is downloaded'
 sh os-checker-installer.sh
 os-checker --help
+
+# run os-checker for repos.yaml
+os-checker

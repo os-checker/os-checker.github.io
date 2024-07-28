@@ -1,0 +1,5 @@
+os-checker/os-checker:
+  all: true
+
+os-checker/os-checker-test-suite:
+  all: true
