@@ -48,5 +48,4 @@ jobs:
         docker run -e DEBUG=1 -v /check:/check ${{ env.IMAGE }}
 
     - name: Display the result of os-checker 
-      run: |
-        echo cat /check/summary.txt >> $GITHUB_STEP_SUMMARY
+      run: cat /check/summary.txt >> $GITHUB_STEP_SUMMARY
