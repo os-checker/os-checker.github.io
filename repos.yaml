@@ -1,2 +1,2 @@
-os-checker/os-checker:
+os-checker/os-checker-test-suite:
   all: true
