@@ -1,6 +1,8 @@
 #!/bin/bash
 
-echo $PWD
+# echo $PWD # 似乎 github action 会默认挂载 /home/runner/work/ci/ci:/ci
+# cd /check # 我们在 yml 中指定了 /home/runner/work/ci/ci:/ci
+# echo $PWD
 
 # build & run Rust project
 cargo r --release
@@ -25,10 +27,9 @@ fi
 os-checker --help
 
 # run os-checker for repos.yaml
-cd /check
 mkdir repos
 cp repos.yaml repos
 cd repos
 apt install -y colorized-logs
-os-checker 2>&1 | ansi2html >../summary.txt
+os-checker 2>&1 | ansi2txt >../summary.txt
 ls -alh ../
