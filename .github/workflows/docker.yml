@@ -45,4 +45,7 @@ jobs:
         docker load --input ${{ env.IMAGE_TAR }}
         docker image ls -a
         # DEBUG means compiling os-checker from source
-        docker run -e DEBUG=1 ${{ env.IMAGE }}
+        docker run -e DEBUG=1 -v ${{ github.workspace }}:/check ${{ env.IMAGE }}
+
+    - name: Display the result of os-checker 
+      run: cat summary.txt >> $GITHUB_STEP_SUMMARY

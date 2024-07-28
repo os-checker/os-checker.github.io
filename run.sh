@@ -23,6 +23,7 @@ fi
 os-checker --help
 
 # run os-checker for repos.yaml
-mkdir check
-cd check
-os-checker --config ../repos.yaml
+mkdir /check
+cp repos.yaml /check/
+cd /check
+os-checker >>summary.txt 2>&1
