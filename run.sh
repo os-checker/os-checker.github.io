@@ -1,8 +1,6 @@
 #!/bin/sh
 
-# clone ci repo & build
-git clone https://github.com/os-checker/ci.git
-cd ci
+# build Rust project
 cargo r --release
 
 # install latest os-checker
