@@ -36,7 +36,8 @@ jobs:
         cache-to: type=gha,mode=max
         outputs: type=docker,dest=/tmp/os-checker.tar
 
-    - name: Load Docker image
+    - name: Load and Run Docker image
       run: |
         docker load --input /tmp/os-checker.tar
         docker image ls -a
+        docker run ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:latest
