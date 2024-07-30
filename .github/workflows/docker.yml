@@ -47,13 +47,13 @@ jobs:
         # DEBUG means compiling os-checker from source
         docker run -e DEBUG=1 -v /check:/check ${{ env.IMAGE }}
 
-    - name: Display the result of os-checker 
-      run: cat /check/summary.txt >> $GITHUB_STEP_SUMMARY
+    # - name: Display the result of os-checker 
+    #   run: cat /check/summary.txt >> $GITHUB_STEP_SUMMARY
 
     - name: Upload pages artifacts
       uses: actions/upload-pages-artifact@v3
       with:
-        path: /check/.gh-pages/
+        path: /check/dist/
 
   # Deploy job
   deploy:
