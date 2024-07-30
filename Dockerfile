@@ -12,5 +12,5 @@
 # 构建静态网页
 FROM node:lts
 COPY ./os-checks/ .
-RUN cd os-checks && npm install && npm run generate && \
+CMD ls -alh && cd os-checks && npm install && npm run generate && \
     cp -LR dist /check/
