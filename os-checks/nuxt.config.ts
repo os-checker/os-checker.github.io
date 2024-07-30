@@ -2,5 +2,6 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-07-30',
   app: { baseURL: '/ci/' },
-  devtools: { enabled: true }
+  devtools: { enabled: true },
+  modules: ["@nuxt/content"]
 })
