@@ -11,7 +11,14 @@
   },
   "dependencies": {
     "@nuxt/content": "^2.13.2",
+    "@primevue/themes": "^4.0.2",
     "nuxt": "latest",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.0.2",
+    "sass": "^1.77.8",
     "vue": "latest"
+  },
+  "devDependencies": {
+    "@primevue/nuxt-module": "^4.0.2"
   }
 }
