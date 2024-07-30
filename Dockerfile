@@ -12,7 +12,7 @@
 # 构建静态网页
 FROM node:lts
 # 把 os-checks 目录的内容展平到 /check
-COPY os-checks /check
+COPY ./os-checks /check
 WORKDIR /check
-CMD ls -alh && npm install && npm run generate && \
-    cp -LR dist /check/
+CMD ls -alh && npm install && npm run generate
+# cp -LR dist /check/
