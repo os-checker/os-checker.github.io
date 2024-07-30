@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:  
   push:  
-    branches: [ main, web-ui ]  
+    branches: [ main ]  
 
 env:
   IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/os-checker:latest
