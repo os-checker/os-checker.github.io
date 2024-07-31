@@ -34,11 +34,11 @@ const onToggle = (val: any) => {
 
     <template #header>
       <div class="container">
-        <div class="left-to-right" style="text-align:left">
+        <div class="left-to-right">
           <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="columns"
             optionLabel="header" class="w-full sm:w-64" display="chip" />
         </div>
-        <div class="right-to-left" style="display: flex;  justify-content: flex-end;">
+        <div class="right-to-left">
           <span style="margin-right: 1rem;">
             <Select v-model="filterMode" :options="filterOptions" optionLabel="label" placeholder="搜索/筛选模式" />
           </span>
