@@ -4,14 +4,20 @@ import type { TreeNode } from 'primevue/treenode';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
-useAsyncData('home', () => queryContent('/nodes').findOne()).then(({ data }) => {
+useAsyncData('home', () => queryContent('/test').findOne()).then(({ data }) => {
   nodes.value = data.value?.body as unknown as TreeNode[] ?? []
 })
 
+// FIXME: make fields/columns generated from nodes
 const columns = ref([
-  { field: 'name', header: 'Name', expander: true },
-  { field: 'size', header: 'Size' },
-  { field: 'type', header: 'Type' }
+  { field: 'user', header: 'User', expander: true },
+  { field: 'repo', header: 'Repo' },
+  { field: 'package', header: 'Package' },
+  { field: 'total_count', header: 'Total Count' },
+  { field: 'Unformatted(File)', header: 'Unformatted(File)' },
+  { field: 'Unformatted(Line)', header: 'Unformatted(Line)' },
+  { field: 'Clippy(Warn)', header: 'Clippy(Warn)' },
+  { field: 'Clippy(Error)', header: 'Clippy(Error)' },
 ]);
 
 // interactive filter mode
@@ -22,7 +28,7 @@ const filterOptions = ref([
   { label: 'Strict', value: 'strict' }
 ]);
 
-const selectedColumns = ref(columns.value);
+const selectedColumns = ref(columns.value.slice(0, 4));
 const onToggle = (val: any) => {
   selectedColumns.value = columns.value.filter(col => val.includes(col));
 };
@@ -59,12 +65,5 @@ const onToggle = (val: any) => {
     </Column>
 
   </TreeTable>
-
-  <div>
-    <i class="pi pi-check" style="font-size: 1rem"></i>
-    <i class="pi pi-times" style="font-size: 1.5rem"></i>
-    <i class="pi pi-search" style="font-size: 2rem"></i>
-    <i class="pi pi-user" style="font-size: 2.5rem"></i>
-  </div>
 
 </template>
