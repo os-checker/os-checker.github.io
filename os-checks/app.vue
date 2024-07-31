@@ -14,10 +14,10 @@ const columns = ref([
   { field: 'repo', header: 'Repo' },
   { field: 'package', header: 'Package' },
   { field: 'total_count', header: 'Total Count' },
+  { field: 'Clippy(Error)', header: 'Clippy(Error)' },
+  { field: 'Clippy(Warn)', header: 'Clippy(Warn)' },
   { field: 'Unformatted(File)', header: 'Unformatted(File)' },
   { field: 'Unformatted(Line)', header: 'Unformatted(Line)' },
-  { field: 'Clippy(Warn)', header: 'Clippy(Warn)' },
-  { field: 'Clippy(Error)', header: 'Clippy(Error)' },
 ]);
 
 // interactive filter mode
