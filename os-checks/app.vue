@@ -1,40 +1,16 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
-import TreeTable from 'primevue/treetable';
-import Column from 'primevue/column';
-import InputText from 'primevue/inputtext';
 
-const nodes: TreeNode[] = [{
-  key: "1",
-  data: { name: "a", size: 1, type: true, },
-  children: [
-    {
-      key: "11", data: { name: "aa", size: 11, type: true }, children: [
-        { key: "11", data: { name: "aa", size: 11, type: true }, },
-        { key: "12", data: { name: "ad", size: 12, type: true } },
-        { key: "13", data: { name: "ac", size: 13, type: true } },
-      ]
-    },
-    { key: "12", data: { name: "ab", size: 12, type: true } },
-    { key: "13", data: { name: "bac", size: 13, type: true } },
-  ]
-},
-{
-  key: "2",
-  data: { name: "b", size: 0, type: false, },
-  children: [
-    { key: "21", data: { name: "bx", size: 4, type: true } },
-    { key: "22", data: { name: "by", size: 5, type: true } },
-    { key: "23", data: { name: "bz", size: 6, type: true } },
-  ]
-}]
+const { data } = await useAsyncData('home', () => queryContent('/nodes').findOne())
+console.log(data);
+
+const nodes = data.value?.body as unknown as TreeNode[] ?? []
 
 const columns = ref([
   { field: 'name', header: 'Name', expander: true },
   { field: 'size', header: 'Size' },
   { field: 'type', header: 'Type' }
 ]);
-
 
 const filters = ref<any>({});
 const filterMode = ref<any>({});
@@ -47,6 +23,7 @@ const filterOptions = ref([
 <template>
 
   <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filterMode="filterMode.value" :filters="filters">
+
     <template #header>
       <div style="display: flex;  justify-content: flex-end;">
         <span style="margin-right: 1rem;">
@@ -60,11 +37,13 @@ const filterOptions = ref([
         </span>
       </div>
     </template>
+
     <Column v-for="col in columns" :field="col.field" :header="col.header" :expander="col.expander">
       <template #filter>
         <InputText v-model="filters[col.field]" type="text" :placeholder="`Filter by ${col.field}`" />
       </template>
     </Column>
+
   </TreeTable>
 
   <div>

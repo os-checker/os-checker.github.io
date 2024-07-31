@@ -1,0 +1,96 @@
+[
+    {
+        "key": "1",
+        "data": {
+            "name": "a",
+            "size": 1,
+            "type": true
+        },
+        "children": [
+            {
+                "key": "11",
+                "data": {
+                    "name": "aa",
+                    "size": 11,
+                    "type": true
+                },
+                "children": [
+                    {
+                        "key": "11",
+                        "data": {
+                            "name": "aa",
+                            "size": 11,
+                            "type": true
+                        }
+                    },
+                    {
+                        "key": "12",
+                        "data": {
+                            "name": "ad",
+                            "size": 12,
+                            "type": true
+                        }
+                    },
+                    {
+                        "key": "13",
+                        "data": {
+                            "name": "ac",
+                            "size": 13,
+                            "type": true
+                        }
+                    }
+                ]
+            },
+            {
+                "key": "12",
+                "data": {
+                    "name": "ab",
+                    "size": 12,
+                    "type": true
+                }
+            },
+            {
+                "key": "13",
+                "data": {
+                    "name": "bac",
+                    "size": 13,
+                    "type": true
+                }
+            }
+        ]
+    },
+    {
+        "key": "2",
+        "data": {
+            "name": "b",
+            "size": 0,
+            "type": false
+        },
+        "children": [
+            {
+                "key": "21",
+                "data": {
+                    "name": "bx",
+                    "size": 4,
+                    "type": true
+                }
+            },
+            {
+                "key": "22",
+                "data": {
+                    "name": "by",
+                    "size": 5,
+                    "type": true
+                }
+            },
+            {
+                "key": "23",
+                "data": {
+                    "name": "bz",
+                    "size": 6,
+                    "type": true
+                }
+            }
+        ]
+    }
+]
