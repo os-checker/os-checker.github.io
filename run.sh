@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Current dir: /.../ci
+CI_dir=$PWD
+echo CI_dir in docker is $CI_dir
 
 # build & run Rust project
 cargo r --release
@@ -37,6 +39,8 @@ echo '```text' >>summary.txt
 ansi2txt <summary.out >>summary.txt
 echo '```' >>summary.txt
 
+os-checker --emit test.json # to be moved into ci/os-checks/content
+
 # github pages dir
-mkdir /check/.gh-pages
-ansi2html <summary.out >/check/.gh-pages/index.html
+# mkdir /check/.gh-pages
+# ansi2html <summary.out >/check/.gh-pages/index.html
