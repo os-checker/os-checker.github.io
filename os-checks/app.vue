@@ -11,21 +11,21 @@ const nodes: TreeNode[] = [{
     {
       key: "11", data: { name: "aa", size: 11, type: true }, children: [
         { key: "11", data: { name: "aa", size: 11, type: true }, },
-        { key: "12", data: { name: "ab", size: 12, type: true } },
+        { key: "12", data: { name: "ad", size: 12, type: true } },
         { key: "13", data: { name: "ac", size: 13, type: true } },
       ]
     },
     { key: "12", data: { name: "ab", size: 12, type: true } },
-    { key: "13", data: { name: "ac", size: 13, type: true } },
+    { key: "13", data: { name: "bac", size: 13, type: true } },
   ]
 },
 {
   key: "2",
-  data: { name: "b", size: 2, type: false, },
+  data: { name: "b", size: 0, type: false, },
   children: [
-    { key: "11", data: { name: "aa", size: 11, type: true } },
-    { key: "12", data: { name: "ab", size: 12, type: true } },
-    { key: "13", data: { name: "ac", size: 13, type: true } },
+    { key: "21", data: { name: "bx", size: 4, type: true } },
+    { key: "22", data: { name: "by", size: 5, type: true } },
+    { key: "23", data: { name: "bz", size: 6, type: true } },
   ]
 }]
 
@@ -35,21 +35,29 @@ const columns = ref([
   { field: 'type', header: 'Type' }
 ]);
 
-interface Filters {
-  [key: string]: string;
-}
-const filters = ref<Filters>({ global: "", name: "", size: "size:)", type: "" });
+
+const filters = ref<any>({});
+const filterMode = ref<any>({});
+const filterOptions = ref([
+  { label: 'Lenient', value: 'lenient' },
+  { label: 'Strict', value: 'strict' }
+]);
 </script>
 
 <template>
-  <Button label="Check" icon="pi pi-check-circle" />
-  <TreeTable :value="nodes" tableStyle="min-width: 50rem" filterMode="lenient">
+
+  <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filterMode="filterMode.value" :filters="filters">
     <template #header>
-      <div class="flex justify-end">
-        <IconField>
-          <InputIcon class="pi pi-search" />
-          <InputText v-model="filters['global']" placeholder="Global Search" />
-        </IconField>
+      <div style="display: flex;  justify-content: flex-end;">
+        <span style="margin-right: 1rem;">
+          <Select v-model="filterMode" :options="filterOptions" optionLabel="label" placeholder="搜索/筛选模式" />
+        </span>
+        <span style="display: inline-block;">
+          <IconField>
+            <InputIcon class="pi pi-search" />
+            <InputText v-model="filters.global" placeholder="Global Search" />
+          </IconField>
+        </span>
       </div>
     </template>
     <Column v-for="col in columns" :field="col.field" :header="col.header" :expander="col.expander">
