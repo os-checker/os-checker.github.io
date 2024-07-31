@@ -1,7 +1,30 @@
-<script setup>
-import NodeService from './utils/data'
-const nodes = await NodeService.getTreeTableNodes();
-const value = ref(null);
+<script setup lang="ts">
+import type { TreeNode } from 'primevue/treenode';
+
+const nodes: TreeNode[] = [{
+  key: "1",
+  data: { name: "a", size: 1, type: true, },
+  children: [
+    {
+      key: "11", data: { name: "aa", size: 11, type: true }, children: [
+        { key: "11", data: { name: "aa", size: 11, type: true }, },
+        { key: "12", data: { name: "ab", size: 12, type: true } },
+        { key: "13", data: { name: "ac", size: 13, type: true } },
+      ]
+    },
+    { key: "12", data: { name: "ab", size: 12, type: true } },
+    { key: "13", data: { name: "ac", size: 13, type: true } },
+  ]
+},
+{
+  key: "2",
+  data: { name: "b", size: 2, type: false, },
+  children: [
+    { key: "11", data: { name: "aa", size: 11, type: true } },
+    { key: "12", data: { name: "ab", size: 12, type: true } },
+    { key: "13", data: { name: "ac", size: 13, type: true } },
+  ]
+}]
 </script>
 
 <template>
@@ -19,8 +42,4 @@ const value = ref(null);
     <i class="pi pi-user" style="font-size: 2.5rem"></i>
   </div>
 
-
-  <div class="card flex justify-center">
-    <Password v-model="value" toggleMask />
-  </div>
 </template>
