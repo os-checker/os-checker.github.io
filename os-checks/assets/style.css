@@ -25,19 +25,5 @@
     /* 将第二个 div 推到容器的右侧 */
 }
 
-/* 子元素样式 */
-.left-to-right div,
-.right-to-left div {
-    text-align: center;
-    /* 允许子元素有一定大小并根据需要换行 */
-}
-
-/* 媒体查询：对于较小的屏幕，调整元素的最小宽度 */
-@media (max-width: 600px) {
-
-    .left-to-right div,
-    .right-to-left div {
-        flex-basis: 100%;
-        /* 在小屏幕上，每个子元素占据整行 */
-    }
-}
+/* 媒体查询：对于较小的屏幕 */
+/* @media (max-width: 600px) {} */
