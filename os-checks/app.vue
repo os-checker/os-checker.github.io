@@ -25,14 +25,18 @@ const nodes: TreeNode[] = [{
     { key: "13", data: { name: "ac", size: 13, type: true } },
   ]
 }]
+
+const columns = ref([
+  { field: 'name', header: 'Name', expander: true },
+  { field: 'size', header: 'Size' },
+  { field: 'type', header: 'Type' }
+]);
 </script>
 
 <template>
   <Button label="Check" icon="pi pi-check-circle" />
   <TreeTable :value="nodes" tableStyle="min-width: 50rem">
-    <Column field="name" header="Name" expander style="width: 34%"></Column>
-    <Column field="size" header="Size" style="width: 33%"></Column>
-    <Column field="type" header="Type" style="width: 33%"></Column>
+    <Column v-for="col in columns" :field="col.field" :header="col.header" :expander="col.expander" />
   </TreeTable>
 
   <div>
