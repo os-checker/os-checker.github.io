@@ -73,21 +73,48 @@ const onToggle = (val: any) => {
 <style scoped>
 .container {
   display: flex;
+  flex-wrap: wrap;
+  /* 允许子元素换行 */
   justify-content: space-between;
-  /* 让两个子 div 分别靠近容器的左右边缘 */
+}
+
+.left-to-right,
+.right-to-left {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  /* 允许子元素在必要时换行 */
 }
 
 .left-to-right {
-  display: flex;
-  flex-direction: row;
-  /* 默认值，子元素水平排列 */
   justify-content: flex-start;
   /* 子元素从左往右排列 */
 }
 
 .right-to-left {
-  display: flex;
   justify-content: flex-end;
   /* 子元素在容器内靠右对齐 */
+  margin-left: auto;
+  /* 将第二个 div 推到容器的右侧 */
+}
+
+/* 子元素样式 */
+.left-to-right div,
+.right-to-left div {
+  text-align: center;
+  flex: 1 1 150px;
+  /* 允许子元素有一定大小并根据需要换行 */
+}
+
+/* 媒体查询：对于较小的屏幕，调整元素的最小宽度 */
+@media (max-width: 600px) {
+
+  .left-to-right div,
+  .right-to-left div {
+    flex-basis: 100%;
+    /* 在小屏幕上，每个子元素占据整行 */
+    margin: 5px 0;
+    /* 调整垂直方向的外边距 */
+  }
 }
 </style>
