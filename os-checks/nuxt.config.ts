@@ -11,5 +11,5 @@ export default defineNuxtConfig({
       theme: { preset: Aura }
     }
   },
-  css: ["primeicons/primeicons.css"]
+  css: ["primeicons/primeicons.css", "~/assets/style.css"]
 })
