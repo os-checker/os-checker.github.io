@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
 
-const { data } = await useAsyncData('home', () => queryContent('/nodes').findOne())
-console.log(data);
-
-const nodes = data.value?.body as unknown as TreeNode[] ?? []
+// fetch JSON data from content dir
+const nodes = ref<TreeNode[]>([])
+useAsyncData('home', () => queryContent('/nodes').findOne()).then(({ data }) => {
+  nodes.value = data.value?.body as unknown as TreeNode[] ?? []
+})
 
 const columns = ref([
   { field: 'name', header: 'Name', expander: true },
@@ -12,6 +13,7 @@ const columns = ref([
   { field: 'type', header: 'Type' }
 ]);
 
+// interactive filter mode
 const filters = ref<any>({});
 const filterMode = ref<any>({});
 const filterOptions = ref([
