@@ -27,18 +27,19 @@ fi
 os-checker --help
 
 # handle ansi via ansi2html or ansi2txt
-apt install -y colorized-logs
+# apt install -y colorized-logs
 
 # prepare os-checker configuration file
-cp repos.yaml /check/
-cd /check
+# cp repos.yaml /check/
+# cd /check
 # Current dir: /check
 
-os-checker 2>&1 >summary.out
-echo '```text' >>summary.txt
-ansi2txt <summary.out >>summary.txt
-echo '```' >>summary.txt
+# os-checker 2>&1 >summary.out
+# echo '```text' >>summary.txt
+# ansi2txt <summary.out >>summary.txt
+# echo '```' >>summary.txt
 
+ls -alh && echo PWD = $PWD
 os-checker --emit test.json # to be moved into ci/os-checks/content
 
 # github pages dir
