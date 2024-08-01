@@ -5,7 +5,16 @@ import type { TreeNode } from 'primevue/treenode';
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
 useAsyncData('home', () => queryContent('/test').findOne()).then(({ data }) => {
-  nodes.value = data.value?.body as unknown as TreeNode[] ?? []
+  let value = data.value?.body as unknown as TreeNode[] ?? [];
+  // 展平单仓库单项目成一行数据
+  for (let i = 0; i < value.length; i++) {
+    let node = value[i];
+    if (node.children?.length === 1) {
+      node = node.children[0];
+      value[i] = node;
+    }
+  }
+  nodes.value = value
 })
 
 // FIXME: make fields/columns generated from nodes
