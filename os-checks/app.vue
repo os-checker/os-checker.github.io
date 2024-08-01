@@ -9,9 +9,19 @@ useAsyncData('home', () => queryContent('/test').findOne()).then(({ data }) => {
   // 展平单仓库单项目成一行数据
   for (let i = 0; i < value.length; i++) {
     let node = value[i];
-    if (node.children?.length === 1) {
+    if (!node.children) {
+      continue;
+    }
+    if (node.children.length === 1) {
       node = node.children[0];
       value[i] = node;
+      continue;
+    }
+    for (let i = 0; i < node.children.length; i++) {
+      if (node.children[i].data.total_count === 0) {
+        // 当总计为 0，不要显示 0
+        node.children[i].data.total_count = null;
+      }
     }
   }
   nodes.value = value
