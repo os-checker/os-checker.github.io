@@ -55,7 +55,8 @@ const onToggle = (val: any) => {
 
 <template>
 
-  <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filterMode="filterMode.value" :filters="filters">
+  <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filterMode="filterMode.value" :filters="filters"
+    removableSort sortMode="multiple">
 
     <template #header>
       <div class="container">
@@ -77,7 +78,7 @@ const onToggle = (val: any) => {
       </div>
     </template>
 
-    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" :expander="col.expander">
+    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" :expander="col.expander" sortable>
       <template #filter>
         <InputText v-if="filterHeaders.includes(col.field)" v-model="filters[col.field]" type="text"
           :placeholder="`Filter by ${col.field}`" />
