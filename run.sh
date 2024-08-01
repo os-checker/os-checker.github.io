@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cat $HOME/.bashrc
+source $HOME/.bashrc
 
 # Current dir: /ci
 echo PWD=$PWD && ls -alh
