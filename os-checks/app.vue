@@ -13,11 +13,11 @@ const columns = ref([
   { field: 'user', header: 'User', expander: true },
   { field: 'repo', header: 'Repo' },
   { field: 'package', header: 'Package' },
-  { field: 'total_count', header: 'Total Count' },
+  { field: 'total_count', header: '报告数量' },
   { field: 'Clippy(Error)', header: 'Clippy(Error)' },
   { field: 'Clippy(Warn)', header: 'Clippy(Warn)' },
   { field: 'Unformatted(File)', header: 'Unformatted(File)' },
-  { field: 'Unformatted(Line)', header: 'Unformatted(Line)' },
+  // { field: 'Unformatted(Line)', header: 'Unformatted(Line)' },
 ]);
 
 // interactive filter mode
