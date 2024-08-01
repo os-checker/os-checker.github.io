@@ -14,10 +14,9 @@ const columns = ref([
   { field: 'repo', header: 'Repo' },
   { field: 'package', header: 'Package' },
   { field: 'total_count', header: '报告数量' },
-  { field: 'Clippy(Error)', header: 'Clippy(Error)' },
-  { field: 'Clippy(Warn)', header: 'Clippy(Warn)' },
-  { field: 'Unformatted(File)', header: 'Unformatted(File)' },
-  // { field: 'Unformatted(Line)', header: 'Unformatted(Line)' },
+  { field: 'Clippy(Error)', header: 'Clippy(Errors)' },
+  { field: 'Clippy(Warn)', header: 'Clippy(Warns)' },
+  { field: 'Unformatted(File)', header: '未格式化' },
 ]);
 
 // interactive filter mode
@@ -28,7 +27,7 @@ const filterOptions = ref([
   { label: 'Strict', value: 'strict' }
 ]);
 
-const selectedColumns = ref(columns.value.slice(0, 4));
+const selectedColumns = ref(columns.value);
 const onToggle = (val: any) => {
   selectedColumns.value = columns.value.filter(col => val.includes(col));
 };
