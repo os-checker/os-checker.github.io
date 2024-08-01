@@ -3,3 +3,15 @@ os-checker/os-checker-test-suite:
 
 arceos-org/arceos:
   all: true
+
+kern-crates/CSpace:
+  all: true
+
+elliott10/e1000-driver:
+  all: true
+
+kern-crates/ByteOS:
+  all: true
+
+shilei-massclouds/axdtb:
+  all: true
