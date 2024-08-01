@@ -26,6 +26,7 @@ const filterOptions = ref([
   { label: 'Lenient', value: 'lenient' },
   { label: 'Strict', value: 'strict' }
 ]);
+const filterHeaders = ['user', 'repo', 'package'] // 只对非数值列筛选
 
 const selectedColumns = ref(columns.value);
 const onToggle = (val: any) => {
@@ -59,7 +60,8 @@ const onToggle = (val: any) => {
 
     <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" :expander="col.expander">
       <template #filter>
-        <InputText v-model="filters[col.field]" type="text" :placeholder="`Filter by ${col.field}`" />
+        <InputText v-if="filterHeaders.includes(col.field)" v-model="filters[col.field]" type="text"
+          :placeholder="`Filter by ${col.field}`" />
       </template>
     </Column>
 
