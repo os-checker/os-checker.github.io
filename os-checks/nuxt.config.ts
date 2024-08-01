@@ -4,7 +4,7 @@ import Aura from '@primevue/themes/aura';
 export default defineNuxtConfig({
   compatibilityDate: '2024-07-30',
   app: {
-    baseURL: '/ci/',
+    // baseURL: '/ci/',
     head: { link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }] }
   },
   devtools: { enabled: true },
