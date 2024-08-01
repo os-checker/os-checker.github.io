@@ -15,8 +15,9 @@ FROM node:lts
 # 下载最新的 nightly Rust 工具链
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y && \
     rustup toolchain install nightly --allow-downgrade --profile minimal --component rustfmt,clippy,miri
-WORKDIR /
-CMD wget https://raw.githubusercontent.com/os-checker/ci/main/run.sh && ./run.sh
+COPY . /ci
+WORKDIR /ci
+CMD ["./run.sh"]
     
 # 把 os-checks 目录的内容展平到 /os-checks 下
 # 注意：这里不能指定为 /check，貌似因为它已经是挂载卷，如果现在复制文件过去，容器运行后该 

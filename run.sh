@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Current dir: /.../ci
-git clone https://github.com/os-checker/ci.git
-cd ci
 CI_dir=$PWD
 echo CI_dir in docker is $CI_dir
 
