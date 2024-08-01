@@ -6,9 +6,6 @@ source $HOME/.bashrc
 # Current dir: /ci
 echo PWD=$PWD && ls -alh
 
-# build & run Rust project
-cargo r --release
-
 # install latest os-checker
 echo "DEBUG=$DEBUG"
 if [[ "$DEBUG" == 1 ]]; then
