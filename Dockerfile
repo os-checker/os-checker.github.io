@@ -14,7 +14,8 @@
 FROM node:lts
 # 下载最新的 nightly Rust 工具链
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y && \
-    . "$HOME/.cargo/env" && \
+    cat $HOME/.bashrc && \
+    echo '. "$HOME/.cargo/env"' >> "$HOME/.bashrc" && . "$HOME/.cargo/env" && \
     rustup toolchain install nightly --allow-downgrade --profile minimal --component rustfmt,clippy,miri
 COPY . /ci
 WORKDIR /ci

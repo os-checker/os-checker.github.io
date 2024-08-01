@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# Current dir: /.../ci
-CI_dir=$PWD
-echo CI_dir in docker is $CI_dir
+cat $HOME/.bashrc
+
+# Current dir: /ci
+echo PWD=$PWD && ls -alh
 
 # build & run Rust project
 cargo r --release
