@@ -78,7 +78,7 @@ const toggleDarkMode = () => darkMode.value = !darkMode.value;
           <span style="display: inline-block;">
             <IconField>
               <InputIcon class="pi pi-search" />
-              <InputText placeholder="Global Search" />
+              <InputText v-model="filters['global']" placeholder="Global Search" />
             </IconField>
           </span>
 
