@@ -11,7 +11,10 @@ export default defineNuxtConfig({
   modules: ["@nuxt/content", "@primevue/nuxt-module"],
   primevue: {
     options: {
-      theme: { preset: Aura }
+      theme: {
+        preset: Aura,
+        options: { darkModeSelector: '.my-app-dark' },
+      },
     }
   },
   css: ["primeicons/primeicons.css", "~/assets/style.css"],

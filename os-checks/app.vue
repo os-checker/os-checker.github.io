@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import MultiSelect from 'primevue/multiselect';
 import type { TreeNode } from 'primevue/treenode';
 
 // fetch JSON data from content dir
@@ -27,7 +26,7 @@ useAsyncData('home', () => queryContent('/test').findOne()).then(({ data }) => {
   nodes.value = value
 })
 
-// FIXME: make fields/columns generated from nodes
+// TODO: make fields/columns generated from nodes
 const columns = ref([
   { field: 'user', header: 'User', expander: true },
   { field: 'repo', header: 'Repo' },
@@ -47,9 +46,23 @@ const selectedColumns = ref(columns.value);
 const onToggle = (val: any) => {
   selectedColumns.value = columns.value.filter(col => val.includes(col));
 };
+
+// Toggle light vs dark theme.
+const darkMode = ref(false);
+watch(() => darkMode.value, () => {
+  document.querySelector('html')?.classList.toggle('my-app-dark', darkMode.value);
+  console.log(darkMode.value);
+});
+function toggleDarkMode() {
+  darkMode.value = !darkMode.value;
+}
 </script>
 
 <template>
+
+  <div>
+    <Button @click="toggleDarkMode">{{ darkMode ? 'Light Mode' : 'Dark Mode' }}</Button>
+  </div>
 
   <TreeTable :value="nodes" tableStyle="min-width: 50rem" removableSort sortMode="multiple">
 
@@ -78,5 +91,6 @@ const onToggle = (val: any) => {
     </Column>
 
   </TreeTable>
+
 
 </template>
