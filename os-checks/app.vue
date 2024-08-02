@@ -49,35 +49,14 @@ const onToggle = (val: any) => {
 
 // Toggle light vs dark theme.
 const { $darkMode } = useNuxtApp();
-// function getDarkMode() {
-//   return $darkMode?.get() || false;
-//   // if (import.meta.browser) {
-//   //   return localStorage.getItem("darkMode") ? true : false;
-//   // } else {
-//   //   return true
-//   // }
-// }
-// function setDarkMode(dark: boolean) {
-//   if (dark) {
-//     $darkMode.set(dark);
-//   }
-//   // if (import.meta.browser && dark) {
-//   //   localStorage.setItem("darkMode", "1");
-//   // }
-// }
-// function toggleDarkModeClass(dark: boolean) {
-//   $darkMode.toggle(dark);
-// document.querySelector("html")?.classList.toggle("my-app-dark", dark);
-// }
+const darkMode = ref($darkMode?.init || false);
+watch(darkMode, (dark) => {
+  $darkMode.toggle(dark);
+  $darkMode.store(dark); // Store dark theme locally
+});
 function toggleDarkMode() {
   darkMode.value = !darkMode.value;
 }
-const darkMode = ref($darkMode?.get() || false);
-watch(darkMode, (dark) => {
-  $darkMode.toggle(dark);
-  // Store dark theme locally
-  $darkMode.store(dark);
-});
 </script>
 
 <template>
@@ -92,9 +71,11 @@ watch(darkMode, (dark) => {
         </div>
         <div class="right-to-left">
 
-          <span style="margin-right: 0.8rem;">
-            <Button @click="toggleDarkMode" :icon="darkMode ? 'pi pi-sun' : 'pi pi-moon'" severity="contrast" />
-          </span>
+          <ClientOnly>
+            <span style="margin-right: 0.8rem;">
+              <Button @click="toggleDarkMode" severity="contrast" :icon="darkMode ? 'pi pi-sun' : 'pi pi-moon'" />
+            </span>
+          </ClientOnly>
 
           <span style="display: inline-block;">
             <IconField>
@@ -102,6 +83,7 @@ watch(darkMode, (dark) => {
               <InputText placeholder="Global Search" />
             </IconField>
           </span>
+
         </div>
       </div>
     </template>
