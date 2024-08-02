@@ -38,14 +38,10 @@ const columns = ref([
   { field: 'Unformatted(File)', header: '未格式化' },
 ]);
 
-// interactive filter mode
-const filters = ref<any>({});
-const filterMode = ref<any>({});
-const filterOptions = ref([
-  { label: 'Lenient', value: 'lenient' },
-  { label: 'Strict', value: 'strict' }
-]);
-const filterHeaders = ['user', 'repo', 'package'] // 只对非数值列筛选
+// interactive filter
+const filterHeaderInputs = ref<any>({});
+// 只对非数值列筛选
+const filterHeaders = ['user', 'repo', 'package']
 
 const selectedColumns = ref(columns.value);
 const onToggle = (val: any) => {
@@ -55,8 +51,7 @@ const onToggle = (val: any) => {
 
 <template>
 
-  <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filterMode="filterMode.value" :filters="filters"
-    removableSort sortMode="multiple">
+  <TreeTable :value="nodes" tableStyle="min-width: 50rem" removableSort sortMode="multiple">
 
     <template #header>
       <div class="container">
@@ -65,13 +60,10 @@ const onToggle = (val: any) => {
             optionLabel="header" class="w-full sm:w-64" display="chip" />
         </div>
         <div class="right-to-left">
-          <span style="margin-right: 1rem;">
-            <Select v-model="filterMode" :options="filterOptions" optionLabel="label" placeholder="搜索/筛选模式" />
-          </span>
           <span style="display: inline-block;">
             <IconField>
               <InputIcon class="pi pi-search" />
-              <InputText v-model="filters.global" placeholder="Global Search" />
+              <InputText placeholder="Global Search" />
             </IconField>
           </span>
         </div>
@@ -80,7 +72,7 @@ const onToggle = (val: any) => {
 
     <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" :expander="col.expander" sortable>
       <template #filter>
-        <InputText v-if="filterHeaders.includes(col.field)" v-model="filters[col.field]" type="text"
+        <InputText v-if="filterHeaders.includes(col.field)" v-model="filterHeaderInputs[col.field]" type="text"
           :placeholder="`Filter by ${col.field}`" />
       </template>
     </Column>
