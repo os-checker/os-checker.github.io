@@ -49,9 +49,8 @@ const onToggle = (val: any) => {
 
 // Toggle light vs dark theme.
 const darkMode = ref(false);
-watch(() => darkMode.value, () => {
+watch(darkMode, () => {
   document.querySelector('html')?.classList.toggle('my-app-dark', darkMode.value);
-  console.log(darkMode.value);
 });
 function toggleDarkMode() {
   darkMode.value = !darkMode.value;
@@ -60,9 +59,6 @@ function toggleDarkMode() {
 
 <template>
 
-  <div>
-    <Button @click="toggleDarkMode">{{ darkMode ? 'Light Mode' : 'Dark Mode' }}</Button>
-  </div>
 
   <TreeTable :value="nodes" tableStyle="min-width: 50rem" removableSort sortMode="multiple">
 
@@ -73,6 +69,11 @@ function toggleDarkMode() {
             optionLabel="header" class="w-full sm:w-64" display="chip" />
         </div>
         <div class="right-to-left">
+
+          <span style="margin-right: 0.8rem;">
+            <Button @click="toggleDarkMode" :icon="darkMode ? 'pi pi-sun' : 'pi pi-moon'" severity="contrast" />
+          </span>
+
           <span style="display: inline-block;">
             <IconField>
               <InputIcon class="pi pi-search" />
