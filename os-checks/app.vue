@@ -37,8 +37,8 @@ const columns = ref([
   { field: 'Unformatted(File)', header: '未格式化' },
 ]);
 
-// interactive filter
-const filterHeaderInputs = ref<any>({});
+// interactive filter inputs
+const filters = ref<any>({});
 // 只对非数值列筛选
 const filterHeaders = ['user', 'repo', 'package']
 
@@ -54,14 +54,12 @@ watch(darkMode, (dark) => {
   $darkMode.toggle(dark);
   $darkMode.store(dark); // Store dark theme locally
 });
-function toggleDarkMode() {
-  darkMode.value = !darkMode.value;
-}
+const toggleDarkMode = () => darkMode.value = !darkMode.value;
 </script>
 
 <template>
 
-  <TreeTable :value="nodes" tableStyle="min-width: 50rem" removableSort sortMode="multiple">
+  <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple">
 
     <template #header>
       <div class="container">
@@ -90,7 +88,7 @@ function toggleDarkMode() {
 
     <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" :expander="col.expander" sortable>
       <template #filter>
-        <InputText v-if="filterHeaders.includes(col.field)" v-model="filterHeaderInputs[col.field]" type="text"
+        <InputText v-if="filterHeaders.includes(col.field)" v-model="filters[col.field]" type="text"
           :placeholder="`Filter by ${col.field}`" />
       </template>
     </Column>
