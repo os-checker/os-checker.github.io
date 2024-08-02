@@ -1,4 +1,4 @@
-# os-checker WebUI
+# os-checker Docker
 
 [![Docker Image CI](https://github.com/os-checker/os-checker.github.io/actions/workflows/docker.yml/badge.svg)](https://github.com/os-checker/os-checker.github.io/actions/workflows/docker.yml)
 
@@ -15,3 +15,13 @@ Docker 部署成静态网页。
 
 说明：该 Dockerfile 已经制作了镜像，你可以直接拉取 [`zjpzjp/os-checker:latest`](https://hub.docker.com/repository/docker/zjpzjp/os-checker)
 使用，而无需本仓库。
+
+# os-checker WebUI
+
+树状表格的已实现的功能：
+* 指定列显示/不显示
+* 表格内容搜索：
+  * 按列搜索（仅支持从第一个字符开始）
+  * 全局搜索（支持任何字符开始，范围为所有列）
+  * 复合搜索：可同时使用上述搜索方式
+* [多列排序](https://github.com/os-checker/os-checker.github.io/issues/6)
