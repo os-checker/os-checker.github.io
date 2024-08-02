@@ -48,17 +48,39 @@ const onToggle = (val: any) => {
 };
 
 // Toggle light vs dark theme.
-const darkMode = ref(false);
-watch(darkMode, () => {
-  document.querySelector('html')?.classList.toggle('my-app-dark', darkMode.value);
-});
+const { $darkMode } = useNuxtApp();
+// function getDarkMode() {
+//   return $darkMode?.get() || false;
+//   // if (import.meta.browser) {
+//   //   return localStorage.getItem("darkMode") ? true : false;
+//   // } else {
+//   //   return true
+//   // }
+// }
+// function setDarkMode(dark: boolean) {
+//   if (dark) {
+//     $darkMode.set(dark);
+//   }
+//   // if (import.meta.browser && dark) {
+//   //   localStorage.setItem("darkMode", "1");
+//   // }
+// }
+// function toggleDarkModeClass(dark: boolean) {
+//   $darkMode.toggle(dark);
+// document.querySelector("html")?.classList.toggle("my-app-dark", dark);
+// }
 function toggleDarkMode() {
   darkMode.value = !darkMode.value;
 }
+const darkMode = ref($darkMode?.get() || false);
+watch(darkMode, (dark) => {
+  $darkMode.toggle(dark);
+  // Store dark theme locally
+  $darkMode.store(dark);
+});
 </script>
 
 <template>
-
 
   <TreeTable :value="nodes" tableStyle="min-width: 50rem" removableSort sortMode="multiple">
 
