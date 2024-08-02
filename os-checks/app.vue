@@ -49,7 +49,7 @@ const onToggle = (val: any) => {
 
 // Toggle light vs dark theme.
 const { $darkMode } = useNuxtApp();
-const darkMode = ref($darkMode?.init || false);
+const darkMode = $darkMode?.init || ref(false);
 watch(darkMode, (dark) => {
   $darkMode.toggle(dark);
   $darkMode.store(dark); // Store dark theme locally

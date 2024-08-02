@@ -22,16 +22,20 @@ function toggle(dark: boolean) {
   document.querySelector("html")?.classList.toggle("my-app-dark", dark);
 }
 
-const loaded = load();
+const loaded = ref(load());
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.hook('app:beforeMount', () => {
     // 监听系统/浏览器明暗变化
     window
       .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', (event) => toggle(event.matches));
+      .addEventListener('change', (event) => {
+        const dark = event.matches;
+        loaded.value = dark;
+        toggle(dark);
+      });
 
-    toggle(loaded);
+    toggle(loaded.value);
   });
   return {
     provide: {
