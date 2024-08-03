@@ -59,7 +59,8 @@ const toggleDarkMode = () => darkMode.value = !darkMode.value;
 
 <template>
 
-  <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple">
+  <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
+    scrollable>
 
     <template #header>
       <div class="container">
