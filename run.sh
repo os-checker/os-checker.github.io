@@ -41,7 +41,14 @@ os-checker --help
 # ls -alh && echo PWD = $PWD
 os-checker --emit os-checks/content/test.json # to be moved into ci/os-checks/content
 
+# /check 目录在 github action 和 Docker 容器之间共享
+
+# 将 test.json 从容器提交到仓库
+cp os-checks/content/test.json /check/test.json
+
 # github pages dir
 # mkdir /check/.gh-pages
 # ansi2html <summary.out >/check/.gh-pages/index.html
+
+# 构建网页应用，并从容器移至 Github Action 目录，待部署到 Github Pages
 cd os-checks && npm install && npm run generate && cp -LR dist /check/
