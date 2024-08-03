@@ -53,6 +53,7 @@ jobs:
     - name: Commit and push test.json
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TEST_JSON: os-checks/content/test.json # 本仓库的 json 数据路径
       run: |
         git config user.name "zjp-CN"
         git config user.email "jiping_zhou@foxmail.com"
@@ -60,10 +61,17 @@ jobs:
         git config committer.email "zjp-CN[bot]@users.noreply.github.com"
         # echo "The head commit message is: ${{ github.event.head_commit.message }}" > commit.txt
         # git add commit.txt
-        cp /check/test.json os-checks/content/test.json
-        git add os-checks/content/test.json
-        git commit -m "[bot] update os-checks/content/test.json"
-        git push 
+        cp /check/test.json ${{ TEST_JSON }}
+        # 注意：如果检查结果和上次一样，那么无法提交（也不应该提交）
+        # 检查是否有未暂存的更改
+        if git status --porcelain | grep -q '${{ TEST_JSON }}'; then
+            echo "添加 ${{ TEST_JSON }} 到暂存并提交。"
+            git add ${{ TEST_JSON }}
+            git commit -m "[bot] update os-checks/content/test.json"
+            git push 
+        else
+           echo "工作目录干净，无需提交 ${{ TEST_JSON }}。"
+        fi
 
   # Deploy job
   deploy:
