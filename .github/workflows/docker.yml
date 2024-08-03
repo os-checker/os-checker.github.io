@@ -53,7 +53,8 @@ jobs:
     - name: Commit and push test.json
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TEST_JSON: os-checks/content/test.json # 本仓库的 json 数据路径
+        # 本仓库的 json 数据路径
+        TEST_JSON: os-checks/content/test.json
       run: |
         git config user.name "zjp-CN"
         git config user.email "jiping_zhou@foxmail.com"
