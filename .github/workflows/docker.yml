@@ -63,7 +63,7 @@ jobs:
         cp /check/test.json os-checks/content/test.json
         git add os-checks/content/test.json
         git commit -m "[bot] update os-checks/content/test.json"
-        git push origin main
+        git push 
 
   # Deploy job
   deploy:
