@@ -1,1 +1,3 @@
-The head commit message is: fix(ci): typo txt file name to be committed
+The head commit message is: fix(ci): distinguish user and commiter
+
+to see username authored and username[bot]
