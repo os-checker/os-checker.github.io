@@ -15,11 +15,6 @@ jobs:
     steps:  
     - uses: actions/checkout@v4  
       
-    # - name: Build the Docker image  
-    #   run: |
-    #     docker build -t rust-hi . 
-    #     docker run rust-hi
-
     # Create and boot a builder using by default the docker-container driver.
     # This is not required but recommended using it to be able to build multi-platform images, export cache, etc.
     - name: Set up Docker Buildx
