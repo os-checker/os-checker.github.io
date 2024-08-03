@@ -57,7 +57,7 @@ jobs:
         git config user.name "zjp-CN[bot]"
         git config user.email "zjp-CN[bot]@users.noreply.github.com"
         echo "The head commit message is: ${{ github.event.head_commit.message }}" > commit.txt
-        git add hello.txt
+        git add commit.txt
         git commit -m "test: push a commit.txt via github action"
         git push origin main
 
