@@ -26,26 +26,19 @@ useAsyncData('home', () => queryContent('/test').findOne()).then(({ data }) => {
   nodes.value = value
 })
 
-// TODO: make fields/columns generated from nodes
-const columns = ref([
-  { field: 'user', header: 'User', expander: true },
-  { field: 'repo', header: 'Repo' },
-  { field: 'package', header: 'Package' },
+const dataColumns = ref([
   { field: 'total_count', header: '报告数量' },
   { field: 'Clippy(Error)', header: 'Clippy(Errors)' },
   { field: 'Clippy(Warn)', header: 'Clippy(Warns)' },
   { field: 'Unformatted(File)', header: '未格式化' },
 ]);
 
-// interactive filter inputs
+// interactive filter/search inputs
 const filters = ref<any>({});
-// 只对非数值列筛选
-const filterHeaders = ['user', 'repo', 'package']
 
-const selectedColumns = ref(columns.value);
-const onToggle = (val: any) => {
-  selectedColumns.value = columns.value.filter(col => val.includes(col));
-};
+// pick data columns
+const selectedColumns = ref(dataColumns.value);
+const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
 
 // Toggle light vs dark theme.
 const { $darkMode } = useNuxtApp();
@@ -65,7 +58,7 @@ const toggleDarkMode = () => darkMode.value = !darkMode.value;
     <template #header>
       <div class="container">
         <div class="left-to-right">
-          <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="columns"
+          <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="dataColumns"
             optionLabel="header" class="w-full sm:w-64" display="chip" />
         </div>
         <div class="right-to-left">
@@ -87,12 +80,25 @@ const toggleDarkMode = () => darkMode.value = !darkMode.value;
       </div>
     </template>
 
-    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" :expander="col.expander" sortable>
+    <Column field="user" header="User" expander sortable>
       <template #filter>
-        <InputText v-if="filterHeaders.includes(col.field)" v-model="filters[col.field]" type="text"
-          :placeholder="`Filter by ${col.field}`" />
+        <InputText v-model="filters.user" type="text" :placeholder="`Filter by user`" />
       </template>
     </Column>
+
+    <Column field="repo" header="Repo" sortable>
+      <template #filter>
+        <InputText v-model="filters.repo" type="text" :placeholder="`Filter by repo`" />
+      </template>
+    </Column>
+
+    <Column field="package" header="Package" sortable>
+      <template #filter>
+        <InputText v-model="filters.package" type="text" :placeholder="`Filter by package`" />
+      </template>
+    </Column>
+
+    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable />
 
   </TreeTable>
 
