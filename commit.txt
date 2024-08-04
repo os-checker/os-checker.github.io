@@ -1,3 +1,0 @@
-The head commit message is: fix(ci): distinguish user and commiter
-
-to see username authored and username[bot]

@@ -56,12 +56,11 @@ jobs:
         # 本仓库的 json 数据路径
         TEST_JSON: os-checks/content/test.json
       run: |
+        # author zjp-CN, and commiter bot
         git config user.name "zjp-CN"
         git config user.email "jiping_zhou@foxmail.com"
         git config committer.name "zjp-CN[bot]"
         git config committer.email "zjp-CN[bot]@users.noreply.github.com"
-        # echo "The head commit message is: ${{ github.event.head_commit.message }}" > commit.txt
-        # git add commit.txt
         cp /check/test.json ${{ env.TEST_JSON }}
         # 注意：如果检查结果和上次一样，那么无法提交（也不应该提交）
         # 检查是否有未暂存的更改
