@@ -48,12 +48,15 @@ watch(darkMode, (dark) => {
   $darkMode.store(dark); // Store dark theme locally
 });
 const toggleDarkMode = () => darkMode.value = !darkMode.value;
+
+// a single selected row
+const selectedKey = ref();
 </script>
 
 <template>
 
   <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
-    scrollable scrollHeight="800px">
+    scrollable scrollHeight="800px" v-model:selectionKeys="selectedKey" selectionMode="single">
 
     <template #header>
       <div class="container">
@@ -90,6 +93,12 @@ const toggleDarkMode = () => darkMode.value = !darkMode.value;
       <template #filter>
         <InputText v-model="filters.repo" type="text" :placeholder="`Filter by repo`" />
       </template>
+
+      <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
+      <!-- TODO: 自定义样式或者内容 -->
+      <!-- <template #body="{ node: { data } }"> -->
+      <!--   <Button :label="data.repo" text /> -->
+      <!-- </template> -->
     </Column>
 
     <Column field="package" header="Package" sortable>
