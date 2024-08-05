@@ -3,8 +3,8 @@ import type { TreeNode } from 'primevue/treenode';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
-useAsyncData('home', () => queryContent('/test').findOne()).then(({ data }) => {
-  let value = data.value?.body as unknown as TreeNode[] ?? [];
+useAsyncData('test', () => queryContent('/test').findOne()).then(({ data }) => {
+  const value = data.value?.body as unknown as TreeNode[] ?? [];
   // 展平单仓库单项目成一行数据
   for (let i = 0; i < value.length; i++) {
     let node = value[i];
@@ -25,6 +25,13 @@ useAsyncData('home', () => queryContent('/test').findOne()).then(({ data }) => {
   }
   nodes.value = value
 })
+
+const raw_reports = ref<TreeNode[]>([])
+useAsyncData('raw_reports', () => queryContent('/test_raw_reports').findOne()).then(({ data }) => {
+  const value = data.value?.body as unknown as TreeNode[] ?? [];
+  raw_reports.value = value;
+  // console.log(`${JSON.stringify(value)}`);
+});
 
 const dataColumns = ref([
   { field: 'total_count', header: '报告数量' },
