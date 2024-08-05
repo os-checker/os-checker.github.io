@@ -45,6 +45,7 @@ os-checker --emit os-checks/content/test.json # to be moved into ci/os-checks/co
 
 # 将 test.json 从容器提交到仓库
 cp os-checks/content/test.json /check/test.json
+cp os-checks/content/test_raw_reports.json /check/test_raw_reports.json
 
 # github pages dir
 # mkdir /check/.gh-pages
