@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxt/content": "^2.13.2",
     "@primevue/themes": "^4.0.2",
+    "highlight.js": "^11.10.0",
     "nuxt": "latest",
     "primeicons": "^7.0.0",
     "primevue": "^4.0.2",
