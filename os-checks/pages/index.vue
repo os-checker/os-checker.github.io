@@ -3,28 +3,29 @@ import type { TreeNode } from 'primevue/treenode';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
-useAsyncData('test', () => queryContent('/test').findOne()).then(({ data }) => {
-  const value = data.value?.body as unknown as TreeNode[] ?? [];
-  // 展平单仓库单项目成一行数据
-  for (let i = 0; i < value.length; i++) {
-    let node = value[i];
-    if (!node.children) {
-      continue;
-    }
-    if (node.children.length === 1) {
-      node = node.children[0];
-      value[i] = node;
-      continue;
-    }
-    for (let i = 0; i < node.children.length; i++) {
-      if (node.children[i].data.total_count === 0) {
-        // 当总计为 0，不要显示 0
-        node.children[i].data.total_count = null;
+githubFetch({ branch: "raw-reports", path: "os-checks/content/test.json" })
+  .then(({ data }) => {
+    const value = data.value as TreeNode[] ?? [];
+    // 展平单仓库单项目成一行数据
+    for (let i = 0; i < value.length; i++) {
+      let node = value[i];
+      if (!node.children) {
+        continue;
+      }
+      if (node.children.length === 1) {
+        node = node.children[0];
+        value[i] = node;
+        continue;
+      }
+      for (let i = 0; i < node.children.length; i++) {
+        if (node.children[i].data.total_count === 0) {
+          // 当总计为 0，不要显示 0
+          node.children[i].data.total_count = null;
+        }
       }
     }
-  }
-  nodes.value = value
-})
+    nodes.value = value
+  })
 
 const dataColumns = ref([
   { field: 'total_count', header: '报告数量' },

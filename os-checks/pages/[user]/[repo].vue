@@ -3,9 +3,8 @@
 import highlightRust from '~/composables/highlight-rust';
 
 const raw_reports = ref<any>([]);
-// const url = "/test_raw_reports.json";
 githubFetch({ branch: "raw-reports", path: "os-checks/public/test_raw_reports.json" })
-  .then((data) => raw_reports.value = data);
+  .then(({ data }) => raw_reports.value = data.value);
 
 highlightRust();
 
