@@ -26,13 +26,6 @@ useAsyncData('test', () => queryContent('/test').findOne()).then(({ data }) => {
   nodes.value = value
 })
 
-const raw_reports = ref<TreeNode[]>([])
-useAsyncData('raw_reports', () => queryContent('/test_raw_reports').findOne()).then(({ data }) => {
-  const value = data.value?.body as unknown as TreeNode[] ?? [];
-  raw_reports.value = value;
-  // console.log(`${JSON.stringify(value)}`);
-});
-
 const dataColumns = ref([
   { field: 'total_count', header: '报告数量' },
   { field: 'Clippy(Error)', header: 'Clippy(Errors)' },
