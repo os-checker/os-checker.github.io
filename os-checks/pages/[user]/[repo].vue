@@ -5,7 +5,12 @@ import highlightRust from '~/composables/highlight-rust';
 const raw_reports = ref<any>([]);
 // const url = "/test_raw_reports.json";
 const url = "https://raw.githubusercontent.com/os-checker/os-checker.github.io/ui/raw-reports/os-checks/public/test_raw_reports.json";
-$fetch(url).then((data) => {
+useFetch(url, {
+  // 构造简单请求来解决跨域问题（同时 github raw 资源支持所有源）
+  "headers": { "content-type": "text/plain" },
+  "body": null,
+  "method": "GET"
+}).then((data) => {
   raw_reports.value = data;
   // console.log(`${JSON.stringify(data)}`);
 });
