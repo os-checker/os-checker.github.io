@@ -4,22 +4,8 @@ import highlightRust from '~/composables/highlight-rust';
 
 const raw_reports = ref<any>([]);
 // const url = "/test_raw_reports.json";
-const url = "https://raw.githubusercontent.com/os-checker/os-checker.github.io/ui/raw-reports/os-checks/public/test_raw_reports.json";
-useFetch(url, {
-  // 构造简单请求来解决跨域问题（同时 github raw 资源支持所有源）
-  "headers": { "content-type": "text/plain" },
-  "body": null,
-  "method": "GET"
-}).then((data) => {
-  raw_reports.value = data;
-  // console.log(`${JSON.stringify(data)}`);
-});
-// useAsyncData('raw_reports', () => queryContent('/test_raw_reports').findOne()).then(({ data }) => {
-//   const value = data.value;
-//   // const value = data.value?.body as unknown as TreeNode[] ?? [];
-//   raw_reports.value = value;
-//   console.log(`raw_reports=${JSON.stringify(value)}`);
-// });
+githubFetch({ branch: "raw-reports", path: "os-checks/public/test_raw_reports.json" })
+  .then((data) => raw_reports.value = data);
 
 highlightRust();
 
