@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
+import highlightRust from '~/composables/highlight-rust';
 
 const raw_reports = ref<TreeNode[]>([])
 useAsyncData('raw_reports', () => queryContent('/test_raw_reports').findOne()).then(({ data }) => {
@@ -7,10 +8,39 @@ useAsyncData('raw_reports', () => queryContent('/test_raw_reports').findOne()).t
   raw_reports.value = value;
   // console.log(`${JSON.stringify(value)}`);
 });
+
+highlightRust();
+
+const code = ref(`diff --git a/file1 b/file2
+index 0123456..7890123 100644
+--- a/file1
++++ b/file2
+@@ -1,3 +1,3 @@
+-Original line
++Modified line`);
 </script>
 
 
 <template>
+
+  <ScrollPanel style="width: 100%; height: 200px" :dt="{
+    bar: {
+      background: '{primary.color}'
+    }
+  }">
+    <pre><code class="language-rust">
+        fn main() { println!("Hello, world!"); }
+        fn main() { println!("Hello, world!"); }
+        fn main() { println!("Hello, world!"); }
+        fn main() { println!("Hello, world!"); }
+        fn main() { println!("Hello, world!"); }
+      </code></pre>
+
+    <pre><code class="language-diff">{{ code }}
+      </code></pre>
+
+  </ScrollPanel>
+
   <nav>
     <NuxtLink to="/">Go Home</NuxtLink>
   </nav>
@@ -63,7 +93,6 @@ useAsyncData('raw_reports', () => queryContent('/test_raw_reports').findOne()).t
       </TabPanel>
     </TabPanels>
   </Tabs>
-
 
 
 </template>
