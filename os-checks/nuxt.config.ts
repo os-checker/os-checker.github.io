@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     head: { link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }] }
   },
   devtools: { enabled: true },
-  modules: ["@nuxt/content", "@primevue/nuxt-module"],
+  modules: ["@primevue/nuxt-module"],
   primevue: {
     options: {
       theme: {

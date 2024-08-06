@@ -10,7 +10,6 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxt/content": "^2.13.2",
     "@primevue/themes": "^4.0.4",
     "highlight.js": "^11.10.0",
     "nuxt": "latest",

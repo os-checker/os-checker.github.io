@@ -5,7 +5,7 @@ import type { TreeNode } from 'primevue/treenode';
 const nodes = ref<TreeNode[]>([])
 githubFetch({ branch: "raw-reports", path: "os-checks/content/test.json" })
   .then(({ data }) => {
-    const value = data.value as TreeNode[] ?? [];
+    const value = JSON.parse(data.value as string) as TreeNode[];
     // 展平单仓库单项目成一行数据
     for (let i = 0; i < value.length; i++) {
       let node = value[i];

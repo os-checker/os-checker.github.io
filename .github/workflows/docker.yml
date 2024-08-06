@@ -54,7 +54,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # 本仓库的 json 数据路径
-        TEST_JSON: os-checks/content/test.json
+        TEST_JSON: os-checks/public/test.json
         TEST_RAW_REPORTS_JSON: os-checks/public/test_raw_reports.json
       run: |
         # author zjp-CN, and commiter bot
