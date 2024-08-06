@@ -3,8 +3,8 @@
 import highlightRust from '~/composables/highlight-rust';
 
 const raw_reports = ref<any>([]);
-const url = "/test_raw_reports.json";
-// const url = "https://github.com/os-checker/os-checker.github.io/raw/ui/raw-reports/os-checks/content/test_raw_reports.json";
+// const url = "/test_raw_reports.json";
+const url = "https://github.com/os-checker/os-checker.github.io/raw/ui/raw-reports/os-checks/content/test_raw_reports.json";
 $fetch(url).then((data) => {
   raw_reports.value = data;
   // console.log(`${JSON.stringify(data)}`);
