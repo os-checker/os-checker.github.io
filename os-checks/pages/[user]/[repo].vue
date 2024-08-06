@@ -1,25 +1,28 @@
 <script setup lang="ts">
-import type { TreeNode } from 'primevue/treenode';
+// import type { TreeNode } from 'primevue/treenode';
 import highlightRust from '~/composables/highlight-rust';
 
-const raw_reports = ref<TreeNode[]>([])
-useAsyncData('raw_reports', () => queryContent('/test_raw_reports').findOne()).then(({ data }) => {
-  const value = data.value?.body as unknown as TreeNode[] ?? [];
-  raw_reports.value = value;
-  // console.log(`${JSON.stringify(value)}`);
+const raw_reports = ref<any>([]);
+const url = "/test_raw_reports.json";
+// const url = "https://github.com/os-checker/os-checker.github.io/raw/ui/raw-reports/os-checks/content/test_raw_reports.json";
+$fetch(url).then((data) => {
+  raw_reports.value = data;
+  // console.log(`${JSON.stringify(data)}`);
 });
+// useAsyncData('raw_reports', () => queryContent('/test_raw_reports').findOne()).then(({ data }) => {
+//   const value = data.value;
+//   // const value = data.value?.body as unknown as TreeNode[] ?? [];
+//   raw_reports.value = value;
+//   console.log(`raw_reports=${JSON.stringify(value)}`);
+// });
 
 highlightRust();
 
-const code = ref(`diff --git a/file1 b/file2
-index 0123456..7890123 100644
---- a/file1
-+++ b/file2
-@@ -1,3 +1,3 @@
+const code = ref(`
 -Original line
 +Modified line`);
-</script>
 
+</script>
 
 <template>
 
@@ -52,7 +55,8 @@ index 0123456..7890123 100644
       background: '{primary.color}'
     }
   }">
-    {{ raw_reports[0]?.[1]?.fmt }}
+    <!-- {{ raw_reports[0]?.[1]?.fmt }} -->
+    {{ raw_reports }}
   </ScrollPanel>
 
 
