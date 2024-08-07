@@ -20,18 +20,18 @@ const containerRef = ref(null);
 
 function highlight() {
   // 找到所有的code标签并进行高亮
-  const codeElements = containerRef.value?.querySelectorAll('.language-rust.codeblock');
+  const codeElements = containerRef.value?.querySelectorAll(`.language-${props.lang}.codeblock`);
   codeElements?.forEach((block) => {
     if (block.tagName === 'CODE') {
       hljs.highlightElement(block);
-      // console.log("hljs highlighted");
+      // console.log("hljs highlighted", props.lang);
     }
   });
 }
 
 // 侦听动态代码片段的内容变化
-watch(() => props.snippets, () => {
-  // console.log(val.length);
+watch(() => props.snippets, (_val) => {
+  // console.log(_val.length);
   // 等待DOM更新
   nextTick(highlight);
 }, { deep: true }); // 确保深度侦听数组内部的变化

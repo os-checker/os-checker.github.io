@@ -1,62 +1,92 @@
 <script setup lang="ts">
-// import type { TreeNode } from 'primevue/treenode';
+import DOMPurify from 'dompurify';
 
 highlightRust();
 
-const raw_reports = ref<any>([]);
+type RawReports = [number, { fmt: Clippy, clippy_warn: Clippy, clippy_error: Clippy }];
+
+const raw_reports = ref<RawReports[]>([]);
 githubFetch({ branch: "raw-reports", path: "os-checks/public/test_raw_reports.json" })
   .then(({ data }) => raw_reports.value = JSON.parse(data.value as string));
 
-const diffCode = ref([`aaa
--Original line
-+Modified line`]);
-
 type Clippy = { [key: string]: string[] };
 const clippyWarn = ref<string[]>([]);
+const clippyError = ref<string[]>([]);
+const fmt = ref<string[]>([]);
 watch(raw_reports, (reports) => {
+  fmt.value = ["-a\n+b"];
   clippyWarn.value = [];
-  const fmts = (reports[7]?.[1]?.clippy_warn) as Clippy;
-  for (const key in fmts) {
-    clippyWarn.value.push(...fmts[key]);
+  clippyError.value = [];
+
+  // 对 <>&"' 之类的符号进行转义，否则 highlightjs 出现 One of your code blocks
+  // includes unescaped HTML. This is a potentially serious security risk.
+  const f = (s: string) => DOMPurify.sanitize(s);
+
+  for (const report of reports) {
+    const fmts = report[1]?.fmt;
+    for (const file in fmts) {
+      fmt.value.push(...(fmts[file].map(f)));
+    }
+
+    const warns = report[1]?.clippy_warn;
+    for (const file in warns) {
+      clippyWarn.value.push(...(warns[file].map(f)));
+    }
+
+    const errors = report[1]?.clippy_error;
+    for (const file in errors) {
+      clippyError.value.push(...(errors[file].map(f)));
+    }
   }
-  clippyWarn.value.push(...diffCode.value);
 });
-
-
 </script>
 
 <template>
 
-  <ScrollPanel style="width: 100%; height: 400px" :dt="{
+  <ScrollPanel style="width: 100%; height: 200px" :dt="{
     bar: {
       background: '{primary.color}'
     }
   }">
 
-    <CodeBlock :snippets="diffCode" lang="diff" />
     <CodeBlock :snippets="clippyWarn" />
 
-    <pre><code class="language-rust">
-        fn main() { println!("Hello, world!"); }
-        fn main() { println!("Hello, world!"); }
-      </code></pre>
-
   </ScrollPanel>
 
-  <nav>
-    <NuxtLink to="/">Go Home</NuxtLink>
-  </nav>
-  <p>{{ $route.params.user }} / {{ $route.params.repo }}</p>
-  <div>fullPath = {{ $route.fullPath }}</div>
-
-  <ScrollPanel style="width: 100%; height: 150px" :dt="{
+  <ScrollPanel style="width: 100%; height: 200px" :dt="{
     bar: {
       background: '{primary.color}'
     }
   }">
-    <!-- {{ raw_reports[0]?.[1]?.fmt }} -->
-    {{ raw_reports }}
+
+    <CodeBlock :snippets="clippyError" />
+
   </ScrollPanel>
+
+  <ScrollPanel style="width: 100%; height: 200px" :dt="{
+    bar: {
+      background: '{primary.color}'
+    }
+  }">
+
+    <CodeBlock :snippets="fmt" lang="diff" />
+
+  </ScrollPanel>
+
+  <!-- <nav> -->
+  <!--   <NuxtLink to="/">Go Home</NuxtLink> -->
+  <!-- </nav> -->
+  <!-- <p>{{ $route.params.user }} / {{ $route.params.repo }}</p> -->
+  <!-- <div>fullPath = {{ $route.fullPath }}</div> -->
+
+  <!-- <ScrollPanel style="width: 100%; height: 150px" :dt="{ -->
+  <!--   bar: { -->
+  <!--     background: '{primary.color}' -->
+  <!--   } -->
+  <!-- }"> -->
+  <!-- {{ raw_reports[0]?.[1]?.fmt }} -->
+  <!--   {{ raw_reports }} -->
+  <!-- </ScrollPanel> -->
 
 
   <Tabs value="2">
