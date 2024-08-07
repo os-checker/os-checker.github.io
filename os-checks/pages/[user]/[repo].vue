@@ -14,7 +14,8 @@ const clippyWarn = ref<string[]>([]);
 const clippyError = ref<string[]>([]);
 const fmt = ref<string[]>([]);
 watch(raw_reports, (reports) => {
-  fmt.value = ["-a\n+b"];
+  if (!reports) { return; }
+  fmt.value = [];
   clippyWarn.value = [];
   clippyError.value = [];
 
@@ -103,7 +104,7 @@ const tabs = reactive<CheckerResult[]>([
     <TabList>
       <Tab v-for="tab in tabs" :value="tab.value">
         {{ tab.title }}
-        <span class="superscript">
+        <span class="tabBadge">
           <Badge :value="tab.snippets.length" :severity="tab.severity" />
         </span>
       </Tab>
@@ -125,9 +126,11 @@ const tabs = reactive<CheckerResult[]>([
 </template>
 
 <style scoped>
-.superscript {
+.tabBadge {
   vertical-align: super;
-  font-size: smaller;
-  /* 可选：使上标文字更小 */
+  --p-badge-padding: 0;
+  --p-badge-font-size: smaller;
+  --p-badge-height: 0.8rem;
+  --p-badge-min-width: 1.2rem;
 }
 </style>
