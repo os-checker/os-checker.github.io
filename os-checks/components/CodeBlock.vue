@@ -6,24 +6,25 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import hljs from 'highlight.js/lib/core';
+
 
 const props = defineProps({
   // 一组代码块文本
-  snippets: Array,
+  snippets: Array<String>,
   // 指定被高亮的语言类型，目前仅为 rust 或者 diff
   lang: { type: String, default: () => "rust" },
 });
 
-const containerRef = ref(null);
+const containerRef = ref<HTMLElement | null>(null);
 
 function highlight() {
   // 找到所有的code标签并进行高亮
   const codeElements = containerRef.value?.querySelectorAll(`.language-${props.lang}.codeblock`);
   codeElements?.forEach((block) => {
     if (block.tagName === 'CODE') {
-      hljs.highlightElement(block);
+      hljs.highlightElement(block as HTMLElement);
       // console.log("hljs highlighted", props.lang);
     }
   });
