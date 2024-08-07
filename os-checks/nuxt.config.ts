@@ -20,10 +20,6 @@ export default defineNuxtConfig({
       },
     }
   },
-  css: [
-    "primeicons/primeicons.css",
-    "~/assets/style.css",
-    "highlight.js/styles/base16/onedark.min.css"
-  ],
+  css: ["primeicons/primeicons.css", "~/assets/style.css"],
   devServer: { host: '0.0.0.0', port: 3001 },
 })

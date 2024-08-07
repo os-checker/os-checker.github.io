@@ -20,6 +20,12 @@ function load() {
 /** 渲染深浅主题 */
 function toggle(dark: boolean) {
   document.querySelector("html")?.classList.toggle("my-app-dark", dark);
+  // 动态切换 highlightjs 的高亮主题
+  if (dark) {
+    import('highlight.js/styles/base16/onedark.min.css');
+  } else {
+    import('highlight.js/styles/base16/atelier-seaside-light.min.css');
+  }
 }
 
 const loaded = ref(load());
