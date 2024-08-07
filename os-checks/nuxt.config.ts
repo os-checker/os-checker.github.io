@@ -7,7 +7,10 @@ export default defineNuxtConfig({
     // baseURL: '/ci/',
     head: { link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }] }
   },
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+    timeline: { enabled: true, },
+  },
   modules: ["@primevue/nuxt-module"],
   primevue: {
     options: {
