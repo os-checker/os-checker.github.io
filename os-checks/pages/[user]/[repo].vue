@@ -1,35 +1,44 @@
 <script setup lang="ts">
 // import type { TreeNode } from 'primevue/treenode';
-import highlightRust from '~/composables/highlight-rust';
-
-const raw_reports = ref<any>([]);
-githubFetch({ branch: "raw-reports", path: "os-checks/public/test_raw_reports.json" })
-  .then(({ data }) => raw_reports.value = data.value);
 
 highlightRust();
 
-const code = ref(`
+const raw_reports = ref<any>([]);
+githubFetch({ branch: "raw-reports", path: "os-checks/public/test_raw_reports.json" })
+  .then(({ data }) => raw_reports.value = JSON.parse(data.value as string));
+
+const diffCode = ref([`aaa
 -Original line
-+Modified line`);
++Modified line`]);
+
+type Clippy = { [key: string]: string[] };
+const clippyWarn = ref<string[]>([]);
+watch(raw_reports, (reports) => {
+  clippyWarn.value = [];
+  const fmts = (reports[7]?.[1]?.clippy_warn) as Clippy;
+  for (const key in fmts) {
+    clippyWarn.value.push(...fmts[key]);
+  }
+  clippyWarn.value.push(...diffCode.value);
+});
+
 
 </script>
 
 <template>
 
-  <ScrollPanel style="width: 100%; height: 200px" :dt="{
+  <ScrollPanel style="width: 100%; height: 400px" :dt="{
     bar: {
       background: '{primary.color}'
     }
   }">
+
+    <CodeBlock :snippets="diffCode" lang="diff" />
+    <CodeBlock :snippets="clippyWarn" />
+
     <pre><code class="language-rust">
         fn main() { println!("Hello, world!"); }
         fn main() { println!("Hello, world!"); }
-        fn main() { println!("Hello, world!"); }
-        fn main() { println!("Hello, world!"); }
-        fn main() { println!("Hello, world!"); }
-      </code></pre>
-
-    <pre><code class="language-diff">{{ code }}
       </code></pre>
 
   </ScrollPanel>
@@ -40,7 +49,7 @@ const code = ref(`
   <p>{{ $route.params.user }} / {{ $route.params.repo }}</p>
   <div>fullPath = {{ $route.fullPath }}</div>
 
-  <ScrollPanel style="width: 100%; height: 200px" :dt="{
+  <ScrollPanel style="width: 100%; height: 150px" :dt="{
     bar: {
       background: '{primary.color}'
     }
