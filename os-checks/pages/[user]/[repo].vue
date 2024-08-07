@@ -100,7 +100,7 @@ const tabs = reactive<CheckerResult[]>([
   <!-- <p>{{ $route.params.user }} / {{ $route.params.repo }}</p> -->
   <!-- <div>fullPath = {{ $route.fullPath }}</div> -->
 
-  <Tabs value="Clippy(Errors)">
+  <Tabs value="Clippy(Errors)" scrollable>
     <TabList>
       <Tab v-for="tab in tabs" :value="tab.value">
         {{ tab.title }}
@@ -131,6 +131,6 @@ const tabs = reactive<CheckerResult[]>([
   --p-badge-padding: 0;
   --p-badge-font-size: smaller;
   --p-badge-height: 0.8rem;
-  --p-badge-min-width: 1.2rem;
+  --p-badge-min-width: 1.3rem;
 }
 </style>
