@@ -103,7 +103,7 @@ const tabs = ref<CheckerResult[]>([
             background: '{primary.color}'
           }
         }">
-          <CodeBlock :snippets="tab.snippets.value" :lang="tab.lang" />
+          <CodeBlock :snippets="tab.snippets" :lang="tab.lang" />
         </ScrollPanel>
       </TabPanel>
     </TabPanels>

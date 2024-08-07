@@ -11,8 +11,10 @@ import hljs from 'highlight.js/lib/core';
 
 
 const props = defineProps({
-  // 一组代码块文本
-  snippets: Array<String>,
+  // 一组代码块文本；这里的类型技巧仅仅为了解决 ts 的类型推断问题，如果写 Array
+  // 或者 Array<string>，则出现 Type 'string[] | Ref<string[], string[]>' is not assignable to type 'string[] | undefined'；
+  // 注意，不能在父组件传递 snippets 时使用 :snippets="tab.snippets.value"，这会丧失反应式（tab.snippets 数据更新，但子组件不更新）！
+  snippets: [String, Array] as unknown as PropType<string[] | Ref<string[], string[]>>,
   // 指定被高亮的语言类型，目前仅为 rust 或者 diff
   lang: { type: String, default: () => "rust" },
 });
