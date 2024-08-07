@@ -51,6 +51,7 @@ const tabs = ref<CheckerResult[]>([
   { value: "Clippy(Errors)", title: "Clippy(Errors)", snippets: clippyError, lang: "rust" },
   { value: "Clippy(Warns)", title: "Clippy(Warns)", snippets: clippyWarn, lang: "rust" },
   { value: "Unformatted", title: "Unformatted", snippets: fmt, lang: "diff" }
+const tabs = reactive<CheckerResult[]>([
 ]);
 </script>
 
