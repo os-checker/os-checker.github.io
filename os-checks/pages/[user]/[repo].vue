@@ -45,13 +45,19 @@ type CheckerResult = {
   title: string,
   snippets: Ref<string[]>,
   lang: string,
+  severity: Severity,
 };
 
-const tabs = ref<CheckerResult[]>([
-  { value: "Clippy(Errors)", title: "Clippy(Errors)", snippets: clippyError, lang: "rust" },
-  { value: "Clippy(Warns)", title: "Clippy(Warns)", snippets: clippyWarn, lang: "rust" },
-  { value: "Unformatted", title: "Unformatted", snippets: fmt, lang: "diff" }
+enum Severity {
+  Danger = "danger",
+  Warn = "warn",
+  Info = "info",
+}
+
 const tabs = reactive<CheckerResult[]>([
+  { value: "Clippy(Errors)", title: "Clippy(Errors)", snippets: clippyError, lang: "rust", severity: Severity.Danger },
+  { value: "Clippy(Warns)", title: "Clippy(Warns)", snippets: clippyWarn, lang: "rust", severity: Severity.Warn },
+  { value: "Unformatted", title: "Unformatted", snippets: fmt, lang: "diff", severity: Severity.Info }
 ]);
 </script>
 
@@ -95,7 +101,12 @@ const tabs = reactive<CheckerResult[]>([
 
   <Tabs value="Clippy(Errors)">
     <TabList>
-      <Tab v-for="tab in tabs" :value="tab.value">{{ tab.title }}</Tab>
+      <Tab v-for="tab in tabs" :value="tab.value">
+        {{ tab.title }}
+        <span class="superscript">
+          <Badge :value="tab.snippets.length" :severity="tab.severity" />
+        </span>
+      </Tab>
     </TabList>
     <TabPanels>
       <TabPanel v-for="tab in tabs" :value="tab.value">
@@ -112,3 +123,11 @@ const tabs = reactive<CheckerResult[]>([
 
 
 </template>
+
+<style scoped>
+.superscript {
+  vertical-align: super;
+  font-size: smaller;
+  /* 可选：使上标文字更小 */
+}
+</style>
