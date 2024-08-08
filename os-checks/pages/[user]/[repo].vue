@@ -63,42 +63,6 @@ const tabs = reactive<CheckerResult[]>([
 </script>
 
 <template>
-  <!---->
-  <!-- <ScrollPanel style="width: 100%; height: 200px" :dt="{ -->
-  <!--   bar: { -->
-  <!--     background: '{primary.color}' -->
-  <!--   } -->
-  <!-- }"> -->
-  <!---->
-  <!--   <CodeBlock :snippets="clippyWarn" /> -->
-  <!---->
-  <!-- </ScrollPanel> -->
-  <!---->
-  <!-- <ScrollPanel style="width: 100%; height: 200px" :dt="{ -->
-  <!--   bar: { -->
-  <!--     background: '{primary.color}' -->
-  <!--   } -->
-  <!-- }"> -->
-  <!---->
-  <!--   <CodeBlock :snippets="clippyError" /> -->
-  <!---->
-  <!-- </ScrollPanel> -->
-  <!---->
-  <!-- <ScrollPanel style="width: 100%; height: 200px" :dt="{ -->
-  <!--   bar: { -->
-  <!--     background: '{primary.color}' -->
-  <!--   } -->
-  <!-- }"> -->
-  <!---->
-  <!--   <CodeBlock :snippets="fmt" lang="diff" /> -->
-  <!---->
-  <!-- </ScrollPanel> -->
-
-  <!-- <nav> -->
-  <!--   <NuxtLink to="/">Go Home</NuxtLink> -->
-  <!-- </nav> -->
-  <!-- <p>{{ $route.params.user }} / {{ $route.params.repo }}</p> -->
-  <!-- <div>fullPath = {{ $route.fullPath }}</div> -->
   <div class="fileViewPanel">
 
     <div class="fileViewNavi">
