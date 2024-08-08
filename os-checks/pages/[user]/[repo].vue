@@ -122,6 +122,6 @@ const tabs = reactive<CheckerResult[]>([
 
 .fileViewScroll {
   width: 100%;
-  height: 86vh;
+  height: 85vh;
 }
 </style>
