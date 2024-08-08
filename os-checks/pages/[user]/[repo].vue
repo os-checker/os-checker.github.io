@@ -99,30 +99,37 @@ const tabs = reactive<CheckerResult[]>([
   <!-- </nav> -->
   <!-- <p>{{ $route.params.user }} / {{ $route.params.repo }}</p> -->
   <!-- <div>fullPath = {{ $route.fullPath }}</div> -->
+  <div class="fileViewPanel">
 
-  <Tabs value="Clippy(Errors)" scrollable>
-    <TabList>
-      <Tab v-for="tab in tabs" :value="tab.value">
-        {{ tab.title }}
-        <span class="tabBadge">
-          <Badge :value="tab.snippets.length" :severity="tab.severity" />
-        </span>
-      </Tab>
-    </TabList>
-    <TabPanels>
-      <TabPanel v-for="tab in tabs" :value="tab.value">
-        <ScrollPanel style="width: 100%; height: 500px" :dt="{
-          bar: {
-            background: '{primary.color}'
-          }
-        }">
-          <CodeBlock :snippets="tab.snippets" :lang="tab.lang" />
-        </ScrollPanel>
-      </TabPanel>
-    </TabPanels>
-  </Tabs>
+    <div class="fileViewNavi">
+      <NavigationBreadcrumb></NavigationBreadcrumb>
+    </div>
 
+    <div class="fileViewResult">
+      <Tabs :value="tabs[0].value" scrollable>
+        <TabList>
+          <Tab v-for="tab in tabs" :value="tab.value">
+            {{ tab.title }}
+            <span class="tabBadge">
+              <Badge :value="tab.snippets.length" :severity="tab.severity" />
+            </span>
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel v-for="tab in tabs" :value="tab.value">
+            <ScrollPanel style="width: 100%; height: 500px" :dt="{
+              bar: {
+                background: '{primary.color}'
+              }
+            }">
+              <CodeBlock :snippets="tab.snippets" :lang="tab.lang" />
+            </ScrollPanel>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </div>
 
+  </div>
 </template>
 
 <style scoped>
@@ -132,5 +139,22 @@ const tabs = reactive<CheckerResult[]>([
   --p-badge-font-size: smaller;
   --p-badge-height: 0.8rem;
   --p-badge-min-width: 1.3rem;
+}
+
+.fileViewPanel {
+  display: flex;
+  /* 使用Flexbox布局 */
+}
+
+.fileViewNavi {
+  flex: 0 0 10%;
+  /* flex-grow, flex-shrink, flex-basis */
+  /* 左边div不扩展也不收缩，基础宽度为10% */
+}
+
+.fileViewResult {
+  flex: 1;
+  /* 右边div占据剩余空间 */
+  /* 可以省略flex-grow为1，因为默认值就是1 */
 }
 </style>
