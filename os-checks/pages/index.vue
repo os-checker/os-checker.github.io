@@ -41,15 +41,6 @@ const filters = ref<any>({});
 const selectedColumns = ref(dataColumns.value);
 const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
 
-// Toggle light vs dark theme.
-const { $darkMode } = useNuxtApp();
-const darkMode = $darkMode?.init || ref(false);
-watch(darkMode, (dark) => {
-  $darkMode.toggle(dark);
-  $darkMode.store(dark); // Store dark theme locally
-});
-const toggleDarkMode = () => darkMode.value = !darkMode.value;
-
 // a single selected row
 const selectedKey = ref();
 </script>
@@ -67,11 +58,7 @@ const selectedKey = ref();
         </div>
         <div class="right-to-left">
 
-          <ClientOnly>
-            <span style="margin-right: 0.8rem;">
-              <Button @click="toggleDarkMode" severity="contrast" :icon="darkMode ? 'pi pi-sun' : 'pi pi-moon'" />
-            </span>
-          </ClientOnly>
+          <DarkMode />
 
           <span style="display: inline-block;">
             <IconField>
