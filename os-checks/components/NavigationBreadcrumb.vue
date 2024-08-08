@@ -6,6 +6,8 @@
       </Button>
 
       <Button icon="pi pi-sitemap" text />
+
+      <DarkMode />
     </div>
 
     <!-- <Breadcrumb :home="home" :model="items"> -->

@@ -102,7 +102,7 @@ const tabs = reactive<CheckerResult[]>([
   <div class="fileViewPanel">
 
     <div class="fileViewNavi">
-      <NavigationBreadcrumb></NavigationBreadcrumb>
+      <NavigationBreadcrumb />
     </div>
 
     <div class="fileViewResult">
