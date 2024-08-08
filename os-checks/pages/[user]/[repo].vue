@@ -3,18 +3,23 @@ import DOMPurify from 'dompurify';
 
 highlightRust();
 
-type RawReports = [number, { fmt: Clippy, clippy_warn: Clippy, clippy_error: Clippy }];
+type RawReport = { file: string, count: number, fmt: Outputs, clippy_warn: Outputs, clippy_error: Outputs };
+type Datum = {
+  user: string,
+  repo: string,
+  package: string,
+  raw_reports: RawReport[]
+}
 
-const raw_reports = ref<RawReports[]>([]);
+const raw_reports = ref<Datum[]>([]);
 githubFetch({ branch: "raw-reports", path: "os-checks/public/test_raw_reports.json" })
   .then(({ data }) => raw_reports.value = JSON.parse(data.value as string));
 
-type Clippy = { [key: string]: string[] };
+type Outputs = string[];
 const clippyWarn = ref<string[]>([]);
 const clippyError = ref<string[]>([]);
 const fmt = ref<string[]>([]);
-watch(raw_reports, (reports) => {
-  if (!reports) { return; }
+watch(raw_reports, (data) => {
   fmt.value = [];
   clippyWarn.value = [];
   clippyError.value = [];
@@ -23,20 +28,11 @@ watch(raw_reports, (reports) => {
   // includes unescaped HTML. This is a potentially serious security risk.
   const f = (s: string) => DOMPurify.sanitize(s);
 
-  for (const report of reports) {
-    const fmts = report[1]?.fmt;
-    for (const file in fmts) {
-      fmt.value.push(...(fmts[file].map(f)));
-    }
-
-    const warns = report[1]?.clippy_warn;
-    for (const file in warns) {
-      clippyWarn.value.push(...(warns[file].map(f)));
-    }
-
-    const errors = report[1]?.clippy_error;
-    for (const file in errors) {
-      clippyError.value.push(...(errors[file].map(f)));
+  for (const datum of data) {
+    for (const report of datum.raw_reports) {
+      fmt.value.push(...(report.fmt.map(f)));
+      clippyWarn.value.push(...(report.clippy_warn.map(f)));
+      clippyError.value.push(...(report.clippy_error.map(f)));
     }
   }
 });
