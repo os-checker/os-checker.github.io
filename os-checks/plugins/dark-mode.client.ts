@@ -20,12 +20,12 @@ function load() {
 /** 渲染深浅主题 */
 function toggle(dark: boolean) {
   document.querySelector("html")?.classList.toggle("my-app-dark", dark);
-  // 动态切换 highlightjs 的高亮主题
-  if (dark) {
-    import('highlight.js/styles/base16/onedark.min.css');
-  } else {
-    import('highlight.js/styles/base16/atelier-seaside-light.min.css');
-  }
+  setHTML_data_theme(dark);
+}
+
+// 动态切换 highlightjs 的高亮主题
+function setHTML_data_theme(dark: boolean) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
 }
 
 const loaded = ref(load());
@@ -55,5 +55,3 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   }
 })
-
-
