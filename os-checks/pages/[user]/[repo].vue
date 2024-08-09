@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
-import DOMPurify from 'dompurify';
 
 highlightRust();
 
@@ -23,13 +22,7 @@ const clippyError = ref<string[]>([]);
 const fmt = ref<string[]>([]);
 watch(raw_reports, (data) => {
   nodes.value = [];
-  fmt.value = [];
-  clippyWarn.value = [];
-  clippyError.value = [];
-
-  // 对 <>&"' 之类的符号进行转义，否则 highlightjs 出现 One of your code blocks
-  // includes unescaped HTML. This is a potentially serious security risk.
-  const f = (s: string) => DOMPurify.sanitize(s);
+  clearResult();
 
   let key = 0;
   for (const datum of data) {
@@ -44,28 +37,28 @@ watch(raw_reports, (data) => {
     }
     for (const report of datum.raw_reports) {
       node?.children?.push({ key: (key++).toString(), label: report.file, icon: "pi pi-file" });
-      fmt.value.push(...(report.fmt.map(f)));
-      clippyWarn.value.push(...(report.clippy_warn.map(f)));
-      clippyError.value.push(...(report.clippy_error.map(f)));
+      fmt.value.push(...(report.fmt.map(domSanitize)));
+      clippyWarn.value.push(...(report.clippy_warn.map(domSanitize)));
+      clippyError.value.push(...(report.clippy_error.map(domSanitize)));
     }
     node && nodes.value.push(node);
   }
 });
 
-function updateTabs(data: Datum[]) {
+/** 清除用于展示的检查结果 */
+function clearResult() {
   fmt.value = [];
   clippyWarn.value = [];
   clippyError.value = [];
+}
 
-  // 对 <>&"' 之类的符号进行转义，否则 highlightjs 出现 One of your code blocks
-  // includes unescaped HTML. This is a potentially serious security risk.
-  const f = (s: string) => DOMPurify.sanitize(s);
-
+function updateTabs(data: Datum[]) {
+  clearResult();
   for (const datum of data) {
     for (const report of datum.raw_reports) {
-      fmt.value.push(...(report.fmt.map(f)));
-      clippyWarn.value.push(...(report.clippy_warn.map(f)));
-      clippyError.value.push(...(report.clippy_error.map(f)));
+      fmt.value.push(...(report.fmt.map(domSanitize)));
+      clippyWarn.value.push(...(report.clippy_warn.map(domSanitize)));
+      clippyError.value.push(...(report.clippy_error.map(domSanitize)));
     }
   }
 }
@@ -74,8 +67,8 @@ const selectedKey = ref({});
 watch(selectedKey, val => {
   const key = Object.keys(val)[0];
   if (key) {
-    const idx = parseInt(key);
-    console.log(idx);
+    // const idx = parseInt(key);
+    // console.log(idx);
     for (const node of nodes.value) {
       // 查找是否点击了 package
       if (node.key === key) {
@@ -94,6 +87,7 @@ watch(selectedKey, val => {
         // node.children?.map(file => file.label);
         return;
       }
+      // TODO: 查找是否点击某个文件
     }
   }
 });
