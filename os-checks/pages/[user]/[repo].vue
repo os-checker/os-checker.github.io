@@ -34,23 +34,69 @@ watch(raw_reports, (data) => {
   let key = 0;
   for (const datum of data) {
     const count = datum.raw_reports.map(r => r.count).reduce((acc, val) => acc + val, 0);
-    let item: TreeNode | null = null;
+    let node: TreeNode | null = null;
     // 排除检查良好的库（这一步最好在 os-checker 做？）
     if (count !== 0) {
-      item = { key: (key++).toString(), label: `[${count}] ${datum.repo} #${datum.package}`, children: [] };
+      node = {
+        key: (key++).toString(), label: `[${count}] ${datum.repo} #${datum.package}`, children: [],
+        data: { user: datum.user, repo: datum.repo, package: datum.package }
+      };
     }
     for (const report of datum.raw_reports) {
-      item?.children?.push({ key: (key++).toString(), label: report.file, icon: "pi pi-file" });
+      node?.children?.push({ key: (key++).toString(), label: report.file, icon: "pi pi-file" });
       fmt.value.push(...(report.fmt.map(f)));
       clippyWarn.value.push(...(report.clippy_warn.map(f)));
       clippyError.value.push(...(report.clippy_error.map(f)));
     }
-    item && nodes.value.push(item);
+    node && nodes.value.push(node);
   }
 });
 
+function updateTabs(data: Datum[]) {
+  fmt.value = [];
+  clippyWarn.value = [];
+  clippyError.value = [];
+
+  // 对 <>&"' 之类的符号进行转义，否则 highlightjs 出现 One of your code blocks
+  // includes unescaped HTML. This is a potentially serious security risk.
+  const f = (s: string) => DOMPurify.sanitize(s);
+
+  for (const datum of data) {
+    for (const report of datum.raw_reports) {
+      fmt.value.push(...(report.fmt.map(f)));
+      clippyWarn.value.push(...(report.clippy_warn.map(f)));
+      clippyError.value.push(...(report.clippy_error.map(f)));
+    }
+  }
+}
+
 const selectedKey = ref({});
-watch(selectedKey, val => console.log(`${JSON.stringify(val)}`));
+watch(selectedKey, val => {
+  const key = Object.keys(val)[0];
+  if (key) {
+    const idx = parseInt(key);
+    console.log(idx);
+    for (const node of nodes.value) {
+      // 查找是否点击了 package
+      if (node.key === key) {
+        // 更新 tabs 展示的数据
+        const package_ = raw_reports.value.find(datum => {
+          const nd = node.data;
+          if (nd && nd.user && nd.repo && nd.package) {
+            return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
+          } else {
+            return false;
+          }
+        });
+        if (package_) {
+          updateTabs([package_]);
+        }
+        // node.children?.map(file => file.label);
+        return;
+      }
+    }
+  }
+});
 
 type CheckerResult = {
   value: string,
