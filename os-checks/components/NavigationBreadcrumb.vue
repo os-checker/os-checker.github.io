@@ -5,7 +5,7 @@
         <NuxtLink to="/"><span class="pi pi-home" /></NuxtLink>
       </Button>
 
-      <Button icon="pi pi-sitemap" text />
+      <!-- <Button icon="pi pi-sitemap" text /> -->
 
       <DarkMode />
     </div>
