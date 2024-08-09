@@ -1,7 +1,14 @@
 <template>
   <div>
     <Tree :value="nodes" class="packageFileTree" filterMode="strict" selectionMode="single" :selectionKeys="selectedKey"
-      @update:selectionKeys="$emit('update:selectedKey', $event)" />
+      @update:selectionKeys="$emit('update:selectedKey', $event)">
+      <!-- 这应该是 primevue 的 bug：使用 node 的数据，导致节点无法展开 -->
+      <!-- <template #nodetoggleicon="{ node: { data: { total } } }"> -->
+      <!--   <span> -->
+      <!--     {{ total }} -->
+      <!--   </span> -->
+      <!-- </template> -->
+    </Tree>
   </div>
 </template>
 
@@ -9,13 +16,11 @@
 import type { TreeNode } from 'primevue/treenode';
 
 type Opts = { [key: string]: boolean };
-type P = {
+const props = defineProps<{
   nodes: TreeNode[],
   // filter: boolean,
   selectedKey: Opts,
-}
-
-const props = defineProps<P>();
+}>();
 defineEmits(["update:selectedKey"]);
 
 // const selectedKey = ref();

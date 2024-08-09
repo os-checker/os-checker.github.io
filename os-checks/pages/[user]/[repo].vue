@@ -32,16 +32,28 @@ watch(raw_reports, (data) => {
     if (count !== 0) {
       node = {
         key: (key++).toString(), label: `[${count}] ${datum.repo} #${datum.package}`, children: [],
-        data: { user: datum.user, repo: datum.repo, package: datum.package }
+        // data: { user: datum.user, repo: datum.repo, package: datum.package }
       };
     }
+    let count_fmt = 0;
+    let count_clippy_warn = 0;
+    let count_clippy_error = 0;
     for (const report of datum.raw_reports) {
-      node?.children?.push({ key: (key++).toString(), label: report.file, icon: "pi pi-file" });
+      node?.children?.push({ key: (key++).toString(), label: report.file });
       fmt.value.push(...(report.fmt.map(domSanitize)));
       clippyWarn.value.push(...(report.clippy_warn.map(domSanitize)));
       clippyError.value.push(...(report.clippy_error.map(domSanitize)));
+      count_fmt += report.fmt.length;
+      count_clippy_warn += report.clippy_warn.length;
+      count_clippy_error += report.clippy_error.length;
     }
-    node && nodes.value.push(node);
+    if (node) {
+      node.data = {
+        user: datum.user, repo: datum.repo, package: datum.package,
+        total: count, fmt: count_fmt, clippy_warn: count_clippy_warn, clippy_error: count_clippy_error
+      };
+      nodes.value.push(node);
+    }
   }
 });
 
@@ -79,7 +91,7 @@ watch(selectedKey, val => {
       const package_ = raw_reports.value.find(datum => {
         return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
       });
-      console.log(package_);
+      // console.log(package_);
       if (package_) {
         updateTabs([package_]);
       }
