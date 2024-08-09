@@ -67,7 +67,7 @@ const tabs = reactive<CheckerResult[]>([
 
     <div class="fileViewResult">
       <Tabs :value="tabs[0].value" scrollable>
-        <TabList style="height: 10vh;">
+        <TabList>
           <Tab v-for="tab in tabs" :value="tab.value">
             {{ tab.title }}
             <span class="tabBadge">
@@ -112,12 +112,15 @@ const tabs = reactive<CheckerResult[]>([
 .fileViewResult {
   flex: 1;
   overflow-x: auto;
+  overflow-y: hidden;
+  /* 控制代码块容器的 padding: 上、左、下、右 */
+  --p-tabs-tabpanel-padding: 0.8rem 0.3rem 0 0;
   /* 右边div占据剩余空间 */
   /* 可以省略flex-grow为1，因为默认值就是1 */
 }
 
 .fileViewScroll {
   width: 100%;
-  height: 85vh;
+  height: 90vh;
 }
 </style>
