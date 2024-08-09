@@ -63,6 +63,8 @@ const tabs = reactive<CheckerResult[]>([
 
     <div class="fileViewNavi">
       <NavigationBreadcrumb />
+
+      <PackageFileMenu></PackageFileMenu>
     </div>
 
     <div class="fileViewResult">
@@ -105,6 +107,8 @@ const tabs = reactive<CheckerResult[]>([
 
 .fileViewNavi {
   flex: 0 0 10%;
+  padding: 0 0.5rem 0 0;
+  z-index: 2;
   /* flex-grow, flex-shrink, flex-basis */
   /* 左边div不扩展也不收缩，基础宽度为10% */
 }
@@ -114,7 +118,7 @@ const tabs = reactive<CheckerResult[]>([
   overflow-x: auto;
   overflow-y: hidden;
   /* 控制代码块容器的 padding: 上、左、下、右 */
-  --p-tabs-tabpanel-padding: 0.8rem 0.3rem 0 0;
+  --p-tabs-tabpanel-padding: 0.35rem 0.3rem 0 0;
   /* 右边div占据剩余空间 */
   /* 可以省略flex-grow为1，因为默认值就是1 */
 }
