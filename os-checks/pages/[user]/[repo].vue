@@ -50,6 +50,7 @@ watch(raw_reports, (data) => {
 });
 
 const selectedKey = ref({});
+watch(selectedKey, val => console.log(`${JSON.stringify(val)}`));
 
 type CheckerResult = {
   value: string,
@@ -78,7 +79,8 @@ const tabs = reactive<CheckerResult[]>([
     <div class="fileViewNavi">
       <NavigationBreadcrumb />
       <ScrollPanel class="fileViewMenu">
-        <PackageFileMenu style="padding-right: 0.8rem;" :nodes="nodes" />
+        <PackageFileMenu style="padding-right: 0.8rem;" :nodes="nodes" :selectedKey="selectedKey"
+          @update:selectedKey="selectedKey = $event" />
       </ScrollPanel>
     </div>
 

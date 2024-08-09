@@ -1,22 +1,24 @@
 <template>
   <div>
-    <Tree :value="nodes" class="packageFileTree" filterMode="strict" selectionMode="single"
-      v-model:selectionKeys="selectedKey" />
+    <Tree :value="nodes" class="packageFileTree" filterMode="strict" selectionMode="single" :selectionKeys="selectedKey"
+      @update:selectionKeys="$emit('update:selectedKey', $event)" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
 
+type Opts = { [key: string]: boolean };
 type P = {
   nodes: TreeNode[],
   // filter: boolean,
-  // selectedKey: { [key: string]: boolean }
+  selectedKey: Opts,
 }
 
 const props = defineProps<P>();
+defineEmits(["update:selectedKey"]);
 
-const selectedKey = ref();
+// const selectedKey = ref();
 // watch(selectedKey, val => console.log(`${JSON.stringify(val)}`));
 </script>
 
