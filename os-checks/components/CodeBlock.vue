@@ -24,6 +24,7 @@ function highlight() {
   const codeElements = containerRef.value?.querySelectorAll(`.language-${props.lang}.codeblock`);
   codeElements?.forEach((block) => {
     if (block.tagName === 'CODE') {
+      block.removeAttribute('data-highlighted');
       hljs.highlightElement(block as HTMLElement);
       // console.log("hljs highlighted", props.lang);
     }
