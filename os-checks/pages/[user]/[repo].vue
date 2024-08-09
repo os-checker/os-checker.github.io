@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import type { MenuItem } from 'primevue/menuitem';
 import DOMPurify from 'dompurify';
 
 highlightRust();
 
+type Outputs = string[];
 type RawReport = { file: string, count: number, fmt: Outputs, clippy_warn: Outputs, clippy_error: Outputs };
 type Datum = {
   user: string,
@@ -15,11 +17,12 @@ const raw_reports = ref<Datum[]>([]);
 githubFetch({ branch: "raw-reports", path: "os-checks/public/test_raw_reports.json" })
   .then(({ data }) => raw_reports.value = JSON.parse(data.value as string));
 
-type Outputs = string[];
+const items = ref<MenuItem[]>([]);
 const clippyWarn = ref<string[]>([]);
 const clippyError = ref<string[]>([]);
 const fmt = ref<string[]>([]);
 watch(raw_reports, (data) => {
+  items.value = [];
   fmt.value = [];
   clippyWarn.value = [];
   clippyError.value = [];
@@ -29,12 +32,21 @@ watch(raw_reports, (data) => {
   const f = (s: string) => DOMPurify.sanitize(s);
 
   for (const datum of data) {
+    const count = datum.raw_reports.map(r => r.count).reduce((acc, val) => acc + val, 0);
+    let item: MenuItem | null = null;
+    // 排除检查良好的库（这一步最好在 os-checker 做？）
+    if (count !== 0) {
+      item = { label: `[${count}] ${datum.repo} #${datum.package}`, items: [] };
+    }
     for (const report of datum.raw_reports) {
+      item?.items?.push({ label: report.file, icon: "pi pi-file" });
       fmt.value.push(...(report.fmt.map(f)));
       clippyWarn.value.push(...(report.clippy_warn.map(f)));
       clippyError.value.push(...(report.clippy_error.map(f)));
     }
+    item && items.value.push(item);
   }
+  console.log(`${JSON.stringify(items)}`);
 });
 
 type CheckerResult = {
@@ -63,8 +75,9 @@ const tabs = reactive<CheckerResult[]>([
 
     <div class="fileViewNavi">
       <NavigationBreadcrumb />
-
-      <PackageFileMenu></PackageFileMenu>
+      <ScrollPanel class="fileViewMenu">
+        <PackageFileMenu style="padding-right: 0.8rem;" :items="items" />
+      </ScrollPanel>
     </div>
 
     <div class="fileViewResult">
@@ -106,11 +119,19 @@ const tabs = reactive<CheckerResult[]>([
 }
 
 .fileViewNavi {
-  flex: 0 0 10%;
-  padding: 0 0.5rem 0 0;
-  z-index: 2;
+  flex: 0 0 20%;
+  padding-left: 0.25rem;
+  padding-right: 0.5rem;
   /* flex-grow, flex-shrink, flex-basis */
   /* 左边div不扩展也不收缩，基础宽度为10% */
+}
+
+.fileViewMenu {
+  flex: 1;
+  height: 90vh;
+  /* 允许不含空格的单词在任何地方换行 */
+  word-break: break-all;
+  font-size: smaller;
 }
 
 .fileViewResult {
