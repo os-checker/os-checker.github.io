@@ -1,24 +1,39 @@
 <template>
   <div>
-    <PanelMenu :model="items" class="packageFileMenu" :pt="{ itemIcon: { style: 'font-size: 0.8rem;' } }" />
+    <Tree :value="nodes" class="packageFileTree" filterMode="strict" selectionMode="single"
+      v-model:selectionKeys="selectedKey" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { MenuItem } from 'primevue/menuitem';
+import type { TreeNode } from 'primevue/treenode';
 
-const props = defineProps({
-  items: Array<MenuItem>,
-});
+type P = {
+  nodes: TreeNode[],
+  // filter: boolean,
+  // selectedKey: { [key: string]: boolean }
+}
+
+const props = defineProps<P>();
+
+const selectedKey = ref();
+// watch(selectedKey, val => console.log(`${JSON.stringify(val)}`));
 </script>
 
 <style scoped>
-.packageFileMenu {
-  --p-panelmenu-item-padding: 0.3rem;
-  --p-panelmenu-panel-padding: 0.2rem;
-  --p-panelmenu-item-gap: 0.2rem;
-  --p-panelmenu-submenu-icon-focus-color: #ff5722;
-  --p-panelmenu-item-icon-focus-color: #ff5722;
-  --p-panelmenu-item-focus-color: #ff5722;
+.packageFileTree {
+  --p-tree-node-hover-color: #ff5722;
+  --p-tree-node-selected-color: #ff5722;
+  --p-tree-node-focus-ring-color: #ff5722;
+  --p-tree-node-icon-hover-color: #ff5722;
+  --p-tree-node-icon-selected-color: #ff5722;
+  --p-tree-node-toggle-button-focus-ring-color: #ff5722;
+  --p-tree-node-toggle-button-hover-color: #ff5722;
+  --p-tree-node-toggle-button-selected-hover-color: #ff5722;
+  --p-tree-node-selected-background: #f2f2f2;
+  --p-tree-node-gap: 0rem;
+  --p-tree-padding: 0;
+  --p-tree-node-padding: 0.3rem 0.2rem;
+  --p-tree-node-toggle-button-size: 1.4rem;
 }
 </style>
