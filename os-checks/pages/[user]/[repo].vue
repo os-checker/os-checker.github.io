@@ -66,29 +66,46 @@ function updateTabs(data: Datum[]) {
 const selectedKey = ref({});
 watch(selectedKey, val => {
   const key = Object.keys(val)[0];
-  if (key) {
-    // const idx = parseInt(key);
-    // console.log(idx);
-    for (const node of nodes.value) {
-      // 查找是否点击了 package
-      if (node.key === key) {
-        // 更新 tabs 展示的数据
-        const package_ = raw_reports.value.find(datum => {
-          const nd = node.data;
-          if (nd && nd.user && nd.repo && nd.package) {
-            return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
-          } else {
-            return false;
-          }
-        });
-        if (package_) {
-          updateTabs([package_]);
-        }
-        // node.children?.map(file => file.label);
-        return;
+  if (!key) { return; }
+  const idx = parseInt(key);
+  // console.log(idx);
+  for (const node of nodes.value.slice().reverse()) {
+    const nd = node.data;
+    if (!(nd && nd.user && nd.repo && nd.package)) { return; }
+
+    // 查找是否点击了 package
+    if (node.key === key) {
+      // 更新 tabs 展示的数据
+      const package_ = raw_reports.value.find(datum => {
+        return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
+      });
+      console.log(package_);
+      if (package_) {
+        updateTabs([package_]);
       }
-      // TODO: 查找是否点击某个文件
+      // node.children?.map(file => file.label);
+      return;
+    } else {
+      // 由于 key 是升序的，现在只要找第一个小于目标 key 的 package，那么这个文件就在那里
+      if (idx > parseInt(node.key)) {
+        for (const file of node.children ?? []) {
+          if (file.key === key) {
+            const filename = file.label;
+            if (!filename) { return; }
+            const package_ = raw_reports.value.find(datum => {
+              return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
+            });
+            const found_file = package_?.raw_reports.find(item => item.file === filename);
+            if (!found_file) { return; }
+            fmt.value = found_file.fmt.map(domSanitize);
+            clippyWarn.value = found_file.clippy_warn.map(domSanitize);
+            clippyError.value = found_file.clippy_error.map(domSanitize);
+            return;
+          }
+        }
+      }
     }
+    // TODO: 查找是否点击某个文件
   }
 });
 
