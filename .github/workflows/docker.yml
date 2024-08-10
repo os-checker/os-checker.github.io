@@ -54,7 +54,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # 本仓库的 json 数据路径
-        TEST_JSON: os-checks/content/test.json
+        TEST_JSON: os-checks/public/test.json
+        TEST_RAW_REPORTS_JSON: os-checks/public/test_raw_reports.json
       run: |
         # author zjp-CN, and commiter bot
         git config user.name "zjp-CN"
@@ -62,15 +63,31 @@ jobs:
         git config committer.name "zjp-CN[bot]"
         git config committer.email "zjp-CN[bot]@users.noreply.github.com"
         cp /check/test.json ${{ env.TEST_JSON }}
+        cp /check/test_raw_reports.json ${{ env.TEST_RAW_REPORTS_JSON }}
+
         # 注意：如果检查结果和上次一样，那么无法提交（也不应该提交）
+
         # 检查是否有未暂存的更改
-        if git status --porcelain | grep -q '${{ env.TEST_JSON }}'; then
-            echo "添加 ${{ env.TEST_JSON }} 到暂存并提交。"
-            git add ${{ env.TEST_JSON }}
-            git commit -m "[bot] update ${{ env.TEST_JSON }}"
+        git_status_output=$(git status --porcelain)
+
+        if echo "$git_status_output" | grep -q "${{ env.TEST_JSON }}"; then
+          echo "${{ env.TEST_JSON }} 被添加到暂存"
+          git add ${{ env.TEST_JSON }}
+        fi
+
+        if echo "$git_status_output" | grep -q "${{ env.TEST_RAW_REPORTS_JSON }}"; then
+          echo "${{ env.TEST_RAW_REPORTS_JSON }} 被添加到暂存"
+          git add ${{ env.TEST_RAW_REPORTS_JSON }}
+        fi
+
+        git_diff_output=$(git diff --cached --name-only | tr '\n' ' ' | sed -e 's/ *$//')
+        if [ -n "$git_diff_output" ]; then
+            echo "正在提交 $git_diff_output"
+            git commit -m "[bot] update $git_diff_output"
             git push 
+            echo "已推送 $git_diff_output"
         else
-           echo "工作目录干净，无需提交 ${{ env.TEST_JSON }}。"
+           echo "工作目录干净，无需提交 ${{ env.TEST_JSON }} 和 ${{ env.TEST_RAW_REPORTS_JSON }}"
         fi
 
   # Deploy job

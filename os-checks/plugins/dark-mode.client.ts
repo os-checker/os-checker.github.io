@@ -20,6 +20,12 @@ function load() {
 /** 渲染深浅主题 */
 function toggle(dark: boolean) {
   document.querySelector("html")?.classList.toggle("my-app-dark", dark);
+  setHTML_data_theme(dark);
+}
+
+// 动态切换 highlightjs 的高亮主题
+function setHTML_data_theme(dark: boolean) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
 }
 
 const loaded = ref(load());
@@ -49,5 +55,3 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   }
 })
-
-

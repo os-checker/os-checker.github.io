@@ -2,13 +2,16 @@ import Aura from '@primevue/themes/aura';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-07-30',
+  compatibilityDate: '2024-08-06',
   app: {
     // baseURL: '/ci/',
     head: { link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }] }
   },
-  devtools: { enabled: true },
-  modules: ["@nuxt/content", "@primevue/nuxt-module"],
+  devtools: {
+    enabled: true,
+    timeline: { enabled: true, },
+  },
+  modules: ["@primevue/nuxt-module"],
   primevue: {
     options: {
       theme: {
@@ -17,6 +20,6 @@ export default defineNuxtConfig({
       },
     }
   },
-  css: ["primeicons/primeicons.css", "~/assets/style.css"],
+  css: ["primeicons/primeicons.css", "~/assets/style.css", "~/assets/highlightjs.scss"],
   devServer: { host: '0.0.0.0', port: 3001 },
 })
