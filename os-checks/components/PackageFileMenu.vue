@@ -2,15 +2,17 @@
   <div>
     <Tree :value="nodes" class="packageFileTree" filterMode="strict" selectionMode="single" :selectionKeys="selectedKey"
       @update:selectionKeys="$emit('update:selectedKey', $event)">
-      <!-- 这应该是 primevue 的 bug：使用 node 的数据，导致节点无法展开 -->
-      <!-- <template #nodetoggleicon="{ node: { data: { total } } }"> -->
-      <!--   <span> -->
-      <!--     {{ total }} -->
-      <!--   </span> -->
-      <!-- </template> -->
     </Tree>
   </div>
 </template>
+
+<!-- 这应该是 primevue 的 bug：使用 node 的数据，导致节点无法展开 -->
+<!-- primevue 的 bug2：这段注释甚至不能放进 Tree tag 里面，因为会无法显示节点 label -->
+<!-- <template #nodetoggleicon="{ node: { data: { total } } }"> -->
+<!--   <span> -->
+<!--     {{ total }} -->
+<!--   </span> -->
+<!-- </template> -->
 
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
