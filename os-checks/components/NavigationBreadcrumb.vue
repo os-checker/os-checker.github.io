@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="naviBreadcrumb">
-      <Button icon="pi pi-home" text>
-        <NuxtLink to="/"><span class="pi pi-home" /></NuxtLink>
-      </Button>
+      <NuxtLink to="/">
+        <Button icon="pi pi-home" title="主页" />
+      </NuxtLink>
 
       <!-- <Button icon="pi pi-sitemap" text /> -->
 
