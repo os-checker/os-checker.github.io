@@ -15,7 +15,7 @@ type Datum = {
 }
 
 const raw_reports = ref<Datum[]>([]);
-githubFetch({ branch: "raw-reports", path: "os-checks/public/test_raw_reports.json" })
+githubFetch({ path: "os-checks/public/test_raw_reports.json" })
   .then(({ data }) => {
     const value: Datum[] = JSON.parse(data.value as string);
     // 按照总问题数量排序；似乎这个默认排序应该由 os-checker 提供？
