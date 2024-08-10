@@ -1,6 +1,6 @@
 <template>
   <div ref="containerRef">
-    <div v-for="snip in snippets">
+    <div v-for="snip in snippets" :key=snip>
       <pre><code :class="`language-${lang} codeblock`" v-html="snip" /></pre>
     </div>
   </div>
@@ -23,8 +23,10 @@ function highlight() {
   // 找到所有的code标签并进行高亮
   const codeElements = containerRef.value?.querySelectorAll(`.language-${props.lang}.codeblock`);
   codeElements?.forEach((block) => {
-    if (block.tagName === 'CODE') {
-      block.removeAttribute('data-highlighted');
+    // highlightjs 高亮代码后会给 code tag 带来 hljs class 和 data-highlighted="yes" 属性；
+    // 重复渲染会得到 highlightjs 的警告。
+    if (block.tagName === 'CODE' && !block.getAttribute('data-highlighted')) {
+      // block.removeAttribute('data-highlighted');
       hljs.highlightElement(block as HTMLElement);
       // console.log("hljs highlighted", props.lang);
     }
