@@ -39,7 +39,11 @@ watch(raw_reports, (data) => {
     let count_clippy_warn = 0;
     let count_clippy_error = 0;
     for (const report of datum.raw_reports) {
-      node?.children?.push({ key: (key++).toString(), label: report.file });
+      node?.children?.push({
+        key: (key++).toString(),
+        label: `[${report.count}] ${report.file}`,
+        data: report.file
+      });
       fmt.value.push(...(report.fmt.map(domSanitize)));
       clippyWarn.value.push(...(report.clippy_warn.map(domSanitize)));
       clippyError.value.push(...(report.clippy_error.map(domSanitize)));
@@ -102,7 +106,7 @@ watch(selectedKey, val => {
       if (idx > parseInt(node.key)) {
         for (const file of node.children ?? []) {
           if (file.key === key) {
-            const filename = file.label;
+            const filename = file.data;
             if (!filename) { return; }
             const package_ = raw_reports.value.find(datum => {
               return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
