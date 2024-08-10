@@ -28,6 +28,10 @@
 .naviBreadcrumb {
   display: flex;
   align-items: center;
+  /* 允许项目换行 */
+  flex-wrap: wrap;
+  /* 指定项目之间的间隔 */
+  gap: 0.5rem;
   /* 垂直居中所有子元素 */
   height: 55px;
   /* 容器的高度 */

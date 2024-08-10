@@ -1,6 +1,6 @@
 <template>
   <ClientOnly>
-    <span style="margin-right: 0.8rem;">
+    <span>
       <Button @click="toggleDarkMode" severity="contrast" :icon="darkMode ? 'pi pi-sun' : 'pi pi-moon'" />
     </span>
   </ClientOnly>

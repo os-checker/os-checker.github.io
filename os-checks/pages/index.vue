@@ -58,7 +58,7 @@ const selectedKey = ref();
         </div>
         <div class="right-to-left">
 
-          <span style="margin-right: 0.8rem;">
+          <span>
             <NuxtLink to="/file-tree">
               <Button title="文件树" icon="pi pi-sitemap" />
             </NuxtLink>
