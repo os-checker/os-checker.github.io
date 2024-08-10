@@ -48,7 +48,7 @@ const selectedKey = ref();
 <template>
 
   <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
-    scrollable scrollHeight="800px" v-model:selectionKeys="selectedKey" selectionMode="single">
+    scrollable scrollHeight="92vh" v-model:selectionKeys="selectedKey" selectionMode="single">
 
     <template #header>
       <div class="container">
