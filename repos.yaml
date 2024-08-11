@@ -8,6 +8,7 @@ rel4team/sel4_cspace:
 # kern-crates/CSpace:
 # kern-crates/sel4_cspace:
   all: true
+  clippy: cargo clippy --target riscv64gc-unknown-none-elf
 
 elliott10/e1000-driver:
   all: true
