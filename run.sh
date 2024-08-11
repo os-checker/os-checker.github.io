@@ -3,6 +3,9 @@
 # 加载 cargo 环境
 source $HOME/.bashrc
 
+# 安装 riscv64 编译目标工具链
+rustup target add riscv64gc-unknown-none-elf
+
 # Current dir: /ci
 echo PWD=$PWD && ls -alh
 
