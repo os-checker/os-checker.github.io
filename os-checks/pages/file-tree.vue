@@ -196,10 +196,10 @@ const tabs = reactive<CheckerResult[]>([
 <style scoped>
 .tabBadge {
   vertical-align: super;
-  --p-badge-padding: 0;
-  --p-badge-font-size: smaller;
-  --p-badge-height: 0.8rem;
-  --p-badge-min-width: 1.3rem;
+  --p-badge-padding: 0.2rem;
+  --p-badge-font-size: normal;
+  --p-badge-height: 1rem;
+  --p-badge-min-width: 1.5rem;
 }
 
 .fileViewPanel {
