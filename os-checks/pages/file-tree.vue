@@ -215,7 +215,7 @@ const tabs = reactive<CheckerResult[]>([
 
 .fileViewMenu {
   flex: 1;
-  height: 90vh;
+  height: 92vh;
   /* 允许不含空格的单词在任何地方换行 */
   word-break: break-all;
   font-size: smaller;
@@ -233,6 +233,6 @@ const tabs = reactive<CheckerResult[]>([
 
 .fileViewScroll {
   width: 100%;
-  height: 90vh;
+  height: 86vh;
 }
 </style>
