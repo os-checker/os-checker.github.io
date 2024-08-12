@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div>Some default layout content shared across all pages :)</div>
+    <TopBar />
+
     <slot />
   </div>
 </template>

@@ -161,7 +161,6 @@ const tabs = reactive<CheckerResult[]>([
   <div class="fileViewPanel">
 
     <div class="fileViewNavi">
-      <NavigationBreadcrumb />
       <ScrollPanel class="fileViewMenu">
         <PackageFileMenu style="padding-right: 0.8rem;" :nodes="nodes" :selectedKey="selectedKey"
           @update:selectedKey="selectedKey = $event" />
