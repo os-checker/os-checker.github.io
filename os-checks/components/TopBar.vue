@@ -1,31 +1,34 @@
 <template>
   <div style="display: flex;">
-    <div class="topBar">
 
-      <DarkMode />
+    <div class="topBarLeft">
+
+      <NuxtLink to="/">
+        <Button title="主页" icon="pi pi-home" />
+      </NuxtLink>
 
       <NuxtLink to="/file-tree">
         <Button title="问题文件树" icon="pi pi-sitemap" />
       </NuxtLink>
 
-      <NuxtLink to="/">
-        <Button icon="pi pi-home" title="主页" />
-      </NuxtLink>
+    </div>
+
+    <div class="topBarRight">
+
+      <DarkMode />
 
     </div>
+
   </div>
 </template>
 
 <style scoped>
-.topBar {
+.topBarLeft,
+.topBarRight {
   display: flex;
-  padding: 0.25rem 1rem;
   flex-direction: row;
   align-items: center;
-  /* 子元素在容器内靠右对齐 */
-  justify-content: flex-end;
-  /* 子元素在容器内靠右对齐 */
-  margin-left: auto;
+  padding: 0.25rem 0.8rem;
   /* 允许子元素换行 */
   justify-content: space-between;
   /* 允许项目换行 */
@@ -36,5 +39,18 @@
   height: 55px;
   /* 容器的高度 */
   --p-button-sm-padding-x: 0.8rem;
+}
+
+.topBarLeft {
+  justify-content: flex-start;
+  /* 子元素从左往右排列 */
+}
+
+.topBarRight {
+  display: flex;
+  /* 子元素在容器内靠右对齐 */
+  justify-content: flex-end;
+  /* 子元素在容器内靠右对齐 */
+  margin-left: auto;
 }
 </style>
