@@ -15,6 +15,9 @@
 
     <div class="topBarRight">
 
+      <Button title="使用说明" icon="pi pi-question" severity="info" as="a" target="_blank" rel="noopener"
+        href="https://github.com/os-checker/os-checker.github.io/wiki/%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E" />
+
       <DarkMode />
 
     </div>
