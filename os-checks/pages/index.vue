@@ -51,7 +51,7 @@ const selectedKey = ref();
     scrollable scrollHeight="92vh" v-model:selectionKeys="selectedKey" selectionMode="single">
 
     <template #header>
-      <div class="container">
+      <div class="header">
 
         <div>
           <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="dataColumns"
@@ -97,3 +97,12 @@ const selectedKey = ref();
   </TreeTable>
 
 </template>
+
+<style scoped>
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  /* 允许子元素换行 */
+  justify-content: space-between;
+}
+</style>
