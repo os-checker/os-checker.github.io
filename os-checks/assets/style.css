@@ -1,32 +1,3 @@
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    /* 允许子元素换行 */
-    justify-content: space-between;
-}
-
-.left-to-right,
-.right-to-left {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    /* 允许子元素在必要时换行 */
-}
-
-.left-to-right {
-    justify-content: flex-start;
-    /* 子元素从左往右排列 */
-}
-
-.right-to-left {
-    justify-content: flex-end;
-    /* 子元素在容器内靠右对齐 */
-    margin-left: auto;
-    /* 将第二个 div 推到容器的右侧 */
-    gap: 0.5rem;
-    /* 容器内部的元素间隔为 0.5rem */
-}
-
 /* 媒体查询：对于较小的屏幕 */
 /* @media (max-width: 600px) {} */
 

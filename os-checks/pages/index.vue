@@ -51,29 +51,20 @@ const selectedKey = ref();
     scrollable scrollHeight="92vh" v-model:selectionKeys="selectedKey" selectionMode="single">
 
     <template #header>
-      <div class="container">
-        <div class="left-to-right">
+      <div class="header">
+
+        <div>
           <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="dataColumns"
             optionLabel="header" class="w-full sm:w-64" display="chip" />
         </div>
-        <div class="right-to-left">
 
-          <span>
-            <NuxtLink to="/file-tree">
-              <Button title="文件树" icon="pi pi-sitemap" />
-            </NuxtLink>
-          </span>
-
-          <DarkMode />
-
-          <span style="display: inline-block;">
-            <IconField>
-              <InputIcon class="pi pi-search" />
-              <InputText v-model="filters['global']" placeholder="Global Search" />
-            </IconField>
-          </span>
-
+        <div>
+          <IconField>
+            <InputIcon class="pi pi-search" />
+            <InputText v-model="filters['global']" placeholder="Global Search" />
+          </IconField>
         </div>
+
       </div>
     </template>
 
@@ -106,3 +97,12 @@ const selectedKey = ref();
   </TreeTable>
 
 </template>
+
+<style scoped>
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  /* 允许子元素换行 */
+  justify-content: space-between;
+}
+</style>

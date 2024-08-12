@@ -1,7 +1,7 @@
 <template>
   <ClientOnly>
     <span>
-      <Button @click="toggleDarkMode" severity="contrast" :icon="darkMode ? 'pi pi-sun' : 'pi pi-moon'" />
+      <Button title="主题切换" @click="toggleDarkMode" severity="contrast" :icon="darkMode ? 'pi pi-sun' : 'pi pi-moon'" />
     </span>
   </ClientOnly>
 </template>
