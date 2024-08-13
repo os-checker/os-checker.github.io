@@ -9,8 +9,7 @@ type Datum = {
   user: string,
   repo: string,
   package: string,
-  // TODO: 该 count 应由 os-checker 提供
-  count?: number,
+  count: number,
   raw_reports: RawReport[]
 }
 
@@ -20,10 +19,9 @@ githubFetch({ path: "os-checks/public/test_raw_reports.json" })
     const value: Datum[] = JSON.parse(data as string);
     // 按照总问题数量排序；似乎这个默认排序应该由 os-checker 提供？
     for (const datum of value) {
-      datum.count = datum.raw_reports.map(r => r.count).reduce((acc, val) => acc + val, 0);
       datum.raw_reports.sort((a, b) => b.count - a.count);
     }
-    value.sort((a, b) => b.count! - a.count!);
+    value.sort((a, b) => b.count - a.count);
     raw_reports.value = value;
   });
 
@@ -37,20 +35,18 @@ watch(raw_reports, (data) => {
 
   let key = 0;
   for (const datum of data) {
-    // const count = datum.raw_reports.map(r => r.count).reduce((acc, val) => acc + val, 0);
-    let node: TreeNode | null = null;
     // 排除检查良好的库（这一步最好在 os-checker 做？）
-    if (datum.count !== 0) {
-      node = {
-        key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.package}`, children: [],
-        // data: { user: datum.user, repo: datum.repo, package: datum.package }
-      };
-    }
+    if (datum.count === 0) { continue; }
+
+    let node: TreeNode = {
+      key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.package}`, children: [],
+      // data: { user: datum.user, repo: datum.repo, package: datum.package }
+    };
     let count_fmt = 0;
     let count_clippy_warn = 0;
     let count_clippy_error = 0;
     for (const report of datum.raw_reports) {
-      node?.children?.push({
+      node.children?.push({
         key: (key++).toString(),
         label: `[${report.count}] ${report.file}`,
         data: report.file
@@ -62,13 +58,11 @@ watch(raw_reports, (data) => {
       count_clippy_warn += report.clippy_warn.length;
       count_clippy_error += report.clippy_error.length;
     }
-    if (node) {
-      node.data = {
-        user: datum.user, repo: datum.repo, package: datum.package,
-        total: datum.count!, fmt: count_fmt, clippy_warn: count_clippy_warn, clippy_error: count_clippy_error
-      };
-      nodes.value.push(node);
-    }
+    node.data = {
+      user: datum.user, repo: datum.repo, package: datum.package,
+      total: datum.count, fmt: count_fmt, clippy_warn: count_clippy_warn, clippy_error: count_clippy_error
+    };
+    nodes.value.push(node);
   }
 });
 
