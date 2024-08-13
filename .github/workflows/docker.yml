@@ -91,6 +91,13 @@ jobs:
            echo "工作目录干净，无需提交 ${{ env.TEST_JSON }} 和 ${{ env.TEST_RAW_REPORTS_JSON }}"
         fi
 
+        git clone https://x-access-token:${{ secrets.ACCESS_TOKEN }}@github.com/os-checker/database.git
+        cd database
+        cp /check/test_raw_reports.json test_raw_reports.json
+        git add test_raw_reports.json
+        git commit -m "[bot] update test_raw_reports.json from WebUI repo"
+        git push
+
   # Deploy job
   deploy:
     # Add a dependency to the build job
