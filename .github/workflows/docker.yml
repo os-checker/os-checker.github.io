@@ -69,7 +69,7 @@ jobs:
         export UI_JSON=ui.json # database 仓库的 json 检查结果
         cp /check/test.json $UI_JSON
         # 运行 jq 生成 WebUI 所需的 JSON 文件，并推送到 database 仓库
-        sh ui.sh
+        sh ci.sh
 
   # Deploy job
   deploy:
