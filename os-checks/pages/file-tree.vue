@@ -3,9 +3,9 @@ import type { TreeNode } from 'primevue/treenode';
 
 highlightRust();
 
-type Outputs = string[];
+type Kinds = { [key: string]: string[] };
 // FIXME: 这里需要找一种可拓展的方式来转换诊断类型，而不是固定的字段（确定后需要更改 database 的 file-tree.jq）
-type RawReport = { file: string, count: number, "Unformatted"?: Outputs, "Clippy(Warn)"?: Outputs, "Clippy(Error)"?: Outputs };
+type RawReport = { file: string, count: number, kinds: Kinds };
 type Datum = {
   user: string,
   repo: string,
@@ -14,6 +14,7 @@ type Datum = {
   raw_reports: RawReport[]
 }
 
+
 const raw_reports = ref<Datum[]>([]);
 githubFetch({ repo: "database", path: "ui/file-tree.json" })
   .then((data) => {
@@ -21,18 +22,17 @@ githubFetch({ repo: "database", path: "ui/file-tree.json" })
     raw_reports.value = value;
   });
 
+const tabs = ref<CheckerResult[]>([]);
 const nodes = ref<TreeNode[]>([]);
-const clippyWarn = ref<string[]>([]);
-const clippyError = ref<string[]>([]);
-const fmt = ref<string[]>([]);
 watch(raw_reports, (data) => {
   nodes.value = [];
-  clearResult();
 
+  // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
+  let kinds = {};
   let key = 0;
   for (const datum of data) {
-    // 排除检查良好的库（这一步最好在 os-checker 做？）
-    if (datum.count === 0) { continue; }
+    // 排除检查良好的库（这一步已经在 database 做了）
+    // if (datum.count === 0) { continue; }
 
     let node: TreeNode = {
       key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.package}`, children: [],
@@ -46,18 +46,8 @@ watch(raw_reports, (data) => {
         label: `[${report.count}] ${report.file}`,
         data: report.file
       });
-      if (report["Unformatted"]) {
-        fmt.value.push(...(report["Unformatted"].map(domSanitize)));
-        count_fmt += report["Unformatted"].length;
-      }
-      if (report["Clippy(Warn)"]) {
-        clippyWarn.value.push(...(report["Clippy(Warn)"].map(domSanitize)));
-        count_clippy_warn += report["Clippy(Warn)"].length;
-      }
-      if (report["Clippy(Error)"]) {
-        clippyError.value.push(...(report["Clippy(Error)"].map(domSanitize)));
-        count_clippy_error += report["Clippy(Error)"].length;
-      }
+
+      mergeObjectsWithArrayConcat(kinds, report.kinds);
     }
     node.data = {
       user: datum.user, repo: datum.repo, package: datum.package,
@@ -65,38 +55,27 @@ watch(raw_reports, (data) => {
     };
     nodes.value.push(node);
   }
+
+  tabs.value = checkerResult(kinds);
 });
 
-/** 清除用于展示的检查结果 */
-function clearResult() {
-  fmt.value = [];
-  clippyWarn.value = [];
-  clippyError.value = [];
-}
-
-function updateTabs(data: Datum[]) {
-  clearResult();
-  for (const datum of data) {
-    for (const report of datum.raw_reports) {
-      if (report["Unformatted"]) {
-        fmt.value.push(...(report["Unformatted"].map(domSanitize)));
-      }
-      if (report["Clippy(Warn)"]) {
-        clippyWarn.value.push(...(report["Clippy(Warn)"].map(domSanitize)));
-      }
-      if (report["Clippy(Error)"]) {
-        clippyError.value.push(...(report["Clippy(Error)"].map(domSanitize)));
-      }
+function mergeObjectsWithArrayConcat(result: Kinds, obj: Kinds) {
+  for (const [key, value] of Object.entries(obj)) {
+    if (result.hasOwnProperty(key)) {
+      // 如果键已经存在，则合并数组
+      result[key] = result[key].concat(value);
+    } else {
+      // 否则，添加新的键值对
+      result[key] = value;
     }
   }
 }
 
 const selectedKey = ref({});
-watch(selectedKey, val => {
+watch(selectedKey, (val) => {
   const key = Object.keys(val)[0];
   if (!key) { return; }
   const idx = parseInt(key);
-  // console.log(idx);
   for (const node of nodes.value.slice().reverse()) {
     const nd = node.data;
     if (!(nd && nd.user && nd.repo && nd.package)) { return; }
@@ -104,14 +83,14 @@ watch(selectedKey, val => {
     // 查找是否点击了 package
     if (node.key === key) {
       // 更新 tabs 展示的数据
-      const package_ = raw_reports.value.find(datum => {
+      const found_pkg = raw_reports.value.find(datum => {
         return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
       });
-      // console.log(package_);
-      if (package_) {
-        updateTabs([package_]);
+      let kinds = {};
+      for (const report of found_pkg?.raw_reports ?? []) {
+        mergeObjectsWithArrayConcat(kinds, report.kinds);
       }
-      // node.children?.map(file => file.label);
+      tabs.value = checkerResult(kinds);
       return;
     } else {
       // 由于 key 是升序的，现在只要找第一个小于目标 key 的 package，那么这个文件就在那里
@@ -119,40 +98,25 @@ watch(selectedKey, val => {
         for (const file of node.children ?? []) {
           if (file.key === key) {
             const filename = file.data;
-            if (!filename) { return; }
+            if (!filename) { return []; }
             const package_ = raw_reports.value.find(datum => {
               return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
             });
             const found_file = package_?.raw_reports.find(item => item.file === filename);
-            if (!found_file) { return; }
-            if (found_file["Unformatted"]) {
-              fmt.value = found_file["Unformatted"].map(domSanitize);
-            } else {
-              fmt.value = [];
+            if (found_file) {
+              tabs.value = checkerResult(found_file.kinds);
+              return;
             }
-            if (found_file["Clippy(Warn)"]) {
-              clippyWarn.value = found_file["Clippy(Warn)"] ?? [].map(domSanitize);
-            } else {
-              clippyWarn.value = [];
-            }
-            if (found_file["Clippy(Error)"]) {
-              clippyError.value = found_file["Clippy(Error)"] ?? [].map(domSanitize);
-            } else {
-              clippyError.value = [];
-            }
-            return;
           }
         }
       }
     }
-    // TODO: 查找是否点击某个文件
   }
 });
 
 type CheckerResult = {
-  value: string,
-  title: string,
-  snippets: Ref<string[]>,
+  kind: string,
+  raw: string[],
   lang: string,
   severity: Severity,
 };
@@ -163,11 +127,21 @@ enum Severity {
   Info = "info",
 }
 
-const tabs = reactive<CheckerResult[]>([
-  { value: "Clippy(Errors)", title: "Clippy(Errors)", snippets: clippyError, lang: "rust", severity: Severity.Danger },
-  { value: "Clippy(Warns)", title: "Clippy(Warns)", snippets: clippyWarn, lang: "rust", severity: Severity.Warn },
-  { value: "Unformatted", title: "Unformatted", snippets: fmt, lang: "diff", severity: Severity.Info }
-]);
+function checkerResult(kinds: Kinds): CheckerResult[] {
+  let results: CheckerResult[] = [];
+  for (const [kind, raw] of Object.entries(kinds)) {
+    let lang = "rust";
+    let severity = Severity.Info;
+    switch (kind) {
+      case "Clippy(Error)": severity = Severity.Danger; break;
+      case "Clippy(Warn)": severity = Severity.Warn; break;
+      case "Unformatted": lang = "diff"; break;
+      default: ;
+    }
+    results.push({ kind, raw: raw.map(domSanitize), lang, severity });
+  }
+  return results;
+}
 </script>
 
 <template>
@@ -181,21 +155,22 @@ const tabs = reactive<CheckerResult[]>([
     </div>
 
     <div class="fileViewResult">
-      <Tabs :value="tabs[0].value" scrollable>
+      <!-- 这个 value 貌似是初始化，不需要反应式变量 -->
+      <Tabs value="Clippy(Error)" scrollable>
         <TabList>
-          <Tab v-for="tab in tabs" :value="tab.value">
-            {{ tab.title }}
+          <Tab v-for="tab in tabs" :value="tab.kind">
+            {{ tab.kind }}
             <span class="tabBadge">
-              <Badge :value="tab.snippets.length" :severity="tab.severity" />
+              <Badge :value="tab.raw.length" :severity="tab.severity" />
             </span>
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel v-for="tab in tabs" :value="tab.value">
+          <TabPanel v-for="tab in tabs" :value="tab.kind">
             <ScrollPanel class="fileViewScroll" :dt="{
               bar: { background: '{primary.color}' },
             }">
-              <CodeBlock :snippets="tab.snippets" :lang="tab.lang" />
+              <CodeBlock :snippets="tab.raw" :lang="tab.lang" />
             </ScrollPanel>
           </TabPanel>
         </TabPanels>
