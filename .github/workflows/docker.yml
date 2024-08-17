@@ -66,7 +66,7 @@ jobs:
         cd database
         git pull --rebase # 防止二次运行 CI 时落后于远程分支
 
-        export UI_JSON=ui.json # database 仓库的 json 检查结果
+        export BOT=1 UI_JSON=ui.json # database 仓库的 json 检查结果
         cp /check/test.json $UI_JSON
         # 运行 jq 生成 WebUI 所需的 JSON 文件，并推送到 database 仓库
         sh ci.sh
