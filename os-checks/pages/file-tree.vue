@@ -14,11 +14,24 @@ type Datum = {
   raw_reports: RawReport[]
 }
 
-
 const raw_reports = ref<Datum[]>([]);
 githubFetch({ repo: "database", path: "ui/file-tree.json" })
   .then((data) => {
     const value: Datum[] = JSON.parse(data as string);
+
+    // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
+    let kinds = {};
+    for (const datum of value) {
+      for (const report of datum.raw_reports) {
+        for (const kind of Object.keys(report.kinds)) {
+          // 对原始输出中的所有特殊符号转义，以后就不需要转义了
+          report.kinds[kind] = report.kinds[kind].map(domSanitize);
+        }
+        mergeObjectsWithArrayConcat(kinds, report.kinds);
+      }
+    }
+
+    tabs.value = checkerResult(kinds);
     raw_reports.value = value;
   });
 
@@ -27,8 +40,6 @@ const nodes = ref<TreeNode[]>([]);
 watch(raw_reports, (data) => {
   nodes.value = [];
 
-  // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
-  let kinds = {};
   let key = 0;
   for (const datum of data) {
     // 排除检查良好的库（这一步已经在 database 做了）
@@ -47,7 +58,6 @@ watch(raw_reports, (data) => {
         data: report.file
       });
 
-      mergeObjectsWithArrayConcat(kinds, report.kinds);
     }
     node.data = {
       user: datum.user, repo: datum.repo, package: datum.package,
@@ -55,8 +65,6 @@ watch(raw_reports, (data) => {
     };
     nodes.value.push(node);
   }
-
-  tabs.value = checkerResult(kinds);
 });
 
 function mergeObjectsWithArrayConcat(result: Kinds, obj: Kinds) {
@@ -138,7 +146,7 @@ function checkerResult(kinds: Kinds): CheckerResult[] {
       case "Unformatted": lang = "diff"; break;
       default: ;
     }
-    results.push({ kind, raw: raw.map(domSanitize), lang, severity });
+    results.push({ kind, raw, lang, severity });
   }
   return results;
 }
@@ -156,7 +164,7 @@ function checkerResult(kinds: Kinds): CheckerResult[] {
 
     <div class="fileViewResult">
       <!-- 这个 value 貌似是初始化，不需要反应式变量 -->
-      <Tabs value="Clippy(Error)" scrollable>
+      <Tabs :value="tabs[0]?.kind ?? 'Clippy(Error)'" scrollable>
         <TabList>
           <Tab v-for="tab in tabs" :value="tab.kind">
             {{ tab.kind }}
