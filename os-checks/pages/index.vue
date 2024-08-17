@@ -3,7 +3,7 @@ import type { TreeNode } from 'primevue/treenode';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
-githubFetch({ path: "os-checks/public/test.json" })
+githubFetch({ repo: "database", path: "ui/home.json" })
   .then((data) => {
     const value = JSON.parse(data as string) as TreeNode[];
     // 展平单仓库单项目成一行数据
@@ -17,21 +17,15 @@ githubFetch({ path: "os-checks/public/test.json" })
         value[i] = node;
         continue;
       }
-      for (let i = 0; i < node.children.length; i++) {
-        if (node.children[i].data.total_count === 0) {
-          // 当总计为 0，不要显示 0
-          node.children[i].data.total_count = null;
-        }
-      }
     }
     nodes.value = value
-  })
+  });
 
 const dataColumns = ref([
   { field: 'total_count', header: '报告数量' },
   { field: 'Clippy(Error)', header: 'Clippy(Errors)' },
   { field: 'Clippy(Warn)', header: 'Clippy(Warns)' },
-  { field: 'Unformatted(File)', header: '未格式化' },
+  { field: 'Unformatted', header: '未格式化' },
 ]);
 
 // interactive filter/search inputs
