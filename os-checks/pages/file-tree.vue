@@ -4,7 +4,8 @@ import type { TreeNode } from 'primevue/treenode';
 highlightRust();
 
 type Outputs = string[];
-type RawReport = { file: string, count: number, fmt: Outputs, clippy_warn: Outputs, clippy_error: Outputs };
+// FIXME: 这里需要找一种可拓展的方式来转换诊断类型，而不是固定的字段（确定后需要更改 database 的 file-tree.jq）
+type RawReport = { file: string, count: number, "Unformatted"?: Outputs, "Clippy(Warn)"?: Outputs, "Clippy(Error)"?: Outputs };
 type Datum = {
   user: string,
   repo: string,
@@ -14,14 +15,9 @@ type Datum = {
 }
 
 const raw_reports = ref<Datum[]>([]);
-githubFetch({ path: "os-checks/public/test_raw_reports.json" })
+githubFetch({ repo: "database", path: "ui/file-tree.json" })
   .then((data) => {
     const value: Datum[] = JSON.parse(data as string);
-    // 按照总问题数量排序；似乎这个默认排序应该由 os-checker 提供？
-    for (const datum of value) {
-      datum.raw_reports.sort((a, b) => b.count - a.count);
-    }
-    value.sort((a, b) => b.count - a.count);
     raw_reports.value = value;
   });
 
@@ -40,7 +36,6 @@ watch(raw_reports, (data) => {
 
     let node: TreeNode = {
       key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.package}`, children: [],
-      // data: { user: datum.user, repo: datum.repo, package: datum.package }
     };
     let count_fmt = 0;
     let count_clippy_warn = 0;
@@ -51,12 +46,18 @@ watch(raw_reports, (data) => {
         label: `[${report.count}] ${report.file}`,
         data: report.file
       });
-      fmt.value.push(...(report.fmt.map(domSanitize)));
-      clippyWarn.value.push(...(report.clippy_warn.map(domSanitize)));
-      clippyError.value.push(...(report.clippy_error.map(domSanitize)));
-      count_fmt += report.fmt.length;
-      count_clippy_warn += report.clippy_warn.length;
-      count_clippy_error += report.clippy_error.length;
+      if (report["Unformatted"]) {
+        fmt.value.push(...(report["Unformatted"].map(domSanitize)));
+        count_fmt += report["Unformatted"].length;
+      }
+      if (report["Clippy(Warn)"]) {
+        clippyWarn.value.push(...(report["Clippy(Warn)"].map(domSanitize)));
+        count_clippy_warn += report["Clippy(Warn)"].length;
+      }
+      if (report["Clippy(Error)"]) {
+        clippyError.value.push(...(report["Clippy(Error)"].map(domSanitize)));
+        count_clippy_error += report["Clippy(Error)"].length;
+      }
     }
     node.data = {
       user: datum.user, repo: datum.repo, package: datum.package,
@@ -77,9 +78,15 @@ function updateTabs(data: Datum[]) {
   clearResult();
   for (const datum of data) {
     for (const report of datum.raw_reports) {
-      fmt.value.push(...(report.fmt.map(domSanitize)));
-      clippyWarn.value.push(...(report.clippy_warn.map(domSanitize)));
-      clippyError.value.push(...(report.clippy_error.map(domSanitize)));
+      if (report["Unformatted"]) {
+        fmt.value.push(...(report["Unformatted"].map(domSanitize)));
+      }
+      if (report["Clippy(Warn)"]) {
+        clippyWarn.value.push(...(report["Clippy(Warn)"].map(domSanitize)));
+      }
+      if (report["Clippy(Error)"]) {
+        clippyError.value.push(...(report["Clippy(Error)"].map(domSanitize)));
+      }
     }
   }
 }
@@ -118,9 +125,21 @@ watch(selectedKey, val => {
             });
             const found_file = package_?.raw_reports.find(item => item.file === filename);
             if (!found_file) { return; }
-            fmt.value = found_file.fmt.map(domSanitize);
-            clippyWarn.value = found_file.clippy_warn.map(domSanitize);
-            clippyError.value = found_file.clippy_error.map(domSanitize);
+            if (found_file["Unformatted"]) {
+              fmt.value = found_file["Unformatted"].map(domSanitize);
+            } else {
+              fmt.value = [];
+            }
+            if (found_file["Clippy(Warn)"]) {
+              clippyWarn.value = found_file["Clippy(Warn)"] ?? [].map(domSanitize);
+            } else {
+              clippyWarn.value = [];
+            }
+            if (found_file["Clippy(Error)"]) {
+              clippyError.value = found_file["Clippy(Error)"] ?? [].map(domSanitize);
+            } else {
+              clippyError.value = [];
+            }
             return;
           }
         }
