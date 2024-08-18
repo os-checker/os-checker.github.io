@@ -4,7 +4,6 @@ import type { TreeNode } from 'primevue/treenode';
 highlightRust();
 
 type Kinds = { [key: string]: string[] };
-// FIXME: 这里需要找一种可拓展的方式来转换诊断类型，而不是固定的字段（确定后需要更改 database 的 file-tree.jq）
 type RawReport = { file: string, count: number, kinds: Kinds };
 type Datum = {
   user: string,
@@ -38,8 +37,7 @@ githubFetch({ repo: "database", path: "ui/file-tree.json" })
         mergeObjectsWithArrayConcat(kinds, report.kinds);
       }
     }
-
-    tabs.value = checkerResult(kinds);
+    tabs.value = checkerResult(kinds, file_tree.kinds_order);
     selectedTab.value = tabs.value[0]?.kind ?? "";
     fileTree.value = file_tree;
   });
@@ -50,9 +48,6 @@ watch(fileTree, (data) => {
 
   let key = 0;
   for (const datum of data.data) {
-    // 排除检查良好的库（这一步已经在 database 做了）
-    // if (datum.count === 0) { continue; }
-
     let node: TreeNode = {
       key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.package}`, children: [],
     };
@@ -106,7 +101,7 @@ watch(selectedKey, (val) => {
       for (const report of found_pkg?.raw_reports ?? []) {
         mergeObjectsWithArrayConcat(kinds, report.kinds);
       }
-      tabs.value = checkerResult(kinds);
+      tabs.value = checkerResult(kinds, fileTree.value.kinds_order);
       return;
     } else {
       // 由于 key 是升序的，现在只要找第一个小于目标 key 的 package，那么这个文件就在那里
@@ -120,7 +115,7 @@ watch(selectedKey, (val) => {
             });
             const found_file = package_?.raw_reports.find(item => item.file === filename);
             if (found_file) {
-              tabs.value = checkerResult(found_file.kinds);
+              tabs.value = checkerResult(found_file.kinds, fileTree.value.kinds_order);
               return;
             }
           }
@@ -143,8 +138,11 @@ enum Severity {
   Info = "info",
 }
 
-function checkerResult(kinds: Kinds): CheckerResult[] {
-  let results: CheckerResult[] = [];
+// Kinds 可能不包含全部诊断类别，因此这里填充空数组，并按照顺序排列
+function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
+  let results = kinds_order.map<CheckerResult>(kind => {
+    return { kind, raw: [], lang: "rust", severity: Severity.Info };
+  });
   for (const [kind, raw] of Object.entries(kinds)) {
     let lang = "rust";
     let severity = Severity.Info;
@@ -154,7 +152,10 @@ function checkerResult(kinds: Kinds): CheckerResult[] {
       case "Unformatted": lang = "diff"; break;
       default: ;
     }
-    results.push({ kind, raw, lang, severity });
+    const pos = results.findIndex(r => r.kind === kind);
+    if (pos !== -1) {
+      results[pos] = { kind, raw, lang, severity };
+    }
   }
   return results;
 }
