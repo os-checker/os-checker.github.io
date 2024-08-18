@@ -14,6 +14,8 @@ type Datum = {
   raw_reports: RawReport[]
 }
 
+const tabs = ref<CheckerResult[]>([]);
+const selectedTab = ref("");
 const raw_reports = ref<Datum[]>([]);
 githubFetch({ repo: "database", path: "ui/file-tree.json" })
   .then((data) => {
@@ -32,10 +34,10 @@ githubFetch({ repo: "database", path: "ui/file-tree.json" })
     }
 
     tabs.value = checkerResult(kinds);
+    selectedTab.value = tabs.value[0]?.kind ?? "";
     raw_reports.value = value;
   });
 
-const tabs = ref<CheckerResult[]>([]);
 const nodes = ref<TreeNode[]>([]);
 watch(raw_reports, (data) => {
   nodes.value = [];
@@ -163,8 +165,7 @@ function checkerResult(kinds: Kinds): CheckerResult[] {
     </div>
 
     <div class="fileViewResult">
-      <!-- 这个 value 貌似是初始化，不需要反应式变量 -->
-      <Tabs :value="tabs[0]?.kind ?? 'Clippy(Error)'" scrollable>
+      <Tabs :value="selectedTab" scrollable>
         <TabList>
           <Tab v-for="tab in tabs" :value="tab.kind">
             {{ tab.kind }}
