@@ -14,16 +14,22 @@ type Datum = {
   raw_reports: RawReport[]
 }
 
+type FileTree = {
+  // 诊断类别数组，越往前的越优先展示
+  kinds_order: string[],
+  data: Datum[]
+}
+
 const tabs = ref<CheckerResult[]>([]);
 const selectedTab = ref("");
-const raw_reports = ref<Datum[]>([]);
+const fileTree = ref<FileTree>({ kinds_order: [], data: [] });
 githubFetch({ repo: "database", path: "ui/file-tree.json" })
   .then((data) => {
-    const value: Datum[] = JSON.parse(data as string);
+    const file_tree: FileTree = JSON.parse(data as string);
 
     // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
     let kinds = {};
-    for (const datum of value) {
+    for (const datum of file_tree.data) {
       for (const report of datum.raw_reports) {
         for (const kind of Object.keys(report.kinds)) {
           // 对原始输出中的所有特殊符号转义，以后就不需要转义了
@@ -35,15 +41,15 @@ githubFetch({ repo: "database", path: "ui/file-tree.json" })
 
     tabs.value = checkerResult(kinds);
     selectedTab.value = tabs.value[0]?.kind ?? "";
-    raw_reports.value = value;
+    fileTree.value = file_tree;
   });
 
 const nodes = ref<TreeNode[]>([]);
-watch(raw_reports, (data) => {
+watch(fileTree, (data) => {
   nodes.value = [];
 
   let key = 0;
-  for (const datum of data) {
+  for (const datum of data.data) {
     // 排除检查良好的库（这一步已经在 database 做了）
     // if (datum.count === 0) { continue; }
 
@@ -93,7 +99,7 @@ watch(selectedKey, (val) => {
     // 查找是否点击了 package
     if (node.key === key) {
       // 更新 tabs 展示的数据
-      const found_pkg = raw_reports.value.find(datum => {
+      const found_pkg = fileTree.value.data.find(datum => {
         return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
       });
       let kinds = {};
@@ -109,7 +115,7 @@ watch(selectedKey, (val) => {
           if (file.key === key) {
             const filename = file.data;
             if (!filename) { return []; }
-            const package_ = raw_reports.value.find(datum => {
+            const package_ = fileTree.value.data.find(datum => {
               return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
             });
             const found_file = package_?.raw_reports.find(item => item.file === filename);
