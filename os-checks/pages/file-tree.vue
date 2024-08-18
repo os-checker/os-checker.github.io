@@ -130,18 +130,20 @@ type CheckerResult = {
   raw: string[],
   lang: string,
   severity: Severity,
+  disabled: boolean, // 对于空数组，禁用选项卡
 };
 
 enum Severity {
   Danger = "danger",
   Warn = "warn",
   Info = "info",
+  Disabled = "secondary",
 }
 
 // Kinds 可能不包含全部诊断类别，因此这里填充空数组，并按照顺序排列
 function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
   let results = kinds_order.map<CheckerResult>(kind => {
-    return { kind, raw: [], lang: "rust", severity: Severity.Info };
+    return { kind, raw: [], lang: "rust", severity: Severity.Disabled, disabled: true };
   });
   for (const [kind, raw] of Object.entries(kinds)) {
     let lang = "rust";
@@ -154,9 +156,11 @@ function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
     }
     const pos = results.findIndex(r => r.kind === kind);
     if (pos !== -1) {
-      results[pos] = { kind, raw, lang, severity };
+      // JSON 提供的诊断信息一定不是空数组
+      results[pos] = { kind, raw, lang, severity, disabled: false };
     }
   }
+  selectedTab.value = results.find(r => !r.disabled)?.kind ?? "";
   return results;
 }
 </script>
@@ -174,7 +178,7 @@ function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
     <div class="fileViewResult">
       <Tabs :value="selectedTab" scrollable>
         <TabList>
-          <Tab v-for="tab in tabs" :value="tab.kind">
+          <Tab v-for="tab in tabs" :value="tab.kind" :disabled="tab.disabled">
             {{ tab.kind }}
             <span class="tabBadge">
               <Badge :value="tab.raw.length" :severity="tab.severity" />
@@ -203,6 +207,7 @@ function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
   --p-badge-font-size: normal;
   --p-badge-height: 1rem;
   --p-badge-min-width: 1.5rem;
+  --p-badge-secondary-color: grey;
 }
 
 .fileViewPanel {
