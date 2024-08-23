@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
 
+const targets = useTargetsStore();
+targets.fetch().then(() => console.log(`Targets: ${targets.targets}`));
+
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
 githubFetch({ repo: "database", path: "ui/home.json" })

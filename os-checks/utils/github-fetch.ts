@@ -6,6 +6,7 @@ type Github = {
 
 // https://raw.githubusercontent.com/os-checker/os-checker.github.io/main/os-checks/public/test_raw_reports.json
 export default function (github: Github) {
+  // FIXME: 替换成 database; os-checker.github.io 不再存储数据
   const repo = github.repo || "os-checker.github.io";
   const branch = github.branch || "main";
   const url = `https://raw.githubusercontent.com/os-checker/${repo}/${branch}/${github.path}`;

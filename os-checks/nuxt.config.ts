@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     enabled: true,
     timeline: { enabled: true, },
   },
-  modules: ["@primevue/nuxt-module"],
+  modules: ["@primevue/nuxt-module", "@pinia/nuxt"],
   primevue: {
     options: {
       theme: {
