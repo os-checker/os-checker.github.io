@@ -44,6 +44,14 @@ targets.$subscribe((_, state) => {
       tabs.value = checkerResult(kinds, file_tree.kinds_order);
       selectedTab.value = tabs.value[0]?.kind ?? "";
       fileTree.value = file_tree;
+    }).catch(() => {
+      // 不存在该文件：意味着该目标架构下的所有仓库没有检查出错误
+      tabs.value = [{
+        kind: "All good! 🥳", raw: ["该目标架构下的所有仓库没有检查出错误 🥳🥳🥳"],
+        lang: "rust", severity: Severity.Info, disabled: false
+      }];
+      selectedTab.value = "All good! 🥳";
+      fileTree.value = { kinds_order: [], data: [] };
     });
 });
 
