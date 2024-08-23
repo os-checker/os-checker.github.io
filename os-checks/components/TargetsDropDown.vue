@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Select v-model="selected" :options="targets" optionLabel="target" placeholder="Targets" class="w-full md:w-56" />
+    <Select v-model="selected" :options="targets" optionLabel="target" placeholder="Targets" />
   </div>
 </template>
 
@@ -12,5 +12,6 @@ const targets = ref([defaultTarget]);
 
 const candidates = useTargetsStore();
 candidates.fetch().then(options => targets.value = options);
+watch(selected, (val) => candidates.current = val.target);
 
 </script>
