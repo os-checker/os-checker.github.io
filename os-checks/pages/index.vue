@@ -6,7 +6,7 @@ targets.fetch().then(() => console.log(`Targets: ${targets.targets}`));
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
-githubFetch({ repo: "database", path: "ui/home.json" })
+githubFetch({ path: "ui/home.json" })
   .then((data) => {
     const value = JSON.parse(data as string) as TreeNode[];
     // 展平单仓库单项目成一行数据

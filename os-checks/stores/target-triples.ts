@@ -6,7 +6,7 @@ export const useTargetsStore = defineStore('targets', {
   }),
   actions: {
     async fetch() {
-      this.targets = await githubFetch({ repo: "database", path: "ui/target-triple.json" }) as TargetTriples;
+      this.targets = await githubFetch({ path: "ui/target-triple.json" }) as TargetTriples;
     }
   }
 })

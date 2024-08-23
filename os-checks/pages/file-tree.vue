@@ -22,7 +22,7 @@ type FileTree = {
 const tabs = ref<CheckerResult[]>([]);
 const selectedTab = ref("");
 const fileTree = ref<FileTree>({ kinds_order: [], data: [] });
-githubFetch({ repo: "database", path: "ui/file-tree.json" })
+githubFetch({ path: "ui/file-tree.json" })
   .then((data) => {
     const file_tree: FileTree = JSON.parse(data as string);
 
