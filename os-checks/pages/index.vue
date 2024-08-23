@@ -3,23 +3,28 @@ import type { TreeNode } from 'primevue/treenode';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
-githubFetch({ path: "ui/home.json" })
-  .then((data) => {
-    const value = JSON.parse(data as string) as TreeNode[];
-    // 展平单仓库单项目成一行数据
-    for (let i = 0; i < value.length; i++) {
-      let node = value[i];
-      if (!node.children) {
-        continue;
+
+const targets = useTargetsStore();
+targets.$subscribe((_, state) => {
+  const path = `ui/home/split/${state.current}.json`;
+  githubFetch({ path })
+    .then((data) => {
+      const value = JSON.parse(data as string) as TreeNode[];
+      // 展平单仓库单项目成一行数据
+      for (let i = 0; i < value.length; i++) {
+        let node = value[i];
+        if (!node.children) {
+          continue;
+        }
+        if (node.children.length === 1) {
+          node = node.children[0];
+          value[i] = node;
+          continue;
+        }
       }
-      if (node.children.length === 1) {
-        node = node.children[0];
-        value[i] = node;
-        continue;
-      }
-    }
-    nodes.value = value
-  });
+      nodes.value = value
+    });
+});
 
 const dataColumns = ref([
   { field: 'total_count', header: '报告数量' },
