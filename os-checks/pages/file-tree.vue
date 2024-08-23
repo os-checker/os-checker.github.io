@@ -22,25 +22,30 @@ type FileTree = {
 const tabs = ref<CheckerResult[]>([]);
 const selectedTab = ref("");
 const fileTree = ref<FileTree>({ kinds_order: [], data: [] });
-githubFetch({ path: "ui/file-tree.json" })
-  .then((data) => {
-    const file_tree: FileTree = JSON.parse(data as string);
 
-    // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
-    let kinds = {};
-    for (const datum of file_tree.data) {
-      for (const report of datum.raw_reports) {
-        for (const kind of Object.keys(report.kinds)) {
+const targets = useTargetsStore();
+targets.$subscribe((_, state) => {
+  const path = `ui/file-tree/split/${state.current}.json`;
+  githubFetch({ path })
+    .then((data) => {
+      const file_tree: FileTree = JSON.parse(data as string);
+
+      // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
+      let kinds = {};
+      for (const datum of file_tree.data) {
+        for (const report of datum.raw_reports) {
+          // for (const kind of Object.keys(report.kinds)) {
           // 对原始输出中的所有特殊符号转义，以后就不需要转义了
-          report.kinds[kind] = report.kinds[kind].map(domSanitize);
+          //   report.kinds[kind] = report.kinds[kind].map(domSanitize);
+          // }
+          mergeObjectsWithArrayConcat(kinds, report.kinds);
         }
-        mergeObjectsWithArrayConcat(kinds, report.kinds);
       }
-    }
-    tabs.value = checkerResult(kinds, file_tree.kinds_order);
-    selectedTab.value = tabs.value[0]?.kind ?? "";
-    fileTree.value = file_tree;
-  });
+      tabs.value = checkerResult(kinds, file_tree.kinds_order);
+      selectedTab.value = tabs.value[0]?.kind ?? "";
+      fileTree.value = file_tree;
+    });
+});
 
 const nodes = ref<TreeNode[]>([]);
 watch(fileTree, (data) => {

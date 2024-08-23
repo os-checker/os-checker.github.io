@@ -1,7 +1,7 @@
 <template>
   <div ref="containerRef">
-    <div v-for="snip in snippets" :key=snip>
-      <pre><code :class="`language-${lang} codeblock`" v-html="snip" /></pre>
+    <div v-for="snip in snippets">
+      <pre><code :class="`language-${lang} codeblock`" :key="snip">{{ snip }}</code></pre>
     </div>
   </div>
 </template>
@@ -27,6 +27,7 @@ function highlight() {
     // 重复渲染会得到 highlightjs 的警告。
     if (block.tagName === 'CODE' && !block.getAttribute('data-highlighted')) {
       // block.removeAttribute('data-highlighted');
+      // block.textContent = domSanitize(block.textContent);
       hljs.highlightElement(block as HTMLElement);
       // console.log("hljs highlighted", props.lang);
     }
