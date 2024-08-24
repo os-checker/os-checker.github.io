@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
 
 // fetch JSON data from content dir
@@ -23,6 +24,10 @@ targets.$subscribe((_, state) => {
         }
       }
       nodes.value = value
+    }).catch((err: FetchError) => {
+      if (err.statusCode === 404) {
+        nodes.value = [{ key: "0", data: { user: "ALL", repo: "ALL", package: "ALL", total_count: 0 } }];
+      }
     });
 });
 
