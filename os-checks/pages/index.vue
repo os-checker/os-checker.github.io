@@ -6,8 +6,9 @@ import type { TreeNode } from 'primevue/treenode';
 const nodes = ref<TreeNode[]>([])
 
 const targets = useTargetsStore();
-targets.$subscribe((_, state) => {
-  const path = `ui/home/split/${state.current}.json`;
+
+function init(target: string) {
+  const path = `ui/home/split/${target}.json`;
   githubFetch({ path })
     .then((data) => {
       const value = JSON.parse(data as string) as TreeNode[];
@@ -29,7 +30,10 @@ targets.$subscribe((_, state) => {
         nodes.value = [{ key: "0", data: { user: "ALL", repo: "ALL", package: "ALL", total_count: 0 } }];
       }
     });
-});
+}
+
+init(targets.current);
+targets.$subscribe((_, state) => init(state.current));
 
 const dataColumns = ref([
   { field: 'total_count', header: '报告数量' },
