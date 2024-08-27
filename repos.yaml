@@ -8,6 +8,10 @@ arceos-org/arceos:
       clippy: cargo clippy --target x86_64-unknown-linux-gnu --no-deps --message-format=json
     deptool:
       clippy: cargo clippy --target x86_64-unknown-linux-gnu --no-deps --message-format=json
+    arceos-shell:
+      clippy: cargo clippy --target x86_64-unknown-linux-gnu --no-deps --message-format=json
+    arceos-httpserver:
+      clippy: cargo clippy --target x86_64-unknown-linux-gnu --no-deps --message-format=json
 
 kern-crates/sel4_cspace:
   all: true
