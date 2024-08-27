@@ -76,15 +76,15 @@ const selectedKey = ref();
       </div>
     </template>
 
-    <Column field="user" header="User" expander sortable>
+    <Column field="user" header="User" expander sortable style="width: 150px">
       <template #filter>
-        <InputText v-model="filters.user" type="text" :placeholder="`Filter by user`" />
+        <InputText v-model="filters.user" type="text" :placeholder="`Filter by user`" style="width: 150px" />
       </template>
     </Column>
 
-    <Column field="repo" header="Repo" sortable>
+    <Column field="repo" header="Repo" sortable style="width: 180px">
       <template #filter>
-        <InputText v-model="filters.repo" type="text" :placeholder="`Filter by repo`" />
+        <InputText v-model="filters.repo" type="text" :placeholder="`Filter by repo`" style="width: 180px" />
       </template>
 
       <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
@@ -94,13 +94,13 @@ const selectedKey = ref();
       <!-- </template> -->
     </Column>
 
-    <Column field="package" header="Package" sortable>
+    <Column field="package" header="Package" sortable style="width: 180px">
       <template #filter>
-        <InputText v-model="filters.package" type="text" :placeholder="`Filter by package`" />
+        <InputText v-model="filters.package" type="text" :placeholder="`Filter by package`" style="width: 180px" />
       </template>
     </Column>
 
-    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable />
+    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable style="min-width: 150px" />
 
   </TreeTable>
 
