@@ -3,6 +3,9 @@ os-checker/os-checker-test-suite:
 
 arceos-org/arceos:
   all: true
+  packages:
+    bwbench-client:
+      clippy: cargo clippy --target x86_64-unknown-linux-gnu --no-deps --message-format=json
 
 kern-crates/sel4_cspace:
   all: true
