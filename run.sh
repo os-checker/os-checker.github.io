@@ -42,6 +42,7 @@ os-checker --help
 # echo '```' >>summary.txt
 
 # ls -alh && echo PWD = $PWD
+os-checker --emit json --norun --setup       # set up toolchains for all repos and checkers
 os-checker --emit os-checks/public/test.json # to be moved into ci/os-checks/content
 
 # /check 目录在 github action 和 Docker 容器之间共享
