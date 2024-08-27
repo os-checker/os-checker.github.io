@@ -3,9 +3,6 @@
 # 加载 cargo 环境
 source $HOME/.bashrc
 
-# 安装所有 targets 以支持所有可能的编译目标
-time rustup target add all
-
 # Current dir: /ci
 echo PWD=$PWD && ls -alh
 
