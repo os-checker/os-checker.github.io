@@ -39,14 +39,10 @@ os-checker --help
 # echo '```' >>summary.txt
 
 # ls -alh && echo PWD = $PWD
-os-checker --emit json --norun --setup       # set up toolchains for all repos and checkers
-os-checker --emit os-checks/public/test.json # to be moved into ci/os-checks/content
+os-checker --emit json --norun --setup # set up toolchains for all repos and checkers
+os-checker --emit /check/ui.json       # to be moved into ci/os-checks/content
 
 # /check 目录在 github action 和 Docker 容器之间共享
-
-# 将 test.json 从容器提交到仓库
-cp os-checks/public/test.json /check/test.json
-cp os-checks/public/test_raw_reports.json /check/test_raw_reports.json
 
 # github pages dir
 # mkdir /check/.gh-pages
