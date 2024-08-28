@@ -1,13 +1,23 @@
 <script setup lang="ts">
 import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
+import type { Column } from '~/modules/types';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
 
+const dataColumns = ref<Column[]>([]);
+
+// pick data columns
+const selectedColumns = ref(dataColumns.value);
+const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
+
 const targets = useTargetsStore();
 
-function init(target: string) {
+function init(target: string, columns: Column[]) {
+  dataColumns.value = columns;
+  selectedColumns.value = columns;
+
   const path = `ui/home/split/${target}.json`;
   githubFetch({ path })
     .then((data) => {
@@ -32,22 +42,11 @@ function init(target: string) {
     });
 }
 
-init(targets.current);
-targets.$subscribe((_, state) => init(state.current));
-
-const dataColumns = ref([
-  { field: 'total_count', header: '报告数量' },
-  { field: 'Clippy(Error)', header: 'Clippy(Errors)' },
-  { field: 'Clippy(Warn)', header: 'Clippy(Warns)' },
-  { field: 'Unformatted', header: '未格式化' },
-]);
+init(targets.current, targets.columns);
+targets.$subscribe((_, state) => init(state.current, state.columns));
 
 // interactive filter/search inputs
 const filters = ref<any>({});
-
-// pick data columns
-const selectedColumns = ref(dataColumns.value);
-const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
 
 // a single selected row
 const selectedKey = ref();
@@ -100,7 +99,7 @@ const selectedKey = ref();
       </template>
     </Column>
 
-    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable style="min-width: 150px" />
+    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable style="min-width: 120px" />
 
   </TreeTable>
 

@@ -4,11 +4,12 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { TargetOption } from '~/modules/types';
 
-const defaultTarget = { target: "x86_64-unknown-linux-gnu" };
-const selected = ref(defaultTarget);
-const targets = ref([defaultTarget]);
+const defaultTarget: TargetOption = { target: "x86_64-unknown-linux-gnu" };
+const selected = ref<TargetOption>(defaultTarget);
+const targets = ref<TargetOption[]>([defaultTarget]);
 
 const candidates = useTargetsStore();
 candidates.fetch().then(options => targets.value = options);
