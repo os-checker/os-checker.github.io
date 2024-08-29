@@ -13,6 +13,6 @@ const targets = ref<TargetOption[]>([defaultTarget]);
 
 const candidates = useTargetsStore();
 candidates.fetch().then(options => targets.value = options);
-watch(selected, (val) => candidates.current = val.target);
+watch(selected, (val) => candidates.update_current(val.target));
 
 </script>

@@ -3,20 +3,23 @@ import type { TargetTriples, Targets, Column, TargetOption } from "~/modules/typ
 export const useTargetsStore = defineStore('targets', {
   state: () => ({
     basic: null as TargetTriples | null,
-    targets: [] as Targets,
-    columns: [] as Column[],
     current: "x86_64-unknown-linux-gnu",
   }),
-  getters: {},
+  getters: {
+    targets(): Targets {
+      return this.basic?.targets ?? [];
+    },
+    columns(): Column[] {
+      return this.basic?.kinds.columns ?? [];
+    }
+  },
   actions: {
     async fetch(): Promise<TargetOption[]> {
       const basic: TargetTriples = JSON.parse(await githubFetch({ path: "ui/target-triple.json" }) as string);
       this.basic = basic;
-      this.columns = basic.kinds.columns;
-      this.targets = basic.targets;
-      return this.targets.map(target => ({ target }));
+      return basic.targets.map(target => ({ target }));
     },
-    update(target: string) {
+    update_current(target: string) {
       this.current = target;
     }
   }

@@ -13,6 +13,7 @@ const selectedColumns = ref(dataColumns.value);
 const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
 
 const targets = useTargetsStore();
+const { current, columns } = storeToRefs(targets);
 
 function init(target: string, columns: Column[]) {
   dataColumns.value = columns;
@@ -43,7 +44,7 @@ function init(target: string, columns: Column[]) {
 }
 
 init(targets.current, targets.columns);
-targets.$subscribe((_, state) => init(state.current, state.columns));
+watchEffect(() => init(current.value, columns.value));
 
 // interactive filter/search inputs
 const filters = ref<any>({});
