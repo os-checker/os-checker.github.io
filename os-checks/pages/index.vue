@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
-import type { Columns } from '~/modules/types';
+import type { Columns } from '~/shared/types';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])

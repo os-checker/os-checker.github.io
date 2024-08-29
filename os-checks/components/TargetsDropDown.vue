@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TargetOption } from '~/modules/types';
+import type { TargetOption } from '~/shared/types';
 
 const defaultTarget: TargetOption = { target: "x86_64-unknown-linux-gnu" };
 const selected = ref<TargetOption>(defaultTarget);
