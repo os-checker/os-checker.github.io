@@ -15,9 +15,8 @@ export const useTargetsStore = defineStore('targets', {
   },
   actions: {
     async fetch(): Promise<TargetOption[]> {
-      const basic: TargetTriples = JSON.parse(await githubFetch({ path: "ui/target-triple.json" }) as string);
-      this.basic = basic;
-      return basic.targets.map(target => ({ target }));
+      this.basic = await githubFetch<TargetTriples>({ path: "ui/target-triple.json" });
+      return this.basic.targets.map(target => ({ target }));
     },
     update_current(target: string) {
       this.current = target;

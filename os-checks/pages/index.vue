@@ -20,9 +20,10 @@ function init(target: string, columns: Column[]) {
   selectedColumns.value = columns;
 
   const path = `ui/home/split/${target}.json`;
-  githubFetch({ path })
-    .then((data) => {
-      const value = JSON.parse(data as string) as TreeNode[];
+  githubFetch<TreeNode[]>({ path })
+    .then((value) => {
+      // const value = data as TreeNode[];
+      // const value = JSON.parse(data as string) as TreeNode[];
       // 展平单仓库单项目成一行数据
       for (let i = 0; i < value.length; i++) {
         let node = value[i];

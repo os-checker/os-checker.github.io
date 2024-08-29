@@ -28,9 +28,9 @@ const targets = useTargetsStore();
 
 function init(target: string) {
   const path = `ui/file-tree/split/${target}.json`;
-  githubFetch({ path })
-    .then((data) => {
-      const file_tree: FileTree = JSON.parse(data as string);
+  githubFetch<FileTree>({ path })
+    .then((file_tree) => {
+      // const file_tree: FileTree = JSON.parse(data as string);
 
       // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
       let kinds = {};

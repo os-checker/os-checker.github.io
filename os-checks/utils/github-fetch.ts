@@ -5,7 +5,7 @@ type Github = {
 }
 
 // https://raw.githubusercontent.com/os-checker/os-checker.github.io/main/os-checks/public/test_raw_reports.json
-export default function (github: Github) {
+export default function <T>(github: Github): Promise<T> {
   const repo = github.repo || "database";
   const branch = github.branch || "main";
   const url = `https://raw.githubusercontent.com/os-checker/${repo}/${branch}/${github.path}`;
@@ -13,6 +13,7 @@ export default function (github: Github) {
     // 构造简单请求来解决跨域问题（同时 github raw 资源支持所有源）
     "headers": { "content-type": "text/plain" },
     "body": null,
-    "method": "GET"
+    "method": "GET",
+    parseResponse: JSON.parse
   });
 }
