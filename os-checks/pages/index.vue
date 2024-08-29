@@ -101,6 +101,8 @@ const selectedKey = ref();
       </template>
     </Column>
 
+    <Column field="total_count" header="报告数量" sortable style="min-width: 120px" />
+
     <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable style="min-width: 120px" />
 
   </TreeTable>
