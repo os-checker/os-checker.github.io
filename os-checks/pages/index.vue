@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
-import type { Column } from '~/modules/types';
+import type { Columns } from '~/modules/types';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
 
-const dataColumns = ref<Column[]>([]);
+const dataColumns = ref<Columns>([]);
 
 // pick data columns
 const selectedColumns = ref(dataColumns.value);
 const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
 
-const targets = useTargetsStore();
-const { current, columns } = storeToRefs(targets);
+const basic = useBasicStore();
+const { current, columns } = storeToRefs(basic);
 
-function init(target: string, columns: Column[]) {
+function init(target: string, columns: Columns) {
   dataColumns.value = columns;
   selectedColumns.value = columns;
 
@@ -44,7 +44,7 @@ function init(target: string, columns: Column[]) {
     });
 }
 
-init(targets.current, targets.columns);
+init(basic.current, basic.columns);
 watchEffect(() => init(current.value, columns.value));
 
 // interactive filter/search inputs

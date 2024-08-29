@@ -24,7 +24,7 @@ const tabs = ref<CheckerResult[]>([]);
 const selectedTab = ref("");
 const fileTree = ref<FileTree>({ kinds_order: [], data: [] });
 
-const targets = useTargetsStore();
+const basic = useBasicStore();
 
 function init(target: string) {
   const path = `ui/file-tree/split/${target}.json`;
@@ -59,8 +59,8 @@ function init(target: string) {
     });
 }
 
-init(targets.current);
-targets.$subscribe((_, state) => init(state.current));
+init(basic.current);
+basic.$subscribe((_, state) => init(state.current));
 
 const nodes = ref<TreeNode[]>([]);
 watch(fileTree, (data) => {

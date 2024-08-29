@@ -11,7 +11,7 @@ const defaultTarget: TargetOption = { target: "x86_64-unknown-linux-gnu" };
 const selected = ref<TargetOption>(defaultTarget);
 const targets = ref<TargetOption[]>([defaultTarget]);
 
-const candidates = useTargetsStore();
+const candidates = useBasicStore();
 candidates.fetch().then(options => targets.value = options);
 watch(selected, (val) => candidates.update_current(val.target));
 
