@@ -1,4 +1,8 @@
-export type Targets = string[];
+export type Target = {
+  triple: string,
+  count: number,
+};
+export type Targets = Target[];
 export type Column = { field: string, header: string };
 export type Columns = Column[];
 export type Basic = {

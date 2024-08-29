@@ -1,4 +1,4 @@
-import type { Basic, Targets, Columns, TargetOption } from "~/modules/types"
+import type { Basic, Targets, Columns, TargetOption } from "~/shared/types"
 
 export const useBasicStore = defineStore('targets', {
   state: () => ({
@@ -14,9 +14,10 @@ export const useBasicStore = defineStore('targets', {
     }
   },
   actions: {
-    async fetch(): Promise<TargetOption[]> {
+    async fetch(): Promise<Targets> {
       this.basic = await githubFetch<Basic>({ path: "ui/basic.json" });
-      return this.basic.targets.map(target => ({ target }));
+      console.log(this.basic);
+      return this.basic.targets;
     },
     update_current(target: string) {
       this.current = target;

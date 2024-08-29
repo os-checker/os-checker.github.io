@@ -1,18 +1,22 @@
 <template>
   <div>
-    <Select v-model="selected" :options="targets" optionLabel="target" placeholder="Targets" />
+    <Select v-model="selected" :options="targets" placeholder="Targets"
+      :optionLabel="(opt: Target) => `[${opt.count}] ${opt.triple}`" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { TargetOption } from '~/shared/types';
+import type { Target, Targets } from '~/shared/types';
 
-const defaultTarget: TargetOption = { target: "x86_64-unknown-linux-gnu" };
-const selected = ref<TargetOption>(defaultTarget);
-const targets = ref<TargetOption[]>([defaultTarget]);
+const defaultTarget: Target = { triple: "x86_64-unknown-linux-gnu", count: 0 };
+const selected = ref<Target>(defaultTarget);
+const targets = ref<Targets>([defaultTarget]);
 
 const candidates = useBasicStore();
-candidates.fetch().then(options => targets.value = options);
-watch(selected, (val) => candidates.update_current(val.target));
+candidates.fetch().then(options => {
+  selected.value = options[0];
+  targets.value = options;
+});
+watch(selected, (val) => candidates.update_current(val.triple));
 
 </script>
