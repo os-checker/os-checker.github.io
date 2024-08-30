@@ -3,6 +3,9 @@
 # 加载 cargo 环境
 source $HOME/.bashrc
 
+# 总是彩色打印 cargo 信息
+export CARGO_TERM_COLOR=always
+
 # Current dir: /ci
 echo PWD=$PWD && ls -alh
 
