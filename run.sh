@@ -12,7 +12,7 @@ if [[ "$DEBUG" == 1 ]]; then
   echo 'compile os-checker from github source'
   git clone https://github.com/os-checker/os-checker.git
   cargo install --path os-checker
-  export RUST_LOG=debug
+  export RUST_LOG=trace
 else
   echo 'download os-checker from github release'
   curl -s https://api.github.com/repos/os-checker/os-checker/releases/latest |
