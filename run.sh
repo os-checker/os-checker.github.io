@@ -6,6 +6,9 @@ source $HOME/.bashrc
 # 总是彩色打印 cargo 信息
 export CARGO_TERM_COLOR=always
 
+echo "查看是否安装了 libclang"
+dpkg -l | grep libclang
+
 # Current dir: /ci
 echo PWD=$PWD && ls -alh
 
