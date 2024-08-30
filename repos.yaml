@@ -1,5 +1,5 @@
-os-checker/os-checker-test-suite:
-  all: true
+# os-checker/os-checker-test-suite:
+#   all: true
 
 arceos-org/arceos:
   all: true
@@ -23,15 +23,15 @@ arceos-org/arceos:
       clippy: cargo clippy --target x86_64-unknown-linux-gnu --no-deps --message-format=json
       lockbud: cargo +nightly-2024-05-21 lockbud -k all -- --target x86_64-unknown-linux-gnu
 
-kern-crates/sel4_cspace:
-  all: true
-  clippy: cargo clippy --target riscv64gc-unknown-none-elf --no-deps --message-format=json
-
-elliott10/e1000-driver:
-  all: true
-
-kern-crates/ByteOS:
-  all: true
-
-shilei-massclouds/axdtb:
-  all: true
+# kern-crates/sel4_cspace:
+#   all: true
+#   clippy: cargo clippy --target riscv64gc-unknown-none-elf --no-deps --message-format=json
+#
+# elliott10/e1000-driver:
+#   all: true
+#
+# kern-crates/ByteOS:
+#   all: true
+#
+# shilei-massclouds/axdtb:
+#   all: true
