@@ -77,17 +77,9 @@ const selectedKey = ref();
       </div>
     </template>
 
-    <Column field="user" header="User" expander sortable style="width: 150px">
-      <template #filter>
-        <InputText v-model="filters.user" type="text" :placeholder="`Filter by user`" style="width: 150px" />
-      </template>
-    </Column>
+    <Column field="user" header="User" expander sortable style="width: 180px" />
 
     <Column field="repo" header="Repo" sortable style="width: 180px">
-      <template #filter>
-        <InputText v-model="filters.repo" type="text" :placeholder="`Filter by repo`" style="width: 180px" />
-      </template>
-
       <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
       <!-- TODO: 自定义样式或者内容 -->
       <!-- <template #body="{ node: { data } }"> -->
@@ -95,11 +87,7 @@ const selectedKey = ref();
       <!-- </template> -->
     </Column>
 
-    <Column field="package" header="Package" sortable style="width: 180px">
-      <template #filter>
-        <InputText v-model="filters.package" type="text" :placeholder="`Filter by package`" style="width: 180px" />
-      </template>
-    </Column>
+    <Column field="package" header="Package" sortable style="width: 180px" />
 
     <Column field="total_count" header="报告数量" sortable style="min-width: 120px" />
 
