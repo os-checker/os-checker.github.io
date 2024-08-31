@@ -169,7 +169,9 @@ function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
     let lang = "rust";
     let severity = Severity.Info;
     switch (kind) {
+      case "Cargo": severity = Severity.Danger; break;
       case "Clippy(Error)": severity = Severity.Danger; break;
+      case "Lockbud(Probably)": severity = Severity.Danger; break;
       case "Clippy(Warn)": severity = Severity.Warn; break;
       case "Unformatted": lang = "diff"; break;
       default: ;
