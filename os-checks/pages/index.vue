@@ -77,7 +77,7 @@ const selectedKey = ref();
       </div>
     </template>
 
-    <Column field="user" header="User" expander sortable style="width: 180px" />
+    <Column field="user" header="User" expander sortable style="min-width: 180px" />
 
     <Column field="repo" header="Repo" sortable style="width: 180px">
       <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
