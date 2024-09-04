@@ -31,9 +31,9 @@ else
 fi
 os-checker --help
 
-os-checker --emit json --norun --setup # set up toolchains for all repos and checkers
+os-checker setup --emit json # set up toolchains for all repos and checkers
 # /check 目录在 github action 和 Docker 容器之间共享
-os-checker --emit /check/ui.json # to be moved into ci/os-checks/content
+os-checker run --emit /check/ui.json # to be moved into ci/os-checks/content
 
 # 构建网页应用，并从容器移至 Github Action 目录，待部署到 Github Pages
 cd os-checks && npm install && npm run generate && cp -LR dist /check/
