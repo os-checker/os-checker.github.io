@@ -16,7 +16,6 @@ export const useBasicStore = defineStore('targets', {
   actions: {
     async fetch(): Promise<Targets> {
       this.basic = await githubFetch<Basic>({ path: "ui/basic.json" });
-      console.log(this.basic);
       return this.basic.targets;
     },
     update_current(target: string) {

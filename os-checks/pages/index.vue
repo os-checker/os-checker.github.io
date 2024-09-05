@@ -67,10 +67,6 @@ function sum(field: string): number {
       <div class="header">
 
         <div>
-          <NuxtLink to="/a/b">a-b</NuxtLink>
-        </div>
-
-        <div>
           <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="dataColumns"
             optionLabel="header" class="w-full sm:w-64" display="chip" />
         </div>
@@ -89,21 +85,16 @@ function sum(field: string): number {
 
     <Column field="repo" header="Repo" sortable style="width: 180px">
       <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
-      <!-- TODO: 自定义样式或者内容 -->
-      <!-- <template #body="{ node: { data } }"> -->
-      <!--   <Button :label="data.repo" text /> -->
-      <!-- </template> -->
+      <template #body="{ node: { data } }">
+        <NuxtLink :to="`/${data.user}/${data.repo}`" class="nav-link">
+          {{ data.repo }}
+        </NuxtLink>
+      </template>
     </Column>
 
     <Column field="package" header="Package" sortable style="width: 180px" />
 
     <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
-
-    <Column field="total_count" header="test" sortable style="min-width: 120px">
-      <template #footer="{ column }">
-        {{ sum(column.props.field as string) }}
-      </template>
-    </Column>
 
     <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable
       style="min-width: 120px; word-break: keep-all;" />
@@ -118,5 +109,16 @@ function sum(field: string): number {
   flex-wrap: wrap;
   /* 允许子元素换行 */
   justify-content: space-between;
+}
+
+.nav-link {
+  color: #336ad7;
+  /* 统一的链接颜色 */
+  text-decoration: none;
+}
+
+.nav-link.router-link-active {
+  color: #336ad7;
+  /* 重置激活链接的颜色 */
 }
 </style>
