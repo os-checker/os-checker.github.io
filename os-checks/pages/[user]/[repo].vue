@@ -8,17 +8,16 @@ const repo = route.params.repo;
 const file_tree = ref<FileTree | null>();
 
 const basic = useBasicStore();
-
-function init(target: string) {
+basic.init_with_and_subscribe_to_current((target) => {
   const path = `ui/repos/${user}/${repo}/${target}.json`;
   githubFetch<FileTree>({ path })
     .then((ftree) => {
       file_tree.value = ftree;
+    }).catch(() => {
+      file_tree.value = {} as FileTree;
     });
-}
+});
 
-init(basic.current);
-basic.$subscribe((_, state) => init(state.current));
 </script>
 
 <template>

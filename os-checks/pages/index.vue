@@ -13,9 +13,7 @@ const selectedColumns = ref(dataColumns.value);
 const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
 
 const basic = useBasicStore();
-const { current, columns } = storeToRefs(basic);
-
-function init(target: string, columns: Columns) {
+basic.init_with_and_subscribe_to_current_and_columns((target, columns) => {
   dataColumns.value = columns;
   selectedColumns.value = columns;
 
@@ -42,10 +40,7 @@ function init(target: string, columns: Columns) {
         nodes.value = [{ key: "0", data: { user: "ALL", repo: "ALL", package: "ALL", total_count: 0 } }];
       }
     });
-}
-
-init(basic.current, basic.columns);
-watchEffect(() => init(current.value, columns.value));
+});
 
 // interactive filter/search inputs
 const filters = ref<any>({});
@@ -53,9 +48,9 @@ const filters = ref<any>({});
 // a single selected row
 const selectedKey = ref();
 
-function sum(field: string): number {
-  return field ? nodes.value.map(node => node.data[field] ?? 0).reduce((acc, cur) => acc + cur, 0) : 0;
-}
+// function sum(field: string): number {
+//   return field ? nodes.value.map(node => node.data[field] ?? 0).reduce((acc, cur) => acc + cur, 0) : 0;
+// }
 </script>
 
 <template>

@@ -11,7 +11,7 @@ const fileTree = ref<FileTree>({ kinds_order: [], data: [] });
 
 const basic = useBasicStore();
 
-function init(target: string) {
+basic.init_with_and_subscribe_to_current((target: string) => {
   const path = `ui/file-tree/split/${target}.json`;
   githubFetch<FileTree>({ path })
     .then((file_tree) => {
@@ -40,12 +40,9 @@ function init(target: string) {
         }];
         selectedTab.value = "All good! 🥳";
         fileTree.value = { kinds_order: [], data: [] };
-      }
+      };
     });
-}
-
-init(basic.current);
-basic.$subscribe((_, state) => init(state.current));
+});
 
 const nodes = ref<TreeNode[]>([]);
 watch(fileTree, (data) => {
