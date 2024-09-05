@@ -89,9 +89,10 @@ const selectedKey = ref();
 
     <Column field="package" header="Package" sortable style="width: 180px" />
 
-    <Column field="total_count" header="报告数量" sortable style="min-width: 120px" />
+    <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
 
-    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable style="min-width: 120px" />
+    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable
+      style="min-width: 120px; word-break: keep-all;" />
 
   </TreeTable>
 
