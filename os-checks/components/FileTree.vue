@@ -3,6 +3,9 @@ import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
 import type { FileTree, Kinds } from '~/shared/file-tree';
 
+type Props = { fetch_path: (target: string) => string };
+const props = defineProps<Props>();
+
 highlightRust();
 
 const tabs = ref<CheckerResult[]>([]);
@@ -12,7 +15,7 @@ const fileTree = ref<FileTree>({ kinds_order: [], data: [] });
 const basic = useBasicStore();
 
 basic.init_with_and_subscribe_to_current((target: string) => {
-  const path = `ui/file-tree/split/${target}.json`;
+  const path = props.fetch_path(target);
   githubFetch<FileTree>({ path })
     .then((file_tree) => {
       // const file_tree: FileTree = JSON.parse(data as string);
