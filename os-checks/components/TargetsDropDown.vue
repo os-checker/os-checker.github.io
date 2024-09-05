@@ -8,7 +8,7 @@
 <script setup lang="ts">
 import type { Target, Targets } from '~/shared/types';
 
-const defaultTarget: Target = { triple: "x86_64-unknown-linux-gnu", count: 0 };
+const defaultTarget: Target = { triple: "All-Targets", count: 0 };
 const selected = ref<Target>(defaultTarget);
 const targets = ref<Targets>([defaultTarget]);
 

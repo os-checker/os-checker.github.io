@@ -3,7 +3,7 @@ import type { Basic, Targets, Columns } from "~/shared/types"
 export const useBasicStore = defineStore('targets', {
   state: () => ({
     basic: null as Basic | null,
-    current: "x86_64-unknown-linux-gnu",
+    current: "All-Targets",
   }),
 
   getters: {
@@ -23,7 +23,10 @@ export const useBasicStore = defineStore('targets', {
     },
 
     update_current(target: string) {
-      this.current = target;
+      // 只在 target 不同时更新，否则会造成不必要的响应
+      if (target !== this.current) {
+        this.current = target;
+      }
     },
 
     init_with_and_subscribe_to_current(init: (target: string) => void): void {
