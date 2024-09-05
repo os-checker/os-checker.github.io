@@ -34,16 +34,19 @@ basic.init_with_and_subscribe_to_current((target: string) => {
       tabs.value = checkerResult(kinds, file_tree.kinds_order);
       selectedTab.value = tabs.value[0]?.kind ?? "";
       fileTree.value = file_tree;
-    }).catch((err: FetchError) => {
-      if (err.statusCode === 404) {
-        // 不存在该文件：意味着该目标架构下的所有仓库没有检查出错误
-        tabs.value = [{
-          kind: "All good! 🥳", raw: ["该目标架构下的所有仓库没有检查出错误 🥳🥳🥳"],
-          lang: "rust", severity: Severity.Info, disabled: false
-        }];
-        selectedTab.value = "All good! 🥳";
-        fileTree.value = { kinds_order: [], data: [] };
-      };
+    }).catch((_: FetchError) => {
+      // 不存在该文件：意味着该目标架构下的所有仓库没有检查出错误
+      // 注意，由于使用 parseResponse，这个错误码并不为 404，而是 undefined，
+      // 且错误原因为 SyntaxError: Unexpected non-whitespace character after JSON at position 3。
+      // 这里 ofetch 没有正确处理错误（貌似也没人报告？），所以暂且认为出现任何网络或解析错误都视为无错误。
+      // console.log(err, err.data, err.statusCode);
+      // if (err.statusCode === 404) {
+      tabs.value = [{
+        kind: "All good! 🥳", raw: ["该目标架构下的所有仓库没有检查出错误 🥳🥳🥳"],
+        lang: "rust", severity: Severity.Info, disabled: false
+      }];
+      selectedTab.value = "All good! 🥳";
+      fileTree.value = { kinds_order: [], data: [] };
     });
 });
 
