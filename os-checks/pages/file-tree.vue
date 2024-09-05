@@ -1,24 +1,9 @@
 <script setup lang="ts">
 import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
+import type { FileTree, Kinds } from '~/shared/file-tree';
 
 highlightRust();
-
-type Kinds = { [key: string]: string[] };
-type RawReport = { file: string, count: number, kinds: Kinds };
-type Datum = {
-  user: string,
-  repo: string,
-  package: string,
-  count: number,
-  raw_reports: RawReport[]
-}
-
-type FileTree = {
-  // 诊断类别数组，越往前的越优先展示
-  kinds_order: string[],
-  data: Datum[]
-}
 
 const tabs = ref<CheckerResult[]>([]);
 const selectedTab = ref("");
