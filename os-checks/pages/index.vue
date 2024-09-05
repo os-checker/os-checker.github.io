@@ -52,6 +52,10 @@ const filters = ref<any>({});
 
 // a single selected row
 const selectedKey = ref();
+
+function sum(field: string): number {
+  return field ? nodes.value.map(node => node.data[field] ?? 0).reduce((acc, cur) => acc + cur, 0) : 0;
+}
 </script>
 
 <template>
@@ -61,6 +65,10 @@ const selectedKey = ref();
 
     <template #header>
       <div class="header">
+
+        <div>
+          <NuxtLink to="/a/b">a-b</NuxtLink>
+        </div>
 
         <div>
           <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="dataColumns"
@@ -90,6 +98,12 @@ const selectedKey = ref();
     <Column field="package" header="Package" sortable style="width: 180px" />
 
     <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
+
+    <Column field="total_count" header="test" sortable style="min-width: 120px">
+      <template #footer="{ column }">
+        {{ sum(column.props.field as string) }}
+      </template>
+    </Column>
 
     <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable
       style="min-width: 120px; word-break: keep-all;" />
