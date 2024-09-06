@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Target, Targets } from '~/shared/types';
+import type { Target, Targets, UserRepo } from '~/shared/types';
 
 const defaultTarget: Target = { triple: "All-Targets", count: 0 };
 const selected = ref<Target>(defaultTarget);
@@ -20,11 +20,8 @@ const candidates = useBasicStore();
 fetch(route.params as UserRepo);
 watch(selected, (val) => candidates.update_current(val.triple));
 
-type UserRepo = { user: string | undefined, repo: string | undefined };
 function fetch(params: UserRepo) {
-  const { user, repo } = params;
-  const path = (user && repo) ? `repos/${user}/${repo}/` : "";
-  candidates.fetch(path).then(options => {
+  candidates.fetch(params).then(options => {
     selected.value = options[0];
     targets.value = options;
   });

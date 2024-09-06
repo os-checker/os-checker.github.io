@@ -14,3 +14,5 @@ export type Basic = {
   }
 };
 export type TargetOption = { target: string };
+
+export type UserRepo = { user: string | undefined, repo: string | undefined };

@@ -1,4 +1,4 @@
-import type { Basic, Targets, Columns } from "~/shared/types"
+import type { Basic, Targets, Columns, UserRepo } from "~/shared/types"
 
 export const useBasicStore = defineStore('targets', {
   state: () => ({
@@ -17,27 +17,27 @@ export const useBasicStore = defineStore('targets', {
   },
 
   actions: {
-    async fetch(): Promise<Targets> {
-      this.basic = await githubFetch<Basic>({ path: "ui/basic.json" });
-    async fetch(repo: string): Promise<Targets> {
-      this.basic = await githubFetch<Basic>({ path: `ui/${repo}basic.json` });
+    async fetch(user_repo: UserRepo): Promise<Targets> {
+      const path = basicJsonPath(user_repo);
+      this.basic = await githubFetch<Basic>({ path });
       return this.basic.targets;
     },
 
     update_current(target: string) {
       // 只在 target 不同时更新，否则会造成不必要的响应
       if (target !== this.current) {
+        console.log(target, this.current);
         this.current = target;
       }
     },
 
     init_with_and_subscribe_to_current(init: (target: string) => void): void {
-      init(this.current);
+      // init(this.current);
       this.$subscribe((_, state) => init(state.current));
     },
 
     init_with_and_subscribe_to_current_and_columns(init: (target: string, columns: Columns) => void): void {
-      init(this.current, this.columns);
+      // init(this.current, this.columns);
 
       const { current, columns } = storeToRefs(this);
       watchEffect(() => init(current.value, columns.value));
