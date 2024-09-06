@@ -22,8 +22,11 @@ watch(selected, (val) => candidates.update_current(val.triple));
 
 function fetch() {
   candidates.fetch().then(options => {
-    selected.value = options[0];
-    targets.value = options;
+    // NOTE: 因为 basic 可能获取失败，那么这个数组为空，那么不要更新选项
+    if (options[0]) {
+      selected.value = options[0];
+      targets.value = options;
+    }
   });
 }
 

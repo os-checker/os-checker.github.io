@@ -40,13 +40,20 @@ basic.init_with_and_subscribe_to_current((target: string) => {
       // 且错误原因为 SyntaxError: Unexpected non-whitespace character after JSON at position 3。
       // 这里 ofetch 没有正确处理错误（貌似也没人报告？），所以暂且认为出现任何网络或解析错误都视为无错误。
       // console.log(err, err.data, err.statusCode);
-      // if (err.statusCode === 404) {
+
       tabs.value = [{
         kind: "All good! 🥳", raw: ["该目标架构下的所有仓库没有检查出错误 🥳🥳🥳"],
         lang: "rust", severity: Severity.Info, disabled: false
       }];
       selectedTab.value = "All good! 🥳";
       fileTree.value = { kinds_order: [], data: [] };
+
+      // tabs.value = [{
+      //   kind: "Not Exists!", raw: ["该目标架构下，无原始报告数据。"],
+      //   lang: "rust", severity: Severity.Danger, disabled: false
+      // }];
+      // selectedTab.value = "Not Exists!";
+      // fileTree.value = { kinds_order: [], data: [] };
     });
 });
 
