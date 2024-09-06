@@ -1,4 +1,4 @@
-import type { Basic, Targets, Columns, UserRepo } from "~/shared/types"
+import type { Basic, Targets, Columns } from "~/shared/types"
 
 export const useBasicStore = defineStore('targets', {
   state: () => ({
@@ -18,10 +18,7 @@ export const useBasicStore = defineStore('targets', {
 
   actions: {
     async fetch(): Promise<Targets> {
-      // 随路由页面变化而下载相应的 basic.json
-      const route = useRoute();
-      const path = basicJsonPath(route.params as UserRepo);
-
+      const path = basicJsonPath();
       this.basic = await githubFetch<Basic>({ path });
       return this.basic.targets;
     },

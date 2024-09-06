@@ -15,7 +15,3 @@ export type Basic = {
 };
 export type TargetOption = { target: string };
 
-/** 
- * 来自 route.params，即 /user/repo
- */
-export type UserRepo = { user: string | undefined, repo: string | undefined };
