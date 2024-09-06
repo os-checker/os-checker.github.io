@@ -14,18 +14,17 @@ const targets = ref<Targets>([defaultTarget]);
 
 // 随路由页面变化而下载相应的 basic.json
 const route = useRoute();
-watch(() => route.params, ({ user, repo }) => {
-  console.log(user, repo);
-  console.log((user && repo) ? `repos/${user}/${repo}/` : "");
-  fetch((user && repo) ? `repos/${user}/${repo}/` : "");
-});
+watch(() => route.params, (params) => fetch(params as UserRepo));
 
 const candidates = useBasicStore();
-fetch("");
+fetch(route.params as UserRepo);
 watch(selected, (val) => candidates.update_current(val.triple));
 
-function fetch(repo: string) {
-  candidates.fetch(repo).then(options => {
+type UserRepo = { user: string | undefined, repo: string | undefined };
+function fetch(params: UserRepo) {
+  const { user, repo } = params;
+  const path = (user && repo) ? `repos/${user}/${repo}/` : "";
+  candidates.fetch(path).then(options => {
     selected.value = options[0];
     targets.value = options;
   });
