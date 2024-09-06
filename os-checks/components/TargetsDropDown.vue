@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Target, Targets, UserRepo } from '~/shared/types';
+import type { Target, Targets } from '~/shared/types';
 
 const defaultTarget: Target = { triple: "All-Targets", count: 0 };
 const selected = ref<Target>(defaultTarget);
@@ -14,14 +14,14 @@ const targets = ref<Targets>([defaultTarget]);
 
 // 随路由页面变化而下载相应的 basic.json
 const route = useRoute();
-watch(() => route.params, (params) => fetch(params as UserRepo));
+watch(() => route.params, () => fetch());
 
 const candidates = useBasicStore();
-fetch(route.params as UserRepo);
+fetch();
 watch(selected, (val) => candidates.update_current(val.triple));
 
-function fetch(params: UserRepo) {
-  candidates.fetch(params).then(options => {
+function fetch() {
+  candidates.fetch().then(options => {
     selected.value = options[0];
     targets.value = options;
   });

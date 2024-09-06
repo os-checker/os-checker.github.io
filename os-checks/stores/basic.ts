@@ -17,8 +17,11 @@ export const useBasicStore = defineStore('targets', {
   },
 
   actions: {
-    async fetch(user_repo: UserRepo): Promise<Targets> {
-      const path = basicJsonPath(user_repo);
+    async fetch(): Promise<Targets> {
+      // 随路由页面变化而下载相应的 basic.json
+      const route = useRoute();
+      const path = basicJsonPath(route.params as UserRepo);
+
       this.basic = await githubFetch<Basic>({ path });
       return this.basic.targets;
     },
