@@ -10,8 +10,36 @@ html, body {
 }
 
 /* 如果你还想隐藏 WebKit 浏览器的滚动条样式，可以添加以下规则 */
-html, body {
-  &::-webkit-scrollbar {
-    width: 0;     /* 滚动条的宽度设置为0 */
-  }
+/* html, body { */
+/*   &::-webkit-scrollbar { */
+/*     width: 0; */
+/*   } */
+/* } */
+
+/* 滚动条整体部分 */
+::-webkit-scrollbar {
+  width: 8px; /* 垂直滚动条的宽度 */
+  height: 8px; /* 水平滚动条的高度 */
+}
+
+/* 滚动条的滑块部分 */
+::-webkit-scrollbar-thumb {
+  background-color: var(--p-button-primary-background); /* 滑块的背景颜色  */
+  border-radius: 6px; /* 滑块的圆角 */
+}
+
+/* 滚动条的轨道部分 */
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* 轨道的背景颜色 */
+}
+
+/* 滚动条的轨道的两端按钮 */
+::-webkit-scrollbar-button {
+  width: 0;
+  height: 0;
+}
+
+/* 滚动条的轨道的角落 */
+::-webkit-scrollbar-corner {
+  background-color: #f1f1f1;
 }
