@@ -37,7 +37,7 @@ basic.init_with_and_subscribe_to_current_and_columns((target, columns) => {
       nodes.value = value
     }).catch((err: FetchError) => {
       if (err.statusCode === 404) {
-        nodes.value = [{ key: "0", data: { user: "ALL", repo: "ALL", package: "ALL", total_count: 0 } }];
+        nodes.value = [{ key: "0", data: { user: "ALL", repo: "ALL", pkg: "ALL", total_count: 0 } }];
       }
     });
 });
@@ -87,7 +87,7 @@ const selectedKey = ref();
       </template>
     </Column>
 
-    <Column field="package" header="Package" sortable style="width: 180px" />
+    <Column field="pkg" header="Package" sortable style="width: 180px" />
 
     <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
 
