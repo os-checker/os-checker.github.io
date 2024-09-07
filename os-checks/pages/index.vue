@@ -54,48 +54,48 @@ const selectedKey = ref();
 </script>
 
 <template>
+  <div class="home-table">
+    <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
+      scrollable scrollHeight="82vh" v-model:selectionKeys="selectedKey" selectionMode="single">
 
-  <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
-    scrollable scrollHeight="80vh" v-model:selectionKeys="selectedKey" selectionMode="single">
+      <template #header>
+        <div class="header">
 
-    <template #header>
-      <div class="header">
+          <div>
+            <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="dataColumns"
+              optionLabel="header" class="w-full sm:w-64" display="chip" />
+          </div>
 
-        <div>
-          <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="dataColumns"
-            optionLabel="header" class="w-full sm:w-64" display="chip" />
+          <div>
+            <IconField>
+              <InputIcon class="pi pi-search" />
+              <InputText v-model="filters['global']" placeholder="Global Search" />
+            </IconField>
+          </div>
+
         </div>
-
-        <div>
-          <IconField>
-            <InputIcon class="pi pi-search" />
-            <InputText v-model="filters['global']" placeholder="Global Search" />
-          </IconField>
-        </div>
-
-      </div>
-    </template>
-
-    <Column field="user" header="User" expander sortable style="min-width: 180px" />
-
-    <Column field="repo" header="Repo" sortable style="width: 300px">
-      <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
-      <template #body="{ node: { data } }">
-        <NuxtLink :to="`/${data.user}/${data.repo}`" class="nav-link">
-          {{ data.repo }}
-        </NuxtLink>
       </template>
-    </Column>
 
-    <Column field="pkg" header="Package" sortable style="width: 200px" />
+      <Column field="user" header="User" expander sortable style="min-width: 180px" />
 
-    <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
+      <Column field="repo" header="Repo" sortable style="width: 300px">
+        <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
+        <template #body="{ node: { data } }">
+          <NuxtLink :to="`/${data.user}/${data.repo}`" class="nav-link">
+            {{ data.repo }}
+          </NuxtLink>
+        </template>
+      </Column>
 
-    <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable
-      style="min-width: 120px; word-break: keep-all;" />
+      <Column field="pkg" header="Package" sortable style="width: 200px" />
 
-  </TreeTable>
+      <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
 
+      <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable
+        style="min-width: 120px; word-break: keep-all;" />
+
+    </TreeTable>
+  </div>
 </template>
 
 <style scoped>
@@ -115,5 +115,10 @@ const selectedKey = ref();
 .nav-link.router-link-active {
   color: #336ad7;
   /* 重置激活链接的颜色 */
+}
+
+.home-table {
+  margin: 2px 10px;
+  height: 50%;
 }
 </style>
