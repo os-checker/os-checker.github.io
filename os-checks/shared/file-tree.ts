@@ -3,7 +3,7 @@ export type RawReport = { file: string, count: number, kinds: Kinds };
 export type Datum = {
   user: string,
   repo: string,
-  package: string,
+  pkg: string,
   count: number,
   raw_reports: RawReport[]
 }

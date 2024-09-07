@@ -64,7 +64,7 @@ watch(fileTree, (data) => {
   let key = 0;
   for (const datum of data.data) {
     let node: TreeNode = {
-      key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.package}`, children: [],
+      key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.pkg}`, children: [],
     };
     let count_fmt = 0;
     let count_clippy_warn = 0;
@@ -78,7 +78,7 @@ watch(fileTree, (data) => {
 
     }
     node.data = {
-      user: datum.user, repo: datum.repo, package: datum.package,
+      user: datum.user, repo: datum.repo, pkg: datum.pkg,
       total: datum.count, fmt: count_fmt, clippy_warn: count_clippy_warn, clippy_error: count_clippy_error
     };
     nodes.value.push(node);
@@ -104,13 +104,13 @@ watch(selectedKey, (val) => {
   const idx = parseInt(key);
   for (const node of nodes.value.slice().reverse()) {
     const nd = node.data;
-    if (!(nd && nd.user && nd.repo && nd.package)) { return; }
+    if (!(nd && nd.user && nd.repo && nd.pkg)) { return; }
 
     // 查找是否点击了 package
     if (node.key === key) {
       // 更新 tabs 展示的数据
       const found_pkg = fileTree.value.data.find(datum => {
-        return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
+        return datum.user === nd.user && datum.repo === nd.repo && datum.pkg === nd.pkg;
       });
       let kinds = {};
       for (const report of found_pkg?.raw_reports ?? []) {
@@ -126,7 +126,7 @@ watch(selectedKey, (val) => {
             const filename = file.data;
             if (!filename) { return []; }
             const package_ = fileTree.value.data.find(datum => {
-              return datum.user === nd.user && datum.repo === nd.repo && datum.package === nd.package;
+              return datum.user === nd.user && datum.repo === nd.repo && datum.pkg === nd.pkg;
             });
             const found_file = package_?.raw_reports.find(item => item.file === filename);
             if (found_file) {
