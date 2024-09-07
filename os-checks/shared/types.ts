@@ -8,8 +8,8 @@ export type Columns = Column[];
 export type Basic = {
   targets: Targets,
   kinds: {
-    order: string[],
-    mapping: { [key: string]: string[] },
+    // order: string[],
+    // mapping: { [key: string]: string[] },
     columns: Columns
   }
 };
