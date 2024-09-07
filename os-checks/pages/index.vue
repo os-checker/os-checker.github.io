@@ -78,7 +78,7 @@ const selectedKey = ref();
 
     <Column field="user" header="User" expander sortable style="min-width: 180px" />
 
-    <Column field="repo" header="Repo" sortable style="width: 180px">
+    <Column field="repo" header="Repo" sortable style="width: 300px">
       <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
       <template #body="{ node: { data } }">
         <NuxtLink :to="`/${data.user}/${data.repo}`" class="nav-link">
@@ -87,7 +87,7 @@ const selectedKey = ref();
       </template>
     </Column>
 
-    <Column field="pkg" header="Package" sortable style="width: 180px" />
+    <Column field="pkg" header="Package" sortable style="width: 200px" />
 
     <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
 

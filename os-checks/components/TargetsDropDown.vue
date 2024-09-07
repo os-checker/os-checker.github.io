@@ -24,7 +24,7 @@ function label(opt: string) {
 
 function fetch() {
   candidates.fetch().then(options => {
-    // NOTE: 因为 basic 可能获取失败，那么这个数组为空，那么不要更新选项
+    // FIXME: basic 可能获取失败怎么办？
     targets.value = options.map(target => target.triple);
   });
 }
