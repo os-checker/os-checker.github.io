@@ -3,9 +3,6 @@ import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
 import type { Columns } from '~/shared/types';
 
-const runtimeConfig = useRuntimeConfig();
-console.log(runtimeConfig.public.debug);
-
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
 
