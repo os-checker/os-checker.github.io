@@ -44,8 +44,3 @@ html, body {
   background-color: transparent;
 }
 
-/* firefox 全局滚动条样式 */
-:root {
-  scrollbar-color: var(--p-button-primary-background) transparent; /* 第一个值是滑块的颜色，第二个是轨道的颜色 */
-  scrollbar-width: thin; /* 可以是 'auto', 'thin', 或 'none' */
-}
