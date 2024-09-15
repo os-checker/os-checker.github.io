@@ -29,7 +29,9 @@ basic.init_with_and_subscribe_to_current_and_columns((target, columns) => {
           continue;
         }
         if (node.children.length === 1) {
+          const idx = node.data.idx;
           node = node.children[0];
+          node.data.idx = idx; // 恢复仓库序号
           value[i] = node;
           continue;
         }
@@ -47,10 +49,6 @@ const filters = ref<any>({});
 
 // a single selected row
 const selectedKey = ref();
-
-// function sum(field: string): number {
-//   return field ? nodes.value.map(node => node.data[field] ?? 0).reduce((acc, cur) => acc + cur, 0) : 0;
-// }
 </script>
 
 <template>
@@ -76,7 +74,9 @@ const selectedKey = ref();
         </div>
       </template>
 
-      <Column field="user" header="User" expander sortable style="min-width: 180px" />
+      <Column field="idx" header="序号" expander style="min-width: 100px" />
+
+      <Column field="user" header="User" sortable style="min-width: 180px" />
 
       <Column field="repo" header="Repo" sortable style="width: 300px">
         <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
