@@ -39,8 +39,8 @@ jobs:
       run: |
         docker load --input ${{ env.IMAGE_TAR }}
         docker image ls -a
-        # DEBUG means compiling os-checker from source
-        docker run -e DEBUG=1 -v /check:/check ${{ env.IMAGE }}
+        # 不要设置 DEBUG，它会从 debug 分支获取数据
+        docker run -e -v /check:/check ${{ env.IMAGE }}
 
     # - name: Display the result of os-checker 
     #   run: cat /check/summary.txt >> $GITHUB_STEP_SUMMARY
