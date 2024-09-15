@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
-import type { Columns } from '~/shared/types';
+import type { Columns, PassCountRepo } from '~/shared/types';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
@@ -49,10 +49,34 @@ const filters = ref<any>({});
 
 // a single selected row
 const selectedKey = ref();
+
+// 无诊断的仓库数量（或者总仓库数量）
+const passCountRepo = ref<PassCountRepo>({ pass: 0, total: 0 });
+githubFetch<PassCountRepo>({
+  path: "ui/pass_count_repo.json"
+}).then(data => passCountRepo.value = data);
+// 计算通过率
+const progressRatio = computed(() => {
+  const count = passCountRepo.value;
+  if (count.total !== 0) {
+    return Math.round(count.pass / count.total * 100.0);
+  } else {
+    return 0;
+  }
+});
+// 根据 target 更新 pass 数（因为总仓库数量是不变的？？ 或许我们需要基于 target 的总仓库数量？？）
+watch(nodes, (n) => passCountRepo.value.pass = passCountRepo.value.total - (n.at(-1)?.data?.idx ?? 0));
 </script>
 
 <template>
   <div class="home-table">
+
+    <div v-if="progressRatio !== 0">
+      <ProgressBar :value="progressRatio"> Pass / Total Repos: {{ passCountRepo.pass }} / {{ passCountRepo.total }}
+        ({{ progressRatio }}%)
+      </ProgressBar>
+    </div>
+
     <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
       scrollable scrollHeight="82vh" v-model:selectionKeys="selectedKey" selectionMode="single">
 

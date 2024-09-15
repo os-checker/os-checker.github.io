@@ -15,3 +15,7 @@ export type Basic = {
 };
 export type TargetOption = { target: string };
 
+export type PassCountRepo = {
+  pass: number,
+  total: number,
+};
