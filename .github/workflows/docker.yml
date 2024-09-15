@@ -40,7 +40,7 @@ jobs:
         docker load --input ${{ env.IMAGE_TAR }}
         docker image ls -a
         # 不要设置 DEBUG，它会从 debug 分支获取数据
-        docker run -e -v /check:/check ${{ env.IMAGE }}
+        docker run -v /check:/check ${{ env.IMAGE }}
 
     # - name: Display the result of os-checker 
     #   run: cat /check/summary.txt >> $GITHUB_STEP_SUMMARY
