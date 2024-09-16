@@ -1,6 +1,7 @@
 <template>
   <div style="margin: 0 20px;">
-    <Chart type="bar" :data="chartData" :options="chartOptions" :plugins="[ChartDataLabels]" class="pass-count" />
+    <Chart type="bar" ref="chart" @select="(event) => console.log(event)" :data="chartData" :options="chartOptions"
+      :plugins="[ChartDataLabels]" class="pass-count" />
   </div>
 </template>
 
@@ -8,6 +9,11 @@
 import type { PassCountRepos } from '~/shared/types';
 import type { Context } from 'chartjs-plugin-datalabels';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import type { ChartMethods } from 'primevue/chart';
+
+const chart = ref<ChartMethods>();
+console.log(chart.value?.getChart());
+watch(chart, (val) => console.log(val));
 
 // 无诊断的仓库数量和具有 target 的总仓库
 const passCountRepos = ref<PassCountRepos>({ "": { pass: 0, total: 0 } });
@@ -73,8 +79,6 @@ watch(passCountRepos, (val) => {
                 } else {
                   return "#1b79b7";
                 }
-
-
               },
               offset: 0,
               align: 'end',
