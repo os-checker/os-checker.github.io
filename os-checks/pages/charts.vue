@@ -8,16 +8,9 @@
 import type { PassCountRepos } from '~/shared/types';
 import type { Context } from 'chartjs-plugin-datalabels';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-// import type { ChartMethods } from 'primevue/chart';
-import { Chart as ChartClass, type LegendOptions } from 'chart.js';
-
-// const chart = ref<ChartMethods>();
-// console.log(chart.value?.getChart());
-// watch(chart, (val) => console.log(val));
 
 // 无诊断的仓库数量和具有 target 的总仓库
 const passCountRepos = ref<PassCountRepos>({ "": { pass: 0, total: 0 } });
-
 
 const labelTotal = computed(() => {
   const val = passCountRepos.value;
@@ -111,33 +104,6 @@ function setChartOptions() {
   const textColorSecondary = documentStyle.getPropertyValue('--p-text-muted-color');
   const surfaceBorder = documentStyle.getPropertyValue('--p-content-border-color');
 
-
-  const legend: Partial<LegendOptions<'bar'>> = {
-    onClick(e, legendItem, legend) {
-      const index = legendItem.datasetIndex;
-      // 点击了 pass 图例
-      if (index === 0) {
-        const ci = legend.chart;
-        // @ts-ignore
-        const labels = ci.data.datasets[1]?.datalabels?.labels;
-        // if (labels && labels.total) {
-        //   if (ci.isDatasetVisible(index)) {
-        //     // 只有 defect 时，不要显示 total 标签
-        //     delete labels.total;
-        //   } else {
-        //     // @ts-ignore
-        //     labels.total = labelTotal.value; // 无法在显示 defect 时删除 total...
-        //   }
-        // }
-      }
-
-      // 恢复默认的行为
-      const defaultLegendClickHandler = ChartClass.defaults.plugins.legend.onClick;
-      // @ts-ignore
-      defaultLegendClickHandler(e, legendItem, legend);
-    }
-  }
-
   return {
     indexAxis: 'y',
     maintainAspectRatio: false,
@@ -155,7 +121,6 @@ function setChartOptions() {
           color: textColor,
           font: { size: fontSizeNormal }
         },
-        onClick: legend.onClick
       },
       datalabels: {
         font: { weight: 'bold' },
