@@ -1,11 +1,13 @@
 <template>
   <div style="margin: 0 20px;">
-    <Chart type="bar" :data="chartData" :options="chartOptions" class="pass-count" />
+    <Chart type="bar" :data="chartData" :options="chartOptions" :plugins="[ChartDataLabels]" class="pass-count" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { PassCountRepos } from '~/shared/types';
+import type { Context } from 'chartjs-plugin-datalabels';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 // 无诊断的仓库数量和具有 target 的总仓库
 const passCountRepos = ref<PassCountRepos>({ "": { pass: 0, total: 0 } });
@@ -15,8 +17,14 @@ githubFetch<PassCountRepos>({ path: "ui/pass_count_repo/_targets_.json" })
 const chartData = ref();
 const chartOptions = ref();
 
+const fontSizeNormal = 15;
+const fontSizeSmaller = 13;
+
 watch(passCountRepos, (val) => {
   const documentStyle = getComputedStyle(document.documentElement);
+  const passColor = documentStyle.getPropertyValue('--p-button-primary-background');
+  const ignore_zero = (ctx: Context) => ctx.dataset.data[ctx.dataIndex] !== 0;
+  const total = Object.values(val).map(count => count.total);
 
   chartData.value = {
     labels: Object.keys(val),
@@ -24,14 +32,56 @@ watch(passCountRepos, (val) => {
       {
         type: 'bar',
         label: 'Pass',
-        backgroundColor: documentStyle.getPropertyValue('--p-button-primary-background'),
-        data: Object.values(val).map(count => count.pass)
+        backgroundColor: passColor,
+        data: Object.values(val).map(count => count.pass),
+        datalabels: {
+          display: ignore_zero,
+          font: { size: fontSizeSmaller },
+          offset: 0,
+          color: "white",
+          align: 'start',
+          anchor: 'end'
+        }
       },
       {
         type: 'bar',
         label: 'Defect',
         backgroundColor: documentStyle.getPropertyValue('--p-gray-200'),
-        data: Object.values(val).map(count => count.total - count.pass)
+        data: Object.values(val).map(count => count.total - count.pass),
+        datalabels: {
+          labels: {
+            defect: {
+              display: ignore_zero,
+              font: { size: fontSizeSmaller },
+              offset: 0,
+              align: 'start',
+              anchor: 'end'
+            },
+            total: {
+              formatter: (defect: number, ctx: Context) => {
+                const sum = total[ctx.dataIndex];
+                const passRatio = Math.round((1 - defect / sum) * 100);
+                return `sum: ${sum}\npass: ${passRatio}%`;
+              },
+              font: { size: fontSizeSmaller },
+              color: (ctx: Context) => {
+                const sum = total[ctx.dataIndex];
+                const defect = (ctx.dataset.data[ctx.dataIndex] as number) ?? 0;
+                const passRatio = Math.round((1 - defect / sum) * 100);
+                if (passRatio < 10) {
+                  return "#c63535";
+                } else {
+                  return "#1b79b7";
+                }
+
+
+              },
+              offset: 0,
+              align: 'end',
+              anchor: 'end'
+            }
+          }
+        }
       }
     ]
   };
@@ -49,7 +99,6 @@ watch(darkMode, () => chartOptions.value = setChartOptions());
 
 
 function setChartOptions() {
-  const fontSize = 18;
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue('--p-text-color');
   const textColorSecondary = documentStyle.getPropertyValue('--p-text-muted-color');
@@ -63,15 +112,18 @@ function setChartOptions() {
       tooltip: {
         mode: 'nearest',
         // intersect: false,
-        titleFont: { size: fontSize },
-        bodyFont: { size: fontSize },
-        footerFont: { size: fontSize },
+        titleFont: { size: fontSizeSmaller },
+        bodyFont: { size: fontSizeSmaller },
+        footerFont: { size: fontSizeSmaller },
       },
       legend: {
         labels: {
           color: textColor,
-          font: { size: fontSize }
+          font: { size: fontSizeNormal }
         }
+      },
+      datalabels: {
+        font: { weight: 'bold' },
       }
     },
     scales: {
@@ -79,7 +131,7 @@ function setChartOptions() {
         stacked: true,
         ticks: {
           color: textColorSecondary,
-          font: { size: fontSize }
+          font: { size: fontSizeNormal }
         },
         grid: {
           color: surfaceBorder,
@@ -89,7 +141,7 @@ function setChartOptions() {
         stacked: true,
         ticks: {
           color: textColorSecondary,
-          font: { size: fontSize }
+          font: { size: fontSizeNormal }
         },
         grid: {
           color: surfaceBorder
