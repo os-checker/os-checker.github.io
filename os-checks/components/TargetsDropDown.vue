@@ -1,6 +1,18 @@
 <template>
   <div>
-    <Select v-model="selected" :options="targets" placeholder="Targets" :optionLabel="label" />
+    <Select v-model="selected" :options="targets" placeholder="Targets">
+
+      <template #option="{ option }">
+        <Tag severity="danger" class="drop-down-options">{{ tagCount(option) }}</Tag>
+        {{ option }}
+      </template>
+
+      <template #value="{ value }">
+        {{ value }}
+        <Tag severity="danger" style="margin-left: 5px">{{ tagCount(value) }}</Tag>
+      </template>
+
+    </Select>
   </div>
 </template>
 
@@ -17,9 +29,9 @@ const candidates = useBasicStore();
 fetch();
 watch(selected, (val) => candidates.update_current(val));
 
-function label(opt: string) {
+function tagCount(opt: string) {
   const target = candidates.targets.find(target => target.triple == opt);
-  return target ? `[${target.count}] ${target.triple}` : "";
+  return target ? target.count : 0;
 };
 
 function fetch() {
@@ -30,3 +42,11 @@ function fetch() {
 }
 
 </script>
+
+<style scoped>
+.drop-down-options {
+  margin-right: 8px;
+  width: 50px;
+  justify-content: right;
+}
+</style>

@@ -26,7 +26,7 @@ export const useBasicStore = defineStore('targets', {
     update_current(target: string) {
       // 只在 target 不同时更新，否则会造成不必要的响应
       if (target !== this.current) {
-        console.log(target, this.current);
+        // console.log(target, this.current);
         this.current = target;
       }
     },
