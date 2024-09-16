@@ -26,6 +26,7 @@ function toggle(dark: boolean) {
 // 动态切换 highlightjs 的高亮主题
 function setHTML_data_theme(dark: boolean) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  useDataThemeStore().update_dark_mode(dark);
 }
 
 const loaded = ref(load());

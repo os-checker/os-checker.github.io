@@ -8,6 +8,7 @@
 
 <script setup lang="ts">
 // Toggle light vs dark theme.
+// $darkMode comes from plugins/dark-mode.client.ts provide object
 const { $darkMode } = useNuxtApp();
 const darkMode = $darkMode?.init || ref(false);
 watch(darkMode, (dark) => {

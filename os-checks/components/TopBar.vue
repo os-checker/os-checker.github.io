@@ -11,6 +11,10 @@
         <Button title="问题文件树" icon="pi pi-sitemap" />
       </NuxtLink>
 
+      <NuxtLink to="/charts">
+        <Button title="统计图表" icon="pi pi-chart-bar" />
+      </NuxtLink>
+
     </div>
 
     <div class="topBarRight">
