@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
-import type { Columns, PassCountRepo } from '~/shared/types';
+import type { Columns, PassCountRepo, PassCountRepos } from '~/shared/types';
 
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
 
 const dataColumns = ref<Columns>([]);
+
+// 无诊断的仓库数量和具有 target 的总仓库
+const selectedPassCountRepo = ref<PassCountRepo>({ pass: 0, total: 0 });
+const passCountRepos = ref<PassCountRepos>({ "": { pass: 0, total: 0 } });
+githubFetch<PassCountRepos>({
+  path: "ui/pass_count_repo/_targets_.json"
+}).then(data => passCountRepos.value = data);
 
 // pick data columns
 const selectedColumns = ref(dataColumns.value);
@@ -14,6 +21,12 @@ const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(
 
 const basic = useBasicStore();
 basic.init_with_and_subscribe_to_current_and_columns((target, columns) => {
+  // 更新进度条
+  const selected_pass_count_repo = passCountRepos.value[target]
+  if (selected_pass_count_repo) {
+    selectedPassCountRepo.value = selected_pass_count_repo;
+  }
+
   dataColumns.value = columns;
   selectedColumns.value = columns;
 
@@ -50,31 +63,31 @@ const filters = ref<any>({});
 // a single selected row
 const selectedKey = ref();
 
-// 无诊断的仓库数量（或者总仓库数量）
-const passCountRepo = ref<PassCountRepo>({ pass: 0, total: 0 });
-githubFetch<PassCountRepo>({
-  path: "ui/pass_count_repo.json"
-}).then(data => passCountRepo.value = data);
 // 计算通过率
 const progressRatio = computed(() => {
-  const count = passCountRepo.value;
+  const count = selectedPassCountRepo.value;
   if (count.total !== 0) {
     return Math.round(count.pass / count.total * 100.0);
   } else {
     return 0;
   }
 });
-// 根据 target 更新 pass 数（因为总仓库数量是不变的？？ 或许我们需要基于 target 的总仓库数量？？）
-watch(nodes, (n) => passCountRepo.value.pass = passCountRepo.value.total - (n.at(-1)?.data?.idx ?? 0));
 </script>
 
 <template>
   <div class="home-table">
 
-    <div v-if="progressRatio !== 0">
-      <ProgressBar :value="progressRatio"> Pass / Total Repos: {{ passCountRepo.pass }} / {{ passCountRepo.total }}
-        ({{ progressRatio }}%)
-      </ProgressBar>
+    <div style="display: flex; justify-content: center; align-content: center">
+      <div style="padding-right: 10px">
+        <span class="pass-repo"> Pass </span>/ Total Repos:
+        <span class="pass-repo"> {{ selectedPassCountRepo.pass }}
+        </span>
+        / {{ selectedPassCountRepo.total }}
+        <span v-if="progressRatio < 5">
+          <Tag severity="danger" rounded>({{ progressRatio }}%)</Tag>
+        </span>
+      </div>
+      <ProgressBar :value="progressRatio" style="flex-grow: 1; height: auto;" />
     </div>
 
     <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
@@ -144,5 +157,10 @@ watch(nodes, (n) => passCountRepo.value.pass = passCountRepo.value.total - (n.at
 .home-table {
   margin: 2px 10px;
   height: 50%;
+}
+
+.pass-repo {
+  color: var(--p-button-primary-background);
+  font-weight: bold;
 }
 </style>

@@ -19,3 +19,4 @@ export type PassCountRepo = {
   pass: number,
   total: number,
 };
+export type PassCountRepos = { [key: string]: PassCountRepo };
