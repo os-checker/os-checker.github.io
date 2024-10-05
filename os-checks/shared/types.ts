@@ -21,19 +21,3 @@ export type PassCountRepo = {
 };
 export type PassCountRepos = { [key: string]: PassCountRepo };
 
-export type Resolved = {
-  pkg: string,
-  toolchain: string,
-  checker: string,
-  target: string,
-  cmd: string,
-};
-
-export type Source = {
-  pkg: string,
-  target: string,
-  src: string,
-  path: string,
-  used: boolean,
-  specified: boolean,
-};
