@@ -32,6 +32,11 @@
         <Select v-model="selectedToolchain" filter showClear :options="toolchains" :optionLabel="label"
           placeholder="All" />
       </span>
+
+      <span class="input">Checker:</span>
+      <span class="select">
+        <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label" placeholder="All" />
+      </span>
     </div>
 
     <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" />
@@ -52,6 +57,7 @@ const selectedRepo = ref("");
 const selectedPkg = ref("");
 const selectedTarget = ref("");
 const selectedToolchain = ref("");
+const selectedChecker = ref("");
 
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
@@ -139,6 +145,7 @@ function uniqueArr(v: any[], selected: any) {
 const pkgs = computed(() => uniqueArr(resolved.value.map(val => val.pkg), selectedPkg));
 const targets = computed(() => uniqueArr(resolved.value.map(val => val.target), selectedTarget));
 const toolchains = computed(() => uniqueArr(resolved.value.map(val => val.toolchain), selectedToolchain));
+const checkers = computed(() => uniqueArr(resolved.value.map(val => val.checker), selectedChecker));
 
 </script>
 
