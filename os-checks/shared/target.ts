@@ -10,9 +10,9 @@ export type Resolved = {
 export const resolvedColumns = [
   { field: "idx", header: "Idx" },
   { field: "pkg", header: "Pkg" },
+  { field: "target", header: "Target" },
   { field: "toolchain", header: "Toolchain" },
   { field: "checker", header: "Checker" },
-  { field: "target", header: "Target" },
   { field: "cmd", header: "Cmd" },
 ]
 

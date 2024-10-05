@@ -1,6 +1,6 @@
 <template>
   <div class="minutiae">
-    <div style="padding: 2px 8px 12px 8px">
+    <div style="padding: 2px 8px 2px 8px">
       <span class="input">Kind:</span>
       <span class="select">
         <SelectButton v-model="selectedKind" :options="tableKinds" :allowEmpty="false" />
@@ -26,6 +26,13 @@
         <Select v-model="selectedTarget" filter showClear :options="targets" :optionLabel="label" placeholder="All" />
       </span>
     </div>
+    <div style="padding: 2px 8px 12px 8px">
+      <span class="input">Toolchain:</span>
+      <span class="select">
+        <Select v-model="selectedToolchain" filter showClear :options="toolchains" :optionLabel="label"
+          placeholder="All" />
+      </span>
+    </div>
 
     <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" />
 
@@ -44,6 +51,7 @@ const selectedUser = ref("");
 const selectedRepo = ref("");
 const selectedPkg = ref("");
 const selectedTarget = ref("");
+const selectedToolchain = ref("");
 
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
@@ -71,6 +79,7 @@ watchEffect(() => {
         const only_one = data.length === 1;
         selectedPkg.value = only_one ? data[0].pkg : "";
         selectedTarget.value = only_one ? data[0].target : "";
+        selectedToolchain.value = only_one ? data[0].toolchain : "";
       });
 
     githubFetch<Source[]>({ path: path + "sources.json" })
@@ -127,21 +136,12 @@ const sourcesFiltered = computed(() => {
   return filtered;
 });
 
-const pkgs = computed(() => {
-  const arr = resolved.value.map(val => val.pkg);
-  // 使用 Set 去重
-  const uniqueArr = [...new Set(arr)];
-  // 对数组进行排序
-  return uniqueArr.sort();
-});
+// 使用 Set 去重，并对数组进行排序
+const uniqueArr = (arr: any[]) => [...new Set(arr)].sort();
 
-const targets = computed(() => {
-  const arr = resolved.value.map(val => val.target);
-  // 使用 Set 去重
-  const uniqueArr = [...new Set(arr)];
-  // 对数组进行排序
-  return uniqueArr.sort();
-});
+const pkgs = computed(() => uniqueArr(resolved.value.map(val => val.pkg)));
+const targets = computed(() => uniqueArr(resolved.value.map(val => val.target)));
+const toolchains = computed(() => uniqueArr(resolved.value.map(val => val.toolchain)));
 
 </script>
 
