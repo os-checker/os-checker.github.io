@@ -20,6 +20,11 @@
       <span class="select">
         <Select v-model="selectedPkg" filter showClear :options="pkgs" :optionLabel="label" placeholder="All" />
       </span>
+
+      <span class="input">Target:</span>
+      <span class="select">
+        <Select v-model="selectedTarget" filter showClear :options="targets" :optionLabel="label" placeholder="All" />
+      </span>
     </div>
 
     <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" />
@@ -36,6 +41,7 @@ const selectedKind = ref<TableKind>(TableKind.Resolved);
 const selectedUser = ref("");
 const selectedRepo = ref("");
 const selectedPkg = ref("");
+const selectedTarget = ref("");
 
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
@@ -47,26 +53,6 @@ const repos = computed(() => user_repo.value[selectedUser.value]);
 watch(repos, (val) => selectedRepo.value = val[0] ?? "");
 
 const resolved = ref<Resolved[]>([]);
-const pkgs = computed(() => {
-  const arr = resolved.value.map(val => val.pkg);
-  // 使用 Set 去重
-  const uniqueArr = [...new Set(arr)];
-  // 对数组进行排序
-  return uniqueArr.sort();
-});
-const resolvedFiltered = computed(() => {
-  const pkg = selectedPkg.value;
-  const all = resolved.value;
-  if (pkg) {
-    if (all.length === 1) { selectedPkg.value = all[0].pkg; }
-    const filtered = all.filter(val => val.pkg === pkg);
-    filtered.forEach((_, idx) => filtered[idx].idx = idx + 1);
-    return filtered;
-  } else {
-    return all;
-  }
-});
-
 watchEffect(() => {
   const user = selectedUser.value;
   const repo = selectedRepo.value;
@@ -75,13 +61,55 @@ watchEffect(() => {
     githubFetch<Resolved[]>({ path })
       .then(data => {
         data.forEach((_, idx) => data[idx].idx = idx + 1);
-        resolved.value = data
-      });
+        resolved.value = data;
 
-    // Clear other selected values, otherwise no results shown.
-    selectedPkg.value = "";
+        // If there's only one option, default to that;
+        // otherwise clear old values.
+        const only_one = data.length === 1;
+        selectedPkg.value = only_one ? data[0].pkg : "";
+        selectedTarget.value = only_one ? data[0].target : "";
+      });
   }
-})
+});
+
+const resolvedFiltered = computed(() => {
+  const pkg = selectedPkg.value;
+  const target = selectedTarget.value;
+  const all = resolved.value;
+
+  if (!pkg && !target) {
+    return all;
+  }
+
+  let filtered = all;
+
+  if (pkg) {
+    filtered = filtered.filter(val => val.pkg === pkg);
+  }
+
+  if (target) {
+    filtered = filtered.filter(val => val.target === target);
+  }
+
+  filtered.forEach((_, idx) => filtered[idx].idx = idx + 1);
+  return filtered;
+});
+
+const pkgs = computed(() => {
+  const arr = resolved.value.map(val => val.pkg);
+  // 使用 Set 去重
+  const uniqueArr = [...new Set(arr)];
+  // 对数组进行排序
+  return uniqueArr.sort();
+});
+
+const targets = computed(() => {
+  const arr = resolved.value.map(val => val.target);
+  // 使用 Set 去重
+  const uniqueArr = [...new Set(arr)];
+  // 对数组进行排序
+  return uniqueArr.sort();
+});
 
 const sources = ref<Source[]>([]);
 githubFetch<Source[]>({ path: "ui/targets/AsyncModules/embassy-priority/sources.json" })
