@@ -1,10 +1,10 @@
 <template>
   <div class="minutiae">
-    <div style="padding: 2px 8px 2px 8px">
-      <span class="input">Kind:</span>
-      <span class="select">
-        <SelectButton v-model="selectedKind" :options="tableKinds" :allowEmpty="false" />
-      </span>
+    <div style="padding: 2px 8px 6px 8px">
+      <!-- <span class="input">Kind:</span> -->
+      <!-- <span class="select"> -->
+      <!--   <SelectButton v-model="selectedKind" :options="tableKinds" :allowEmpty="false" /> -->
+      <!-- </span> -->
 
       <span class="input">User:</span>
       <span class="select">
@@ -26,7 +26,7 @@
         <Select v-model="selectedTarget" filter showClear :options="targets" :optionLabel="label" placeholder="All" />
       </span>
     </div>
-    <div style="padding: 2px 8px 12px 8px">
+    <div style="padding: 2px 8px 8px 8px">
       <span class="input">Toolchain:</span>
       <span class="select">
         <Select v-model="selectedToolchain" filter showClear :options="toolchains" :optionLabel="label"
@@ -37,27 +37,33 @@
       <span class="select">
         <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label" placeholder="All" />
       </span>
+
+      <span class="sources">Sources:</span>
+      <span class="select">
+        <Select v-model="selectedSource" filter showClear :options="sources_" :optionLabel="label" placeholder="All" />
+      </span>
     </div>
 
     <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" />
 
-    <div style="height: 20px;" />
+    <div style="height: 10px;" />
 
     <MinutiaeTable :data="sourcesFiltered" :dataColumns="sourcesColumns" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { type Resolved, type Source, type UserRepo, TableKind, tableKinds, resolvedColumns, sourcesColumns } from '~/shared/target';
+import { type Resolved, type Source, type UserRepo, resolvedColumns, sourcesColumns } from '~/shared/target';
 
 const label = (a: string) => a;
-const selectedKind = ref<TableKind>(TableKind.Resolved);
+// const selectedKind = ref<TableKind>(TableKind.Resolved);
 const selectedUser = ref("");
 const selectedRepo = ref("");
 const selectedPkg = ref("");
 const selectedTarget = ref("");
 const selectedToolchain = ref("");
 const selectedChecker = ref("");
+const selectedSource = ref("");
 
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
@@ -108,21 +114,12 @@ const resolvedFiltered = computed(() => {
 const sourcesFiltered = computed(() => {
   const pkg = selectedPkg.value;
   const target = selectedTarget.value;
-  const all = sources.value;
+  const src = selectedSource.value;
+  let filtered = sources.value;
 
-  if (!pkg && !target) {
-    return all;
-  }
-
-  let filtered = all;
-
-  if (pkg) {
-    filtered = filtered.filter(val => val.pkg === pkg);
-  }
-
-  if (target) {
-    filtered = filtered.filter(val => val.target === target);
-  }
+  if (pkg) { filtered = filtered.filter(val => val.pkg === pkg); }
+  if (target) { filtered = filtered.filter(val => val.target === target); }
+  if (src) { filtered = filtered.filter(val => val.src === src); }
 
   filtered.forEach((_, idx) => filtered[idx].idx = idx + 1);
   return filtered;
@@ -140,6 +137,8 @@ const targets = computed(() => uniqueArr(resolved.value.map(val => val.target), 
 const toolchains = computed(() => uniqueArr(resolved.value.map(val => val.toolchain), selectedToolchain));
 const checkers = computed(() => uniqueArr(resolved.value.map(val => val.checker), selectedChecker));
 
+const sources_ = computed(() => uniqueArr(sources.value.map(val => val.src), selectedSource));
+
 </script>
 
 <style scoped>
@@ -147,6 +146,13 @@ const checkers = computed(() => uniqueArr(resolved.value.map(val => val.checker)
   font-size: 18px;
   font-weight: bold;
   color: var(--p-button-primary-background);
+  padding-right: 10px;
+}
+
+.sources {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--p-orange-400);
   padding-right: 10px;
 }
 
