@@ -1,4 +1,5 @@
 export type Resolved = {
+  idx: number,
   pkg: string,
   toolchain: string,
   checker: string,
@@ -7,6 +8,7 @@ export type Resolved = {
 };
 
 export const resolvedColumns = [
+  { field: "idx", header: "Idx" },
   { field: "pkg", header: "Pkg" },
   { field: "toolchain", header: "Toolchain" },
   { field: "checker", header: "Checker" },
