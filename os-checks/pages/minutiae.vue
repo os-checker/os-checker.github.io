@@ -1,11 +1,13 @@
 <template>
   <div>
-    <DataTable :value="resolved" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" sortMode="multiple" scrollable
+    <DataTable :value="resolved" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows
+      selectionMode="single" v-model:selection="resolvedSelected" removableSort sortMode="multiple" scrollable
       scrollHeight="400px">
       <Column v-for="col of resolvedColumns" :key="col.field" :field="col.field" :header="col.header" sortable />
     </DataTable>
 
-    <DataTable :value="sources" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" sortMode="multiple" scrollable
+    <DataTable :value="sources" paginator :rows="10" :rowsPerPageOptions="[10, 20, 50]" stripedRows
+      selectionMode="single" v-model:selection="sourcesSelected" removableSort sortMode="multiple" scrollable
       scrollHeight="400px">
       <Column v-for="col of sourcesColumns" :key="col.field" :field="col.field" :header="col.header" sortable />
     </DataTable>
@@ -16,7 +18,7 @@
 import { type Resolved, type Source } from '~/shared/types';
 
 const resolved = ref<Resolved[]>([]);
-
+const resolvedSelected = ref();
 const resolvedColumns = [
   { field: "pkg", header: "Pkg" },
   { field: "toolchain", header: "Toolchain" },
@@ -29,12 +31,12 @@ githubFetch<Resolved[]>({ path: "ui/targets/AsyncModules/embassy-priority/resolv
   .then(data => resolved.value = data);
 
 const sources = ref<Source[]>([]);
-
+const sourcesSelected = ref();
 const sourcesColumns = [
   { field: "pkg", header: "Pkg" },
   { field: "target", header: "Target" },
-  { field: "src", header: "Src" },
-  { field: "path", header: "Path" },
+  { field: "src", header: "Heruistic Approach" },
+  { field: "path", header: "Heruistic Path (Repo Root Prefix Stripped)" },
   { field: "used", header: "Used" },
   { field: "specified", header: "Specified" },
 ]
