@@ -17,6 +17,7 @@ export const resolvedColumns = [
 ]
 
 export type Source = {
+  idx: number,
   pkg: string,
   target: string,
   src: string,
@@ -26,6 +27,7 @@ export type Source = {
 };
 
 export const sourcesColumns = [
+  { field: "idx", header: "Idx" },
   { field: "pkg", header: "Pkg" },
   { field: "target", header: "Target" },
   { field: "src", header: "Heruistic Source" },

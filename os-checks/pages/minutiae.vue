@@ -1,6 +1,6 @@
 <template>
   <div class="minutiae">
-    <div style="padding: 10pt">
+    <div style="padding: 2px 8px 12px 8px">
       <span class="input">Kind:</span>
       <span class="select">
         <SelectButton v-model="selectedKind" :options="tableKinds" :allowEmpty="false" />
@@ -29,7 +29,9 @@
 
     <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" />
 
-    <MinutiaeTable :data="sources" :dataColumns="sourcesColumns" />
+    <div style="height: 20px;" />
+
+    <MinutiaeTable :data="sourcesFiltered" :dataColumns="sourcesColumns" />
   </div>
 </template>
 
@@ -53,12 +55,13 @@ const repos = computed(() => user_repo.value[selectedUser.value]);
 watch(repos, (val) => selectedRepo.value = val[0] ?? "");
 
 const resolved = ref<Resolved[]>([]);
+const sources = ref<Source[]>([]);
 watchEffect(() => {
   const user = selectedUser.value;
   const repo = selectedRepo.value;
   if (user && repo) {
-    const path = `ui/targets/${user}/${repo}/resolved.json`;
-    githubFetch<Resolved[]>({ path })
+    const path = `ui/targets/${user}/${repo}/`;
+    githubFetch<Resolved[]>({ path: path + "resolved.json" })
       .then(data => {
         data.forEach((_, idx) => data[idx].idx = idx + 1);
         resolved.value = data;
@@ -69,6 +72,12 @@ watchEffect(() => {
         selectedPkg.value = only_one ? data[0].pkg : "";
         selectedTarget.value = only_one ? data[0].target : "";
       });
+
+    githubFetch<Source[]>({ path: path + "sources.json" })
+      .then(data => {
+        data.forEach((_, idx) => data[idx].idx = idx + 1);
+        sources.value = data;
+      });
   }
 });
 
@@ -76,6 +85,29 @@ const resolvedFiltered = computed(() => {
   const pkg = selectedPkg.value;
   const target = selectedTarget.value;
   const all = resolved.value;
+
+  if (!pkg && !target) {
+    return all;
+  }
+
+  let filtered = all;
+
+  if (pkg) {
+    filtered = filtered.filter(val => val.pkg === pkg);
+  }
+
+  if (target) {
+    filtered = filtered.filter(val => val.target === target);
+  }
+
+  filtered.forEach((_, idx) => filtered[idx].idx = idx + 1);
+  return filtered;
+});
+
+const sourcesFiltered = computed(() => {
+  const pkg = selectedPkg.value;
+  const target = selectedTarget.value;
+  const all = sources.value;
 
   if (!pkg && !target) {
     return all;
@@ -111,9 +143,6 @@ const targets = computed(() => {
   return uniqueArr.sort();
 });
 
-const sources = ref<Source[]>([]);
-githubFetch<Source[]>({ path: "ui/targets/AsyncModules/embassy-priority/sources.json" })
-  .then(data => sources.value = data);
 </script>
 
 <style scoped>
@@ -130,5 +159,6 @@ githubFetch<Source[]>({ path: "ui/targets/AsyncModules/embassy-priority/sources.
 
 .minutiae {
   --p-togglebutton-checked-color: var(--p-button-primary-background);
+  margin: 0px 4px;
 }
 </style>
