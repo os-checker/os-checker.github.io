@@ -25,17 +25,17 @@
       <span class="select">
         <Select v-model="selectedTarget" filter showClear :options="targets" :optionLabel="label" placeholder="All" />
       </span>
+
+      <span class="input">Checker:</span>
+      <span class="select">
+        <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label" placeholder="All" />
+      </span>
     </div>
     <div style="padding: 2px 8px 8px 8px">
       <span class="input">Toolchain:</span>
       <span class="select">
         <Select v-model="selectedToolchain" filter showClear :options="toolchains" :optionLabel="label"
           placeholder="All" />
-      </span>
-
-      <span class="input">Checker:</span>
-      <span class="select">
-        <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label" placeholder="All" />
       </span>
 
       <span class="sources">Target (Sources):</span>
@@ -48,6 +48,17 @@
       <span class="select">
         <Select v-model="selectedSource" filter showClear :options="sources_" :optionLabel="label" placeholder="All" />
       </span>
+
+      <span class="sources">Used:</span>
+      <span class="select">
+        <Select v-model="selectedUsed" filter showClear :options="used_src" :optionLabel="label" placeholder="All" />
+      </span>
+
+      <span class="sources">Specified:</span>
+      <span class="select">
+        <Select v-model="selectedSpecified" filter showClear :options="specified_src" :optionLabel="label"
+          placeholder="All" />
+      </span>
     </div>
 
     <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" />
@@ -59,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import { type Resolved, type Source, type UserRepo, resolvedColumns, sourcesColumns } from '~/shared/target';
+import { type Resolved, type Source, type Source2, type UserRepo, resolvedColumns, sourcesColumns } from '~/shared/target';
 
 const label = (a: string) => a;
 // const selectedKind = ref<TableKind>(TableKind.Resolved);
@@ -71,6 +82,8 @@ const selectedToolchain = ref("");
 const selectedChecker = ref("");
 const selectedTargetSource = ref("");
 const selectedSource = ref("");
+const selectedUsed = ref("");
+const selectedSpecified = ref("");
 
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
@@ -82,7 +95,7 @@ const repos = computed(() => user_repo.value[selectedUser.value]);
 watch(repos, (val) => selectedRepo.value = val[0] ?? "");
 
 const resolved = ref<Resolved[]>([]);
-const sources = ref<Source[]>([]);
+const sources = ref<Source2[]>([]);
 watchEffect(() => {
   const user = selectedUser.value;
   const repo = selectedRepo.value;
@@ -96,8 +109,10 @@ watchEffect(() => {
 
     githubFetch<Source[]>({ path: path + "sources.json" })
       .then(data => {
-        data.forEach((_, idx) => data[idx].idx = idx + 1);
-        sources.value = data;
+        sources.value = data.map((ele, idx) => {
+          const u_s = { used: ele.used ? "✅" : "❌", specified: ele.specified ? "✅" : "❌" };
+          return { idx: idx + 1, ...ele, ...u_s };
+        });
       });
   }
 });
@@ -125,12 +140,16 @@ const sourcesFiltered = computed(() => {
   const target = selectedTarget.value;
   const target_src = selectedTargetSource.value;
   const src = selectedSource.value;
+  const used = selectedUsed.value;
+  const specified = selectedSpecified.value;
   let filtered = sources.value;
 
   if (pkg) { filtered = filtered.filter(val => val.pkg === pkg); }
   if (target) { filtered = filtered.filter(val => val.target === target); }
   if (target_src) { filtered = filtered.filter(val => val.target === target_src); }
   if (src) { filtered = filtered.filter(val => val.src === src); }
+  if (used) { filtered = filtered.filter(val => val.used === used); }
+  if (specified) { filtered = filtered.filter(val => val.specified === specified); }
 
   filtered.forEach((_, idx) => filtered[idx].idx = idx + 1);
   return filtered;
@@ -150,6 +169,8 @@ const checkers = computed(() => uniqueArr(resolved.value.map(val => val.checker)
 
 const targets_src = computed(() => uniqueArr(sources.value.map(val => val.target), selectedTargetSource));
 const sources_ = computed(() => uniqueArr(sources.value.map(val => val.src), selectedSource));
+const used_src = computed(() => uniqueArr(sources.value.map(val => val.used), selectedUsed));
+const specified_src = computed(() => uniqueArr(sources.value.map(val => val.specified), selectedSpecified));
 
 </script>
 

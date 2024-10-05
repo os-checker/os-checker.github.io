@@ -17,13 +17,22 @@ export const resolvedColumns = [
 ]
 
 export type Source = {
-  idx: number,
   pkg: string,
   target: string,
   src: string,
   path: string,
   used: boolean,
   specified: boolean,
+};
+
+export type Source2 = {
+  idx: number,
+  pkg: string,
+  target: string,
+  src: string,
+  path: string,
+  used: string,
+  specified: string,
 };
 
 export const sourcesColumns = [
