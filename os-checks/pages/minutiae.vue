@@ -38,6 +38,12 @@
         <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label" placeholder="All" />
       </span>
 
+      <span class="sources">Target (Sources):</span>
+      <span class="select">
+        <Select v-model="selectedTargetSource" filter showClear :options="targets_src" :optionLabel="label"
+          placeholder="All" />
+      </span>
+
       <span class="sources">Sources:</span>
       <span class="select">
         <Select v-model="selectedSource" filter showClear :options="sources_" :optionLabel="label" placeholder="All" />
@@ -63,6 +69,7 @@ const selectedPkg = ref("");
 const selectedTarget = ref("");
 const selectedToolchain = ref("");
 const selectedChecker = ref("");
+const selectedTargetSource = ref("");
 const selectedSource = ref("");
 
 const user_repo = ref<UserRepo>({});
@@ -98,12 +105,14 @@ watchEffect(() => {
 const resolvedFiltered = computed(() => {
   const pkg = selectedPkg.value;
   const target = selectedTarget.value;
+  const target_src = selectedTargetSource.value;
   const toolchain = selectedToolchain.value;
   const checker = selectedChecker.value;
   let filtered = resolved.value;
 
   if (pkg) { filtered = filtered.filter(val => val.pkg === pkg); }
   if (target) { filtered = filtered.filter(val => val.target === target); }
+  if (target_src) { filtered = filtered.filter(val => val.target === target_src); }
   if (toolchain) { filtered = filtered.filter(val => val.toolchain === toolchain); }
   if (checker) { filtered = filtered.filter(val => val.checker === checker); }
 
@@ -114,11 +123,13 @@ const resolvedFiltered = computed(() => {
 const sourcesFiltered = computed(() => {
   const pkg = selectedPkg.value;
   const target = selectedTarget.value;
+  const target_src = selectedTargetSource.value;
   const src = selectedSource.value;
   let filtered = sources.value;
 
   if (pkg) { filtered = filtered.filter(val => val.pkg === pkg); }
   if (target) { filtered = filtered.filter(val => val.target === target); }
+  if (target_src) { filtered = filtered.filter(val => val.target === target_src); }
   if (src) { filtered = filtered.filter(val => val.src === src); }
 
   filtered.forEach((_, idx) => filtered[idx].idx = idx + 1);
@@ -137,6 +148,7 @@ const targets = computed(() => uniqueArr(resolved.value.map(val => val.target), 
 const toolchains = computed(() => uniqueArr(resolved.value.map(val => val.toolchain), selectedToolchain));
 const checkers = computed(() => uniqueArr(resolved.value.map(val => val.checker), selectedChecker));
 
+const targets_src = computed(() => uniqueArr(sources.value.map(val => val.target), selectedTargetSource));
 const sources_ = computed(() => uniqueArr(sources.value.map(val => val.src), selectedSource));
 
 </script>
