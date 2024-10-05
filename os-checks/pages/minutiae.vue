@@ -73,13 +73,6 @@ watchEffect(() => {
       .then(data => {
         data.forEach((_, idx) => data[idx].idx = idx + 1);
         resolved.value = data;
-
-        // If there's only one option, default to that;
-        // otherwise clear old values.
-        const only_one = data.length === 1;
-        selectedPkg.value = only_one ? data[0].pkg : "";
-        selectedTarget.value = only_one ? data[0].target : "";
-        selectedToolchain.value = only_one ? data[0].toolchain : "";
       });
 
     githubFetch<Source[]>({ path: path + "sources.json" })
@@ -137,11 +130,15 @@ const sourcesFiltered = computed(() => {
 });
 
 // 使用 Set 去重，并对数组进行排序
-const uniqueArr = (arr: any[]) => [...new Set(arr)].sort();
+function uniqueArr(v: any[], selected: any) {
+  const arr = [...new Set(v)].sort();
+  selected.value = (arr.length === 1) ? arr[0] : "";
+  return arr;
+}
 
-const pkgs = computed(() => uniqueArr(resolved.value.map(val => val.pkg)));
-const targets = computed(() => uniqueArr(resolved.value.map(val => val.target)));
-const toolchains = computed(() => uniqueArr(resolved.value.map(val => val.toolchain)));
+const pkgs = computed(() => uniqueArr(resolved.value.map(val => val.pkg), selectedPkg));
+const targets = computed(() => uniqueArr(resolved.value.map(val => val.target), selectedTarget));
+const toolchains = computed(() => uniqueArr(resolved.value.map(val => val.toolchain), selectedToolchain));
 
 </script>
 
