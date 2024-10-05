@@ -1,71 +1,72 @@
 <template>
   <div class="minutiae">
     <div style="padding: 2px 8px 6px 8px">
-      <!-- <span class="input">Kind:</span> -->
-      <!-- <span class="select"> -->
-      <!--   <SelectButton v-model="selectedKind" :options="tableKinds" :allowEmpty="false" /> -->
-      <!-- </span> -->
-
       <span class="input">User:</span>
       <span class="select">
         <Select v-model="selectedUser" filter :options="users" :optionLabel="label" />
       </span>
 
-      <span class="input">Repo:</span>
-      <span class="select">
-        <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
-      </span>
-
-      <span class="input">Pkg:</span>
+      <span class="input resolved">Pkg:</span>
       <span class="select">
         <Select v-model="selectedPkg" filter showClear :options="pkgs" :optionLabel="label" placeholder="All" />
       </span>
 
-      <span class="input">Target:</span>
+      <span class="input resolved">Target:</span>
       <span class="select">
         <Select v-model="selectedTarget" filter showClear :options="targets" :optionLabel="label" placeholder="All" />
       </span>
 
-      <span class="input">Checker:</span>
-      <span class="select">
-        <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label" placeholder="All" />
-      </span>
-    </div>
-    <div style="padding: 2px 8px 8px 8px">
-      <span class="input">Toolchain:</span>
+      <span class="input resolved">Toolchain:</span>
       <span class="select">
         <Select v-model="selectedToolchain" filter showClear :options="toolchains" :optionLabel="label"
           placeholder="All" />
       </span>
 
-      <span class="sources">Target (Sources):</span>
+      <span class="input resolved">Checker:</span>
+      <span class="select">
+        <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label" placeholder="All" />
+      </span>
+    </div>
+    <div style="padding: 2px 8px 8px 8px">
+      <span class="input">Repo:</span>
+      <span class="select">
+        <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
+      </span>
+
+      <span class="input sources">Pkg:</span>
+      <span class="select">
+        <Select v-model="selectedPkgSource" filter showClear :options="pkg_src" :optionLabel="label"
+          placeholder="All" />
+      </span>
+
+      <span class="input sources">Target:</span>
       <span class="select">
         <Select v-model="selectedTargetSource" filter showClear :options="targets_src" :optionLabel="label"
           placeholder="All" />
       </span>
 
-      <span class="sources">Sources:</span>
+      <span class="input sources">Source:</span>
       <span class="select">
         <Select v-model="selectedSource" filter showClear :options="sources_" :optionLabel="label" placeholder="All" />
       </span>
 
-      <span class="sources">Used:</span>
+      <span class="input sources">Used:</span>
       <span class="select">
         <Select v-model="selectedUsed" filter showClear :options="used_src" :optionLabel="label" placeholder="All" />
       </span>
 
-      <span class="sources">Specified:</span>
+      <span class="input sources">Specified:</span>
       <span class="select">
         <Select v-model="selectedSpecified" filter showClear :options="specified_src" :optionLabel="label"
           placeholder="All" />
       </span>
     </div>
 
-    <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" />
+    <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" class="resolved-table" />
 
     <div style="height: 10px;" />
 
-    <MinutiaeTable :data="sourcesFiltered" :dataColumns="sourcesColumns" />
+    <MinutiaeTable :data="sourcesFiltered" :dataColumns="sourcesColumns" class="sources-table" />
   </div>
 </template>
 
@@ -80,6 +81,8 @@ const selectedPkg = ref("");
 const selectedTarget = ref("");
 const selectedToolchain = ref("");
 const selectedChecker = ref("");
+
+const selectedPkgSource = ref("");
 const selectedTargetSource = ref("");
 const selectedSource = ref("");
 const selectedUsed = ref("");
@@ -119,6 +122,7 @@ watchEffect(() => {
 
 const resolvedFiltered = computed(() => {
   const pkg = selectedPkg.value;
+  const pkg_src = selectedPkgSource.value;
   const target = selectedTarget.value;
   const target_src = selectedTargetSource.value;
   const toolchain = selectedToolchain.value;
@@ -126,6 +130,7 @@ const resolvedFiltered = computed(() => {
   let filtered = resolved.value;
 
   if (pkg) { filtered = filtered.filter(val => val.pkg === pkg); }
+  if (pkg_src) { filtered = filtered.filter(val => val.pkg === pkg_src); }
   if (target) { filtered = filtered.filter(val => val.target === target); }
   if (target_src) { filtered = filtered.filter(val => val.target === target_src); }
   if (toolchain) { filtered = filtered.filter(val => val.toolchain === toolchain); }
@@ -137,6 +142,7 @@ const resolvedFiltered = computed(() => {
 
 const sourcesFiltered = computed(() => {
   const pkg = selectedPkg.value;
+  const pkg_src = selectedPkgSource.value;
   const target = selectedTarget.value;
   const target_src = selectedTargetSource.value;
   const src = selectedSource.value;
@@ -145,6 +151,7 @@ const sourcesFiltered = computed(() => {
   let filtered = sources.value;
 
   if (pkg) { filtered = filtered.filter(val => val.pkg === pkg); }
+  if (pkg_src) { filtered = filtered.filter(val => val.pkg === pkg_src); }
   if (target) { filtered = filtered.filter(val => val.target === target); }
   if (target_src) { filtered = filtered.filter(val => val.target === target_src); }
   if (src) { filtered = filtered.filter(val => val.src === src); }
@@ -167,6 +174,7 @@ const targets = computed(() => uniqueArr(resolved.value.map(val => val.target), 
 const toolchains = computed(() => uniqueArr(resolved.value.map(val => val.toolchain), selectedToolchain));
 const checkers = computed(() => uniqueArr(resolved.value.map(val => val.checker), selectedChecker));
 
+const pkg_src = computed(() => uniqueArr(sources.value.map(val => val.pkg), selectedPkgSource));
 const targets_src = computed(() => uniqueArr(sources.value.map(val => val.target), selectedTargetSource));
 const sources_ = computed(() => uniqueArr(sources.value.map(val => val.src), selectedSource));
 const used_src = computed(() => uniqueArr(sources.value.map(val => val.used), selectedUsed));
@@ -178,15 +186,23 @@ const specified_src = computed(() => uniqueArr(sources.value.map(val => val.spec
 .input {
   font-size: 18px;
   font-weight: bold;
-  color: var(--p-button-primary-background);
   padding-right: 10px;
 }
 
+.resolved {
+  color: var(--p-button-primary-background);
+}
+
+.resolved-table {
+  --p-datatable-header-cell-color: var(--p-button-primary-background);
+}
+
 .sources {
-  font-size: 18px;
-  font-weight: bold;
   color: var(--p-orange-400);
-  padding-right: 10px;
+}
+
+.sources-table {
+  --p-datatable-header-cell-color: var(--p-orange-400);
 }
 
 .select {
