@@ -12,7 +12,11 @@
       </NuxtLink>
 
       <NuxtLink to="/charts">
-        <Button title="统计图表" icon="pi pi-chart-bar" />
+        <Button title="统计图" icon="pi pi-chart-bar" />
+      </NuxtLink>
+
+      <NuxtLink to="/minutiae">
+        <Button title="明细表" icon="pi pi-objects-column" />
       </NuxtLink>
 
     </div>
