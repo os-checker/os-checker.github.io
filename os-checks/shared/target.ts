@@ -28,7 +28,7 @@ export type Source = {
 export const sourcesColumns = [
   { field: "pkg", header: "Pkg" },
   { field: "target", header: "Target" },
-  { field: "src", header: "Heruistic Approach" },
+  { field: "src", header: "Heruistic Source" },
   { field: "path", header: "Heruistic Path (Repo Root Prefix Stripped)" },
   { field: "used", header: "Used" },
   { field: "specified", header: "Specified" },
@@ -37,3 +37,10 @@ export const sourcesColumns = [
 export type UserRepo = {
   [key: string]: string[]
 }
+
+export enum TableKind {
+  Resolved = "Resolved Cmds",
+  Sources = "Target Sources"
+}
+
+export const tableKinds: TableKind[] = [TableKind.Resolved, TableKind.Sources];

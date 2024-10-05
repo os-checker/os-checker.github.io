@@ -1,14 +1,19 @@
 <template>
-  <div>
+  <div class="minutiae">
     <div style="padding: 10pt">
+      <span class="input">Kind:</span>
+      <span class="select">
+        <SelectButton v-model="selectedKind" :options="tableKinds" :allowEmpty="false" />
+      </span>
+
       <span class="input">User:</span>
       <span class="select">
-        <Select v-model="selectedUser" filter showClear :options="users" :optionLabel="label" />
+        <Select v-model="selectedUser" filter :options="users" :optionLabel="label" />
       </span>
 
       <span class="input">Repo:</span>
       <span class="select">
-        <Select v-model="selectedRepo" filter showClear :options="repos" :optionLabel="label" />
+        <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
       </span>
 
       <span class="input">Pkg:</span>
@@ -24,9 +29,10 @@
 </template>
 
 <script lang="ts" setup>
-import { type Resolved, type Source, type UserRepo, resolvedColumns, sourcesColumns } from '~/shared/target';
+import { type Resolved, type Source, type UserRepo, TableKind, tableKinds, resolvedColumns, sourcesColumns } from '~/shared/target';
 
 const label = (a: string) => a;
+const selectedKind = ref<TableKind>(TableKind.Resolved);
 const selectedUser = ref("");
 const selectedRepo = ref("");
 const selectedPkg = ref("");
@@ -72,6 +78,7 @@ watchEffect(() => {
         resolved.value = data
       });
 
+    // Clear other selected values, otherwise no results shown.
     selectedPkg.value = "";
   }
 })
@@ -91,5 +98,9 @@ githubFetch<Source[]>({ path: "ui/targets/AsyncModules/embassy-priority/sources.
 
 .select {
   padding-right: 10px;
+}
+
+.minutiae {
+  --p-togglebutton-checked-color: var(--p-button-primary-background);
 }
 </style>
