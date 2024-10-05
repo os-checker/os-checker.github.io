@@ -15,8 +15,8 @@
         <Button title="统计图" icon="pi pi-chart-bar" />
       </NuxtLink>
 
-      <NuxtLink to="/minutiae">
-        <Button title="明细表" icon="pi pi-objects-column" />
+      <NuxtLink to="/target">
+        <Button title="编译目标明细表" icon="pi pi-objects-column" />
       </NuxtLink>
 
     </div>
