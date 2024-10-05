@@ -92,21 +92,14 @@ watchEffect(() => {
 const resolvedFiltered = computed(() => {
   const pkg = selectedPkg.value;
   const target = selectedTarget.value;
-  const all = resolved.value;
+  const toolchain = selectedToolchain.value;
+  const checker = selectedChecker.value;
+  let filtered = resolved.value;
 
-  if (!pkg && !target) {
-    return all;
-  }
-
-  let filtered = all;
-
-  if (pkg) {
-    filtered = filtered.filter(val => val.pkg === pkg);
-  }
-
-  if (target) {
-    filtered = filtered.filter(val => val.target === target);
-  }
+  if (pkg) { filtered = filtered.filter(val => val.pkg === pkg); }
+  if (target) { filtered = filtered.filter(val => val.target === target); }
+  if (toolchain) { filtered = filtered.filter(val => val.toolchain === toolchain); }
+  if (checker) { filtered = filtered.filter(val => val.checker === checker); }
 
   filtered.forEach((_, idx) => filtered[idx].idx = idx + 1);
   return filtered;
