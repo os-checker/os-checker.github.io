@@ -1,8 +1,20 @@
 <template>
   <div>
     <div style="padding: 10pt">
+      <span class="input">User:</span>
+      <span class="select">
+        <Select v-model="selectedUser" filter showClear :options="users" :optionLabel="label" />
+      </span>
+
+      <span class="input">Repo:</span>
+      <span class="select">
+        <Select v-model="selectedRepo" filter showClear :options="repos" :optionLabel="label" />
+      </span>
+
       <span class="input">Pkg:</span>
-      <Select v-model="selectedPkg" filter showClear :options="pkgs" :optionLabel="(a) => a" />
+      <span class="select">
+        <Select v-model="selectedPkg" filter showClear :options="pkgs" :optionLabel="label" placeholder="All" />
+      </span>
     </div>
 
     <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" />
@@ -12,9 +24,21 @@
 </template>
 
 <script lang="ts" setup>
-import { type Resolved, type Source, resolvedColumns, sourcesColumns } from '~/shared/target';
+import { type Resolved, type Source, type UserRepo, resolvedColumns, sourcesColumns } from '~/shared/target';
 
-const selectedPkg = ref();
+const label = (a: string) => a;
+const selectedUser = ref("");
+const selectedRepo = ref("");
+const selectedPkg = ref("");
+
+const user_repo = ref<UserRepo>({});
+githubFetch<UserRepo>({ path: "ui/user_repo.json" })
+  .then(data => user_repo.value = data);
+
+const users = computed(() => Object.keys(user_repo.value).sort());
+watch(users, (val) => selectedUser.value = val[0] ?? "");
+const repos = computed(() => user_repo.value[selectedUser.value]);
+watch(repos, (val) => selectedRepo.value = val[0] ?? "");
 
 const resolved = ref<Resolved[]>([]);
 const pkgs = computed(() => {
@@ -37,14 +61,22 @@ const resolvedFiltered = computed(() => {
   }
 });
 
-githubFetch<Resolved[]>({ path: "ui/targets/AsyncModules/embassy-priority/resolved.json" })
-  .then(data => {
-    data.forEach((_, idx) => data[idx].idx = idx + 1);
-    resolved.value = data
-  });
+watchEffect(() => {
+  const user = selectedUser.value;
+  const repo = selectedRepo.value;
+  if (user && repo) {
+    const path = `ui/targets/${user}/${repo}/resolved.json`;
+    githubFetch<Resolved[]>({ path })
+      .then(data => {
+        data.forEach((_, idx) => data[idx].idx = idx + 1);
+        resolved.value = data
+      });
+
+    selectedPkg.value = "";
+  }
+})
 
 const sources = ref<Source[]>([]);
-
 githubFetch<Source[]>({ path: "ui/targets/AsyncModules/embassy-priority/sources.json" })
   .then(data => sources.value = data);
 </script>
@@ -54,6 +86,10 @@ githubFetch<Source[]>({ path: "ui/targets/AsyncModules/embassy-priority/sources.
   font-size: 18px;
   font-weight: bold;
   color: var(--p-button-primary-background);
+  padding-right: 10px;
+}
+
+.select {
   padding-right: 10px;
 }
 </style>

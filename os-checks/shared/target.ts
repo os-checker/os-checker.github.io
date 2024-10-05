@@ -34,3 +34,6 @@ export const sourcesColumns = [
   { field: "specified", header: "Specified" },
 ]
 
+export type UserRepo = {
+  [key: string]: string[]
+}
