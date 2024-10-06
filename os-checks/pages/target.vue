@@ -62,11 +62,11 @@
       </span>
     </div>
 
-    <MinutiaeTable :data="resolvedFiltered" :dataColumns="resolvedColumns" class="resolved-table" />
+    <TargetTable :data="resolvedFiltered" :dataColumns="resolvedColumns" class="resolved-table" />
 
     <div style="height: 10px;" />
 
-    <MinutiaeTable :data="sourcesFiltered" :dataColumns="sourcesColumns" class="sources-table" />
+    <TargetTable :data="sourcesFiltered" :dataColumns="sourcesColumns" class="sources-table" />
   </div>
 </template>
 
