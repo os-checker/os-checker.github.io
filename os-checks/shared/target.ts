@@ -39,8 +39,8 @@ export const sourcesColumns = [
   { field: "idx", header: "Idx" },
   { field: "pkg", header: "Pkg" },
   { field: "target", header: "Target" },
-  { field: "src", header: "Heruistic Source" },
-  { field: "path", header: "Heruistic Path (Repo Root Prefix Stripped)" },
+  { field: "src", header: "Heuristic Source" },
+  { field: "path", header: "Heuristic Path (Repo Root Prefix Stripped)" },
   { field: "used", header: "Used" },
   { field: "specified", header: "Specified" },
 ]
