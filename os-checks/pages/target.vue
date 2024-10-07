@@ -1,6 +1,6 @@
 <template>
   <div class="minutiae">
-    <div style="padding: 2px 8px 6px 8px">
+    <div style="padding: 6px 8px 6px 8px">
       <span class="input">User:</span>
       <span class="select">
         <Select v-model="selectedUser" filter :options="users" :optionLabel="label" />
@@ -27,7 +27,7 @@
         <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label" placeholder="All" />
       </span>
     </div>
-    <div style="padding: 2px 8px 8px 8px">
+    <div style="padding: 2px 8px 10px 8px">
       <span class="input">Repo:</span>
       <span class="select">
         <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
@@ -184,7 +184,7 @@ const specified_src = computed(() => uniqueArr(sources.value.map(val => val.spec
 
 <style scoped>
 .input {
-  font-size: 18px;
+  font-size: 14.5px;
   font-weight: bold;
   padding-right: 10px;
 }
@@ -212,5 +212,6 @@ const specified_src = computed(() => uniqueArr(sources.value.map(val => val.spec
 .minutiae {
   --p-togglebutton-checked-color: var(--p-button-primary-background);
   margin: 0px 4px;
+  font-size: 14.5px;
 }
 </style>
