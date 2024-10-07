@@ -5,6 +5,8 @@ export type Resolved = {
   checker: string,
   target: string,
   cmd: string,
+  count: number,
+  ms: number,
 };
 
 export const resolvedColumns = [
@@ -14,6 +16,8 @@ export const resolvedColumns = [
   { field: "toolchain", header: "Toolchain" },
   { field: "checker", header: "Checker" },
   { field: "cmd", header: "Cmd" },
+  { field: "count", header: "Count" },
+  { field: "ms", header: "ms" },
 ]
 
 export type Source = {
