@@ -128,6 +128,11 @@ function setChartOptions() {
     },
     scales: {
       x: {
+        title: {
+          display: true,
+          font: { size: fontSizeNormal },
+          text: "Count of Repositories"
+        },
         stacked: true,
         ticks: {
           color: textColorSecondary,
@@ -154,6 +159,6 @@ function setChartOptions() {
 
 <style scoped>
 .pass-count {
-  height: 40rem;
+  height: 45rem;
 }
 </style>
