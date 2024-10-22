@@ -5,19 +5,70 @@
 
   <Button label="Display" @click="click_visible" />
   <Dialog v-model:visible="visible" modal header="Github Action Workflows" :style="{ width: '70%' }">
-    <Timeline :value="events">
-      <template #marker="slotProps">
-        <span class="timeline-marker" :style="{ backgroundColor: slotProps.item.color }">
-          <i :class="slotProps.item.icon"></i>
-        </span>
-      </template>
-      <template #opposite="slotProps">
-        <small class="text-surface-500 dark:text-surface-400">{{ slotProps.item.date }}</small>
-      </template>
-      <template #content="{ item }">
-        {{ item }}
-      </template>
-    </Timeline>
+
+    <Accordion :value="['0']" multiple>
+      <AccordionPanel value="0">
+        <AccordionHeader>Header I</AccordionHeader>
+        <AccordionContent>
+
+          <Timeline :value="events" align="top">
+            <template #marker="slotProps">
+              <span class="timeline-marker" :style="{ backgroundColor: slotProps.item.color }">
+                <i :class="slotProps.item.icon"></i>
+              </span>
+            </template>
+            <!-- <template #opposite="slotProps"> -->
+            <!--   <small>{{ slotProps.item.date }}</small> -->
+            <!-- </template> -->
+            <template #content="{ item }">
+              {{ item }}
+
+              <!-- <Card> -->
+              <!--   <template #title> -->
+              <!--     {{ item.status }} -->
+              <!--   </template> -->
+              <!--   <template #subtitle> -->
+              <!--     {{ item.date }} -->
+              <!--   </template> -->
+              <!--   <template #content> -->
+              <!--     {{ item.icon }} -->
+              <!--   </template> -->
+              <!-- </Card> -->
+
+            </template>
+          </Timeline>
+
+        </AccordionContent>
+      </AccordionPanel>
+      <AccordionPanel value="1">
+        <AccordionHeader>Header II</AccordionHeader>
+        <AccordionContent>
+          <p class="m-0">
+            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
+            rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt
+            explicabo. Nemo enim
+            ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
+            eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
+          </p>
+        </AccordionContent>
+      </AccordionPanel>
+      <AccordionPanel value="2">
+        <AccordionHeader>Header III</AccordionHeader>
+        <AccordionContent>
+          <p class="m-0">
+            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
+            deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non
+            provident, similique sunt in culpa
+            qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est
+            et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo
+            minus.
+          </p>
+        </AccordionContent>
+      </AccordionPanel>
+    </Accordion>
+
+
+
   </Dialog>
 
 </template>
@@ -109,6 +160,8 @@ const runSelected = computed(() => {
   }));
 });
 
+// https://github.com/os-checker/database/blob/debug/plugin/github-api/workflows/Byte-OS/polyhal.json
+
 </script>
 
 <style lang="css">
@@ -125,5 +178,9 @@ const runSelected = computed(() => {
   z-index: 10;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.1);
   /* Tailwind CSS的shadow-sm类定义了轻微的阴影效果 */
+}
+
+.p-timeline-event-opposite {
+  flex: 0 !important;
 }
 </style>
