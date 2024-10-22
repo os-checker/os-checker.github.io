@@ -4,7 +4,7 @@
   <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJob" class="workflow-table" />
 
   <Button label="Display" @click="click_visible" />
-  <Dialog v-model:visible="visible" modal header="Github Action Workflows" :style="{ width: '70%' }">
+  <Dialog v-model:visible="visible" modal :header="dialog_header" :style="{ width: '70%' }">
     <div v-if="jobsInfo">
       {{ jobsInfo }}
     </div>
@@ -63,6 +63,7 @@ import type { Workflows } from '~/shared/workflows';
 
 const visible = ref(true);
 const click_visible = () => visible.value = !visible.value;
+const dialog_header = ref("Github Action Workflows");
 
 const data = ref<Workflows>();
 
@@ -155,9 +156,16 @@ function onRowSelectedJob(event: DataTableRowSelectEvent) {
   const run_id = event.data.id;
   const val = data.value;
   if (!val) { return; }
+
   const workflows = val.workflows;
   const workflow_idx = workflows.findIndex(wf => wf.run.id === run_id);
-  selectedJob.value = workflows[workflow_idx] ? ({ workflow_idx, run_name: workflows[workflow_idx].run.name }) : null;
+  const workflow = workflows[workflow_idx];
+  if (!workflow) { return; }
+
+  const run_name = workflow.run.name;
+  selectedJob.value = { workflow_idx, run_name };
+  const title = workflow.run.display_title;
+  dialog_header.value = `[ ${val.user} / ${val.repo} ] ${run_name} - ${title}`;
   visible.value = true;
 }
 
