@@ -5,69 +5,53 @@
 
   <Button label="Display" @click="click_visible" />
   <Dialog v-model:visible="visible" modal header="Github Action Workflows" :style="{ width: '70%' }">
+    <div v-if="jobsInfo">
+      {{ jobsInfo }}
+    </div>
 
-    <Accordion :value="['0']" multiple>
-      <AccordionPanel value="0">
-        <AccordionHeader>Header I</AccordionHeader>
+    <Accordion :value="jobsIdx" multiple>
+      <AccordionPanel v-for="(job, idx) in jobs" :key="job.job.id" :value="idx.toString()">
+        <AccordionHeader>
+          <Tag :value="idx + 1"></Tag>
+          <b> {{ job.job.workflow_name }}</b>
+        </AccordionHeader>
+
         <AccordionContent>
-
-          <Timeline :value="events" align="top">
+          <Timeline :value="job.steps" class="timeline-event">
             <template #marker="slotProps">
-              <span class="timeline-marker" :style="{ backgroundColor: slotProps.item.color }">
-                <i :class="slotProps.item.icon"></i>
+              <span class="timeline-marker" :style="{ backgroundColor: slotProps.item.icon.color }">
+                <i :class="slotProps.item.icon.icon"></i>
               </span>
             </template>
-            <!-- <template #opposite="slotProps"> -->
-            <!--   <small>{{ slotProps.item.date }}</small> -->
-            <!-- </template> -->
-            <template #content="{ item }">
-              {{ item }}
 
-              <!-- <Card> -->
-              <!--   <template #title> -->
-              <!--     {{ item.status }} -->
-              <!--   </template> -->
-              <!--   <template #subtitle> -->
-              <!--     {{ item.date }} -->
-              <!--   </template> -->
-              <!--   <template #content> -->
-              <!--     {{ item.icon }} -->
-              <!--   </template> -->
-              <!-- </Card> -->
+            <template #content="{ item: { step } }">
+              <Avatar :label="step.number.toString()" shape="circle" />
+
+              <span class="timeline-steps">
+                <span class="timeline-title"> {{ step.name }} </span>
+                <span class="timeline-timestamp">
+                  {{ `${fmtDateTime(step.started_at)} ~ ${fmtDateTime(step.completed_at)}` }}
+                </span>
+                <span class="timeline-timestamp">
+                  {{ `[ ${step.duration_sec}s ]` }}
+                </span>
+              </span>
 
             </template>
           </Timeline>
 
-        </AccordionContent>
-      </AccordionPanel>
-      <AccordionPanel value="1">
-        <AccordionHeader>Header II</AccordionHeader>
-        <AccordionContent>
-          <p class="m-0">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam
-            rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-            explicabo. Nemo enim
-            ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-            eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
-          </p>
-        </AccordionContent>
-      </AccordionPanel>
-      <AccordionPanel value="2">
-        <AccordionHeader>Header III</AccordionHeader>
-        <AccordionContent>
-          <p class="m-0">
-            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum
-            deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non
-            provident, similique sunt in culpa
-            qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est
-            et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo
-            minus.
-          </p>
+          <Card style="padding: 10px 18px;">
+            <template #content>
+              Job:
+              <NuxtLink :to="job.job.html_url" target="_blank">
+                {{ job.job.html_url }}
+              </NuxtLink>
+            </template>
+          </Card>
+
         </AccordionContent>
       </AccordionPanel>
     </Accordion>
-
-
 
   </Dialog>
 
@@ -78,14 +62,6 @@ import type { Workflows } from '~/shared/workflows';
 
 const visible = ref(true);
 const click_visible = () => visible.value = !visible.value;
-
-const events = ref([
-  { status: 'Ordered', date: '15/10/2020 10:30', icon: 'pi pi-shopping-cart', color: '#9C27B0' },
-  { status: 'Processing', date: '15/10/2020 14:00', icon: 'pi pi-cog', color: '#673AB7' },
-  { status: 'Shipped', date: '15/10/2020 16:15', icon: 'pi pi-shopping-cart', color: '#FF9800' },
-  { status: 'Delivered', date: '16/10/2020 10:00', icon: 'pi pi-check', color: '#607D8B' },
-  { status: 'Delivered', date: '16/10/2020 10:00', icon: 'pi pi-times', color: 'red' },
-]);
 
 const data = ref<Workflows>();
 
@@ -162,6 +138,57 @@ const runSelected = computed(() => {
 
 // https://github.com/os-checker/database/blob/debug/plugin/github-api/workflows/Byte-OS/polyhal.json
 
+function icon(status: string, conclusion: string) {
+  if (status === "completed") {
+    if (conclusion === "success") {
+      return { icon: "pi pi-check", color: "#607D8B" };
+    }
+  }
+  return { icon: "pi pi-times", color: "red" };
+}
+
+const jobs = computed(() => {
+  const val = data.value;
+  if (!val) { return [] }
+
+  return val.workflows[0]?.jobs.jobs.map(job => {
+    return {
+      job, icon: icon(job.status, job.conclusion),
+      steps: job.steps.map(step => ({ step, icon: icon(step.status, step.conclusion) }))
+    };
+  }) ?? [];
+});
+
+const jobsIdx = computed(() => [...Array(jobs.value.length).keys().map(x => x.toString())]);
+
+
+function sum(arr: any) {
+  // @ts-ignore
+  return arr.reduce((accumulator, currentNumber) => accumulator + currentNumber, 0);
+};
+
+const jobsInfo = computed(() => {
+  const val = data.value;
+  if (!val) { return null }
+
+  const j = val.workflows[0].jobs;
+  const jj = val.workflows[0].jobs.jobs;
+  return {
+    jobs: {
+      total: j.total_count,
+      completed: jj.filter(job => job.status === "completed").length,
+      success: jj.filter(job => job.conclusion === "success").length,
+    },
+    steps:
+    {
+      total: sum(jj.map(job => job.steps.length)),
+      completed: sum(jj.map(job => job.steps.filter(step => step.status === "completed").length)),
+      success: sum(jj.map(job => job.steps.filter(step => step.conclusion === "success").length)),
+
+    }
+  }
+});
+
 </script>
 
 <style lang="css">
@@ -181,6 +208,26 @@ const runSelected = computed(() => {
 }
 
 .p-timeline-event-opposite {
+  /* eliminate the left hand side */
   flex: 0 !important;
+}
+
+.timeline-event {
+  --p-timeline-event-min-height: 2.8rem;
+}
+
+.timeline-steps {
+  display: inline-grid;
+  grid-template-columns: 6fr 3fr 0.5fr;
+}
+
+.timeline-title {
+  margin-left: 12px;
+}
+
+.timeline-timestamp {
+  font-size: small;
+  color: gray;
+  justify-self: end;
 }
 </style>

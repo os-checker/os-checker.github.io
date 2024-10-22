@@ -49,7 +49,8 @@ export type Job = {
   started_at: string,
   completed_at: number,
   duration_sec: string,
-  steps: Step[]
+  steps: Step[],
+  id: number,
 };
 
 export type Step = {
