@@ -1,7 +1,7 @@
 <template>
   <TargetTable :data="workflowSelected" :dataColumns="workflowColumns" class="workflow-table" />
 
-  <TargetTable :data="runSelected" :dataColumns="runColumns" class="workflow-table" />
+  <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJob" class="workflow-table" />
 
   <Button label="Display" @click="click_visible" />
   <Dialog v-model:visible="visible" modal header="Github Action Workflows" :style="{ width: '70%' }">
@@ -58,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import type { Workflows } from '~/shared/workflows';
 
 const visible = ref(true);
@@ -120,7 +121,7 @@ const runSelected = computed(() => {
   if (!val) { return []; }
 
   return val.workflows.map((wf, idx) => ({
-    idx,
+    idx: idx + 1,
     repo: `${val.user}/${val.repo}`,
     name: wf.run.name,
     title: wf.run.display_title,
@@ -131,6 +132,7 @@ const runSelected = computed(() => {
     created_at: fmtDateTime(wf.run.created_at),
     updated_at: wf.run.updated_at,
     duration_sec: wf.run.duration_sec,
+    id: wf.run.id,
     // head_commit_message: wf.run.head_commit.message,
     // head_commit_timestamp: wf.run.head_commit.timestamp,
   }));
@@ -147,12 +149,26 @@ function icon(status: string, conclusion: string) {
   return { icon: "pi pi-times", color: "red" };
 }
 
+const selectedJob = ref<{ workflow_idx: number, run_name: string } | null>();
+function onRowSelectedJob(event: DataTableRowSelectEvent) {
+  // @rowSelect="onRowSelect"
+  const run_id = event.data.id;
+  const val = data.value;
+  if (!val) { return; }
+  const workflows = val.workflows;
+  const workflow_idx = workflows.findIndex(wf => wf.run.id === run_id);
+  selectedJob.value = workflows[workflow_idx] ? ({ workflow_idx, run_name: workflows[workflow_idx].run.name }) : null;
+  visible.value = true;
+}
+
 const jobs = computed(() => {
   const val = data.value;
-  if (!val) { return [] }
+  const selected_job = selectedJob.value;
+  if (!val || !selected_job) { return [] }
 
-  return val.workflows[0]?.jobs.jobs.map(job => {
+  return val.workflows[selected_job.workflow_idx]?.jobs.jobs.map(job => {
     return {
+      run_name: selected_job.run_name,
       job, icon: icon(job.status, job.conclusion),
       steps: job.steps.map(step => ({ step, icon: icon(step.status, step.conclusion) }))
     };
@@ -161,7 +177,6 @@ const jobs = computed(() => {
 
 const jobsIdx = computed(() => [...Array(jobs.value.length).keys().map(x => x.toString())]);
 
-
 function sum(arr: any) {
   // @ts-ignore
   return arr.reduce((accumulator, currentNumber) => accumulator + currentNumber, 0);
@@ -169,10 +184,11 @@ function sum(arr: any) {
 
 const jobsInfo = computed(() => {
   const val = data.value;
-  if (!val) { return null }
+  const workflow_idx = selectedJob.value?.workflow_idx ?? null;
+  if (!val || (workflow_idx === null)) { return null }
 
-  const j = val.workflows[0].jobs;
-  const jj = val.workflows[0].jobs.jobs;
+  const j = val.workflows[workflow_idx].jobs;
+  const jj = val.workflows[workflow_idx].jobs.jobs;
   return {
     jobs: {
       total: j.total_count,
