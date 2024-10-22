@@ -33,7 +33,6 @@ const workflowSelected = computed(() => {
 
 const runColumns = [
   { field: "idx", header: "Idx" },
-  { field: "user", header: "User" },
   { field: "repo", header: "Repo" },
   { field: "name", header: "Workflow Name" },
   { field: "title", header: "Title" },
@@ -44,7 +43,7 @@ const runColumns = [
   // { field: "run_attempt", header: "Attempt" },
   // { field: "run_started_at", header: "Started" },
   { field: "created_at", header: "Created" },
-  { field: "duration_sec", header: "Seconds" },
+  { field: "duration_sec", header: "Duration(s)" },
   // { field: "updated_at", header: "Updated" },
 ]
 
@@ -66,8 +65,7 @@ const runSelected = computed(() => {
 
   return val.workflows.map((wf, idx) => ({
     idx,
-    user: val.user,
-    repo: val.repo,
+    repo: `${val.user}/${val.repo}`,
     name: wf.run.name,
     title: wf.run.display_title,
     status: wf.run.status,
