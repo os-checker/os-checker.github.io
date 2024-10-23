@@ -19,6 +19,10 @@
         <Button title="编译目标明细表" icon="pi pi-objects-column" />
       </NuxtLink>
 
+      <NuxtLink to="/workflows">
+        <Button title="Github Workflows" icon="pi pi-bell" />
+      </NuxtLink>
+
     </div>
 
     <div class="topBarRight">

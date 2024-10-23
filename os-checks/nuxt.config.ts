@@ -2,9 +2,9 @@ import Aura from '@primevue/themes/aura';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-08-28',
+  compatibilityDate: '2024-10-22',
   app: {
-    // baseURL: '/ci/',
+    // baseURL: '/os-checker/',
     head: { link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }] }
   },
   devtools: {
