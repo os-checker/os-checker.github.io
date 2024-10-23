@@ -71,10 +71,21 @@
           </Timeline>
 
           <div style="padding: 20px 30px;">
-            Job:
-            <NuxtLink :to="job.job.html_url" target="_blank">
-              {{ job.job.html_url }}
-            </NuxtLink>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0;">
+              Job:
+              <Message severity="info">
+                <NuxtLink :to="job.job.html_url" target="_blank">
+                  {{ job.job.html_url }}
+                </NuxtLink>
+              </Message>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+              Log:
+              <Message severity="warn">
+                {{ `gh api /repos/${data?.user}/${data?.repo}/actions/jobs/${job.job.id}/logs | less -R` }}
+              </Message>
+            </div>
           </div>
 
         </AccordionContent>
