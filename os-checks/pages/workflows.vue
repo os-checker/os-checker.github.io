@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
-import type { Workflows } from '~/shared/workflows';
+import type { Workflows, Summary } from '~/shared/workflows';
 
 const visible = ref(false);
 
@@ -88,26 +88,56 @@ const dialogHeader = ref<Header>({ repo: "", repo_url: "", run_name: "", run_url
 
 const data = ref<Workflows>();
 
-githubFetch<Workflows>({
-  path: "plugin/github-api/workflows/Byte-OS/polyhal.json"
-}).then(wf => data.value = wf);
+const summaries = ref<Summary[]>([]);
+githubFetch<Summary[]>({
+  path: "plugin/github-api/workflows/summaries.json"
+}).then(val => {
+  summaries.value = val;
+
+  const latest = val[0];
+  if (!latest) { return; }
+  // githubFetch<Workflows>({
+  //   path: `plugin/github-api/workflows/${latest.user}/${latest.repo}.json`
+  // }).then(wf => data.value = wf);
+
+  // 暂时只显示最新的 workflows
+  data.value = {
+    user: latest.user,
+    repo: latest.repo,
+    runs_total_count: latest.runs,
+    workflows: latest.last?.workflows ?? []
+  };
+});
+
+
+// githubFetch<Workflows>({
+//   path: "plugin/github-api/workflows/Byte-OS/polyhal.json"
+// }).then(wf => data.value = wf);
 
 const workflowColumns = [
   { field: "idx", header: "Idx" },
   { field: "user", header: "User" },
   { field: "repo", header: "Repo" },
-  { field: "runs_total_count", header: "Workflows Count" },
+  { field: "history", header: "History" },
+  { field: "updated_at", header: "Updated" },
+  { field: "completed", header: "Completed" },
+  { field: "success", header: "Success" },
+  { field: "head_branch", header: "Branch" },
+  { field: "duration_sec", header: "Duration(s)" },
 ]
 
 const workflowSelected = computed(() => {
-  const val = data.value;
-  if (!val) { return []; }
-  return [{
-    idx: 1,
+  return summaries.value.map((val, idx) => ({
+    idx: idx + 1,
     user: val.user,
     repo: val.repo,
-    runs_total_count: val.runs_total_count,
-  }]
+    history: val.runs,
+    completed: val.last?.completed ? "✅" : "❌",
+    success: val.last?.success ? "✅" : "❌",
+    head_branch: val.last?.head_branch ?? "",
+    updated_at: val.last?.updated_at ?? "",
+    duration_sec: val.last?.duration_sec ?? null,
+  }));
 });
 
 const runColumns = [

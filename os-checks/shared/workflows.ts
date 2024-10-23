@@ -5,15 +5,17 @@ export type Workflows = {
   workflows: Workflow[]
 };
 
+export type HeadCommit = {
+  message: string,
+  timestamp: string,
+}
+
 export type Workflow = {
   run: {
     name: string,
     head_branch: string,
     head_sha: string,
-    head_commit: {
-      message: string,
-      timestamp: string,
-    },
+    head_commit: HeadCommit,
     display_title: string,
     html_url: string,
     event: string,
@@ -65,3 +67,24 @@ export type Step = {
   duration_sec: number,
 }
 
+export type Summary = {
+  user: string,
+  repo: string,
+  // total count of workflow runs
+  runs: number,
+  last: null | LastWorkflow,
+}
+
+export type LastWorkflow = {
+  created_at: string,
+  // Find the updated_at timestamp of latest
+  updated_at: string,
+  // A substraction from above timestamps: p
+  duration_sec: number,
+  completed: boolean,
+  success: boolean,
+  head_branch: string,
+  head_sha: string,
+  head_commit: HeadCommit,
+  workflows: Workflow[],
+}
