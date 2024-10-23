@@ -3,7 +3,6 @@
 
   <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJob" class="workflow-table" />
 
-  <Button label="Display" @click="click_visible" />
   <Dialog v-model:visible="visible" modal :header="dialog_header" :style="{ width: '70%' }">
     <div v-if="jobsInfo" style="display: flex; justify-content: space-evenly; margin: 5px 10px; gap: 20px;">
       <WorkflowRatioCard title="Jobs" :data="jobsInfo.jobs" />
@@ -60,8 +59,7 @@
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import type { Workflows } from '~/shared/workflows';
 
-const visible = ref(true);
-const click_visible = () => visible.value = !visible.value;
+const visible = ref(false);
 const dialog_header = ref("Github Action Workflows");
 
 const data = ref<Workflows>();
