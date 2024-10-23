@@ -6,66 +6,8 @@
   <Button label="Display" @click="click_visible" />
   <Dialog v-model:visible="visible" modal :header="dialog_header" :style="{ width: '70%' }">
     <div v-if="jobsInfo" style="display: flex; justify-content: space-evenly; margin: 5px 10px; gap: 20px;">
-      <Card style="width: 40%;">
-        <template #title>Jobs</template>
-        <template #content>
-          <div style="display: flex; justify-content: center; gap: 20%;">
-
-            <div
-              style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 30%">
-              <Knob v-model="jobsInfo.jobs.completed_ratio" :valueTemplate="knobRatio" />
-              <div>
-                Completed
-              </div>
-              <div>
-                {{ jobsInfo.jobs.completed }} / {{ jobsInfo.jobs.total }}
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <Knob v-model="jobsInfo.jobs.successs_ratio" :valueTemplate="knobRatio"
-                :value-color="jobsInfo.jobs.success_color" />
-              <div>
-                Success
-              </div>
-              <div>
-                {{ jobsInfo.jobs.success }} / {{ jobsInfo.jobs.total }}
-              </div>
-            </div>
-
-          </div>
-        </template>
-      </Card>
-
-      <Card style="width: 40%;">
-        <template #title>Steps</template>
-        <template #content>
-          <div style="display: flex; justify-content: center; gap: 20%;">
-
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <Knob v-model="jobsInfo.steps.completed_ratio" :valueTemplate="knobRatio" />
-              <div>
-                Completed
-              </div>
-              <div>
-                {{ jobsInfo.steps.completed }} / {{ jobsInfo.steps.total }}
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <Knob v-model="jobsInfo.steps.successs_ratio" :valueTemplate="knobRatio"
-                :value-color="jobsInfo.steps.success_color" />
-              <div>
-                Success
-              </div>
-              <div>
-                {{ jobsInfo.steps.success }} / {{ jobsInfo.steps.total }}
-              </div>
-            </div>
-
-          </div>
-        </template>
-      </Card>
+      <WorkflowRatioCard title="Jobs" :data="jobsInfo.jobs" />
+      <WorkflowRatioCard title="Steps" :data="jobsInfo.steps" />
     </div>
 
     <Accordion :value="jobsIdx" multiple>
@@ -115,13 +57,13 @@
 </template>
 
 <script setup lang="ts">
+import { WorkflowRatioCard } from '#build/components';
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import type { Workflows } from '~/shared/workflows';
 
 const visible = ref(true);
 const click_visible = () => visible.value = !visible.value;
 const dialog_header = ref("Github Action Workflows");
-const knobRatio = (val: number) => `${val}%`;
 
 const data = ref<Workflows>();
 
