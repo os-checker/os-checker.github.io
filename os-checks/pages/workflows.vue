@@ -234,8 +234,9 @@ const runSelected = computed(() => {
 
 function icon(status: string, conclusion: string) {
   if (status === "completed") {
-    if (conclusion === "success") {
-      return { icon: "pi pi-check", color: "#607D8B" };
+    switch (conclusion) {
+      case "success": return { icon: "pi pi-check", color: "#607D8B" };
+      case "skipped": return { icon: "pi pi-filter-slash", color: "#807D8B" };
     }
   }
   return { icon: "pi pi-times", color: red.value };
@@ -299,13 +300,15 @@ const jobsInfo = computed(() => {
   const j = val.workflows[workflow_idx].jobs;
   const jj = val.workflows[workflow_idx].jobs.jobs;
 
+  const is_success = (s: string) => s === "success" || s === "skipped";
+
   const total_jobs = j.total_count;
   const completed_jobs = jj.filter(job => job.status === "completed").length;
-  const success_jobs = jj.filter(job => job.conclusion === "success").length;
+  const success_jobs = jj.filter(job => is_success(job.conclusion)).length;
 
   const total_steps = sum(jj.map(job => job.steps.length));
   const completed_steps = sum(jj.map(job => job.steps.filter(step => step.status === "completed").length));
-  const success_steps = sum(jj.map(job => job.steps.filter(step => step.conclusion === "success").length));
+  const success_steps = sum(jj.map(job => job.steps.filter(step => is_success(step.conclusion)).length));
 
   return {
     jobs: {
