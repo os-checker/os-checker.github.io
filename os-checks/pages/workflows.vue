@@ -88,6 +88,17 @@
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import type { Workflows, Summary } from '~/shared/workflows';
 
+const green = ref("green");
+const red = ref("red");
+onMounted(() => {
+  // 获取元素的计算后的样式
+  const styles = window.getComputedStyle(document.documentElement);
+
+  // 获取CSS变量的值
+  green.value = styles.getPropertyValue('--p-emerald-500').trim();
+  red.value = styles.getPropertyValue('--p-red-500').trim();
+});
+
 const visible = ref(false);
 
 type Header = { repo: string, repo_url: string, run_name: string, run_url: string, title: string };
@@ -223,7 +234,7 @@ function icon(status: string, conclusion: string) {
       return { icon: "pi pi-check", color: "#607D8B" };
     }
   }
-  return { icon: "pi pi-times", color: "red" };
+  return { icon: "pi pi-times", color: red.value };
 }
 
 const selectedJob = ref<{ workflow_idx: number, run_name: string } | null>();
@@ -276,17 +287,6 @@ function sum(arr: any) {
   // @ts-ignore
   return arr.reduce((accumulator, currentNumber) => accumulator + currentNumber, 0);
 };
-
-const green = ref("green");
-const red = ref("red");
-onMounted(() => {
-  // 获取元素的计算后的样式
-  const styles = window.getComputedStyle(document.documentElement);
-
-  // 获取CSS变量的值
-  green.value = styles.getPropertyValue('--p-emerald-500').trim();
-  red.value = styles.getPropertyValue('--p-red-500').trim();
-});
 
 const jobsInfo = computed(() => {
   const val = data.value;
