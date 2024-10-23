@@ -1,9 +1,15 @@
 <template>
-  <div style="padding: 10px;">
-    Repo:
-    <!-- <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" /> -->
-    <MultiSelect v-model="selectedRepo" display="chip" :options="repos" :optionLabel="label" filter
-      :maxSelectedLabels="3" placeholder="Select Repos" />
+  <div style="padding: 16px; display: flex; justify-content: space-between; ">
+    <div>
+      Repo:
+      <MultiSelect v-model="selectedRepo" display="chip" :options="repos" :optionLabel="label" filter
+        :maxSelectedLabels="3" placeholder="Select Repos" />
+    </div>
+
+    <Message severity="secondary" >
+      Repo Count: {{ summariesInfo.total_repos }} in total, {{ summariesInfo.good }} good, and
+      {{ summariesInfo.zero_history }} with zero history
+    </Message>
   </div>
 
   <TargetTable :data="workflowSelected" :dataColumns="workflowColumns" :rowSelect="onRowSelectedWorkflow"
@@ -121,6 +127,7 @@ const data = ref<Workflows>();
 const selectedSummaries = ref<Summary[]>([]);
 
 const summaries = ref<Summary[]>([]);
+
 githubFetch<Summary[]>({
   path: "plugin/github-api/workflows/summaries.json"
 }).then(val => {
@@ -135,6 +142,16 @@ githubFetch<Summary[]>({
 
   // 暂时只显示最新的 workflows
   data.value = summary_to_workflows(latest);
+});
+
+const summariesInfo = computed(() => {
+  const val = summaries.value;
+  const total_repos = val.length;
+  const zero_history = val.reduce((acc, cur) => {
+    if (cur.runs === 0) { acc += 1; }
+    return acc;
+  }, 0);
+  return { total_repos, zero_history, good: total_repos - zero_history };
 });
 
 function onRowSelectedWorkflow(event: DataTableRowSelectEvent) {
