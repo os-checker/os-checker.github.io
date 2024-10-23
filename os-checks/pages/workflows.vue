@@ -6,7 +6,8 @@
       :maxSelectedLabels="3" placeholder="Select Repos" />
   </div>
 
-  <TargetTable :data="workflowSelected" :dataColumns="workflowColumns" class="workflow-table" />
+  <TargetTable :data="workflowSelected" :dataColumns="workflowColumns" :rowSelect="onRowSelectedWorkflow"
+    class="workflow-table" />
 
   <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJob" class="workflow-table" />
 
@@ -86,7 +87,7 @@
 
 <script setup lang="ts">
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
-import type { Workflows, Summary } from '~/shared/workflows';
+import { type Workflows, type Summary, summary_to_workflows } from '~/shared/workflows';
 
 const green = ref("green");
 const red = ref("red");
@@ -122,13 +123,16 @@ githubFetch<Summary[]>({
   // }).then(wf => data.value = wf);
 
   // 暂时只显示最新的 workflows
-  data.value = {
-    user: latest.user,
-    repo: latest.repo,
-    runs_total_count: latest.runs,
-    workflows: latest.last?.workflows ?? []
-  };
+  data.value = summary_to_workflows(latest);
 });
+
+function onRowSelectedWorkflow(event: DataTableRowSelectEvent) {
+  const user = event.data.user;
+  const repo = event.data.repo;
+  const found = selectedSummaries.value.find(val => val.user === user && val.repo === repo);
+  if (!found) { return; }
+  data.value = summary_to_workflows(found);
+}
 
 type Repo = { idx: number, user: string, repo: string };
 const label = ({ user, repo }: Repo) => `${user} / ${repo}`;
@@ -239,11 +243,10 @@ function icon(status: string, conclusion: string) {
 
 const selectedJob = ref<{ workflow_idx: number, run_name: string } | null>();
 function onRowSelectedJob(event: DataTableRowSelectEvent) {
-  // @rowSelect="onRowSelect"
-  const run_id = event.data.id;
   const val = data.value;
   if (!val) { return; }
 
+  const run_id = event.data.id;
   const workflows = val.workflows;
   const workflow_idx = workflows.findIndex(wf => wf.run.id === run_id);
   const workflow = workflows[workflow_idx];

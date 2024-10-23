@@ -88,3 +88,12 @@ export type LastWorkflow = {
   head_commit: HeadCommit,
   workflows: Workflow[],
 }
+
+export function summary_to_workflows(summary: Summary ): Workflows {
+  return {
+    user: summary.user,
+    repo: summary.repo,
+    runs_total_count: summary.runs,
+    workflows: summary.last?.workflows ?? []
+  };
+}
