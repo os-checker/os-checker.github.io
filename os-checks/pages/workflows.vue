@@ -3,7 +3,22 @@
 
   <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJob" class="workflow-table" />
 
-  <Dialog v-model:visible="visible" modal :header="dialog_header" :style="{ width: '70%' }">
+  <Dialog v-model:visible="visible" modal :style="{ width: '70%' }">
+    <template #header>
+      <span style="display: inline-flex; gap: 40px; font-size: large;">
+        <div>
+          <NuxtLink :to="dialogHeader.repo_url" target="_blank">
+            <Tag icon="pi pi-github" severity="info">
+              {{ dialogHeader.repo }}
+            </Tag>
+          </NuxtLink>
+        </div>
+
+        <div><i>{{ dialogHeader.run_name }}</i></div>
+        <div><b>{{ dialogHeader.title }}</b></div>
+      </span>
+    </template>
+
     <div v-if="jobsInfo" style="display: flex; justify-content: space-evenly; margin: 5px 10px; gap: 20px;">
       <WorkflowRatioCard title="Jobs" :data="jobsInfo.jobs" />
       <WorkflowRatioCard title="Steps" :data="jobsInfo.steps" />
@@ -60,7 +75,9 @@ import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import type { Workflows } from '~/shared/workflows';
 
 const visible = ref(false);
-const dialog_header = ref("Github Action Workflows");
+
+type Header = { repo: string, repo_url: string, run_name: string, title: string };
+const dialogHeader = ref<Header>({ repo: "", repo_url: "", run_name: "", title: "" });
 
 const data = ref<Workflows>();
 
@@ -162,7 +179,9 @@ function onRowSelectedJob(event: DataTableRowSelectEvent) {
   const run_name = workflow.run.name;
   selectedJob.value = { workflow_idx, run_name };
   const title = workflow.run.display_title;
-  dialog_header.value = `[ ${val.user} / ${val.repo} ] ${run_name} - ${title}`;
+  const repo = `${val.user}/${val.repo}`;
+  const repo_url = `https://github.com/${repo}`;
+  dialogHeader.value = { repo, repo_url, run_name, title };
   visible.value = true;
 }
 
