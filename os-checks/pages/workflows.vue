@@ -1,4 +1,11 @@
 <template>
+  <div style="padding: 10px;">
+    Repo:
+    <!-- <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" /> -->
+    <MultiSelect v-model="selectedRepo" display="chip" :options="repos" :optionLabel="label" filter
+      :maxSelectedLabels="3" placeholder="Select Repos" />
+  </div>
+
   <TargetTable :data="workflowSelected" :dataColumns="workflowColumns" class="workflow-table" />
 
   <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJob" class="workflow-table" />
@@ -88,11 +95,14 @@ const dialogHeader = ref<Header>({ repo: "", repo_url: "", run_name: "", run_url
 
 const data = ref<Workflows>();
 
+const selectedSummaries = ref<Summary[]>([]);
+
 const summaries = ref<Summary[]>([]);
 githubFetch<Summary[]>({
   path: "plugin/github-api/workflows/summaries.json"
 }).then(val => {
   summaries.value = val;
+  selectedSummaries.value = val;
 
   const latest = val[0];
   if (!latest) { return; }
@@ -109,10 +119,25 @@ githubFetch<Summary[]>({
   };
 });
 
+type Repo = { idx: number, user: string, repo: string };
+const label = ({ user, repo }: Repo) => `${user} / ${repo}`;
+const repos = computed<Repo[]>(() => summaries.value.map((val, idx) => ({ idx, user: val.user, repo: val.repo })));
 
-// githubFetch<Workflows>({
-//   path: "plugin/github-api/workflows/Byte-OS/polyhal.json"
-// }).then(wf => data.value = wf);
+const selectedRepo = ref<Repo[] | null>(null);
+watch(selectedRepo, (selected_repos) => {
+  const arr = summaries.value;
+
+  if (!selected_repos || selected_repos.length === 0) {
+    selectedSummaries.value = arr;
+    return;
+  }
+
+  let res = [];
+  for (let value of selected_repos) {
+    res.push(arr[value.idx]);
+  }
+  selectedSummaries.value = res;
+});
 
 const workflowColumns = [
   { field: "idx", header: "Idx" },
@@ -127,7 +152,7 @@ const workflowColumns = [
 ]
 
 const workflowSelected = computed(() => {
-  return summaries.value.map((val, idx) => ({
+  return selectedSummaries.value.map((val, idx) => ({
     idx: idx + 1,
     user: val.user,
     repo: val.repo,
