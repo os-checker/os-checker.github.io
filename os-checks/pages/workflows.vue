@@ -202,17 +202,24 @@ const workflowColumns = [
 ]
 
 const workflowSelected = computed(() => {
-  return selectedSummaries.value.map((val, idx) => ({
-    idx: idx + 1,
-    user: val.user,
-    repo: val.repo,
-    history: val.runs,
-    completed: val.last?.completed ? "✅" : (val.runs ? "❌" : ""),
-    success: val.last?.success ? "✅" : (val.runs ? "❌" : ""),
-    head_branch: val.last?.head_branch ?? "",
-    updated_at: val.last?.updated_at ?? "",
-    duration_sec: val.last?.duration_sec ?? null,
-  }));
+  return selectedSummaries.value.map((val, idx) => {
+    let updated_at = "";
+    if (val.last?.updated_at) {
+      updated_at = fmtDateTime(val.last?.updated_at);
+    }
+
+    return {
+      idx: idx + 1,
+      user: val.user,
+      repo: val.repo,
+      history: val.runs,
+      completed: val.last?.completed ? "✅" : (val.runs ? "❌" : ""),
+      success: val.last?.success ? "✅" : (val.runs ? "❌" : ""),
+      head_branch: val.last?.head_branch ?? "",
+      updated_at,
+      duration_sec: val.last?.duration_sec ?? null,
+    }
+  });
 });
 
 const runColumns = [
