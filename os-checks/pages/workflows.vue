@@ -5,8 +5,67 @@
 
   <Button label="Display" @click="click_visible" />
   <Dialog v-model:visible="visible" modal :header="dialog_header" :style="{ width: '70%' }">
-    <div v-if="jobsInfo">
-      {{ jobsInfo }}
+    <div v-if="jobsInfo" style="display: flex; justify-content: space-evenly; margin: 5px 10px; gap: 20px;">
+      <Card style="width: 40%;">
+        <template #title>Jobs</template>
+        <template #content>
+          <div style="display: flex; justify-content: center; gap: 20%;">
+
+            <div
+              style="display: flex; flex-direction: column; justify-content: center; align-items: center; width: 30%">
+              <Knob v-model="jobsInfo.jobs.completed_ratio" :valueTemplate="knobRatio" />
+              <div>
+                Completed
+              </div>
+              <div>
+                {{ jobsInfo.jobs.completed }} / {{ jobsInfo.jobs.total }}
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <Knob v-model="jobsInfo.jobs.successs_ratio" :valueTemplate="knobRatio"
+                :value-color="jobsInfo.jobs.success_color" />
+              <div>
+                Success
+              </div>
+              <div>
+                {{ jobsInfo.jobs.success }} / {{ jobsInfo.jobs.total }}
+              </div>
+            </div>
+
+          </div>
+        </template>
+      </Card>
+
+      <Card style="width: 40%;">
+        <template #title>Steps</template>
+        <template #content>
+          <div style="display: flex; justify-content: center; gap: 20%;">
+
+            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <Knob v-model="jobsInfo.steps.completed_ratio" :valueTemplate="knobRatio" />
+              <div>
+                Completed
+              </div>
+              <div>
+                {{ jobsInfo.steps.completed }} / {{ jobsInfo.steps.total }}
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <Knob v-model="jobsInfo.steps.successs_ratio" :valueTemplate="knobRatio"
+                :value-color="jobsInfo.steps.success_color" />
+              <div>
+                Success
+              </div>
+              <div>
+                {{ jobsInfo.steps.success }} / {{ jobsInfo.steps.total }}
+              </div>
+            </div>
+
+          </div>
+        </template>
+      </Card>
     </div>
 
     <Accordion :value="jobsIdx" multiple>
@@ -40,14 +99,12 @@
             </template>
           </Timeline>
 
-          <Card style="padding: 10px 18px;">
-            <template #content>
-              Job:
-              <NuxtLink :to="job.job.html_url" target="_blank">
-                {{ job.job.html_url }}
-              </NuxtLink>
-            </template>
-          </Card>
+          <div style="padding: 20px 30px;">
+            Job:
+            <NuxtLink :to="job.job.html_url" target="_blank">
+              {{ job.job.html_url }}
+            </NuxtLink>
+          </div>
 
         </AccordionContent>
       </AccordionPanel>
@@ -64,6 +121,7 @@ import type { Workflows } from '~/shared/workflows';
 const visible = ref(true);
 const click_visible = () => visible.value = !visible.value;
 const dialog_header = ref("Github Action Workflows");
+const knobRatio = (val: number) => `${val}%`;
 
 const data = ref<Workflows>();
 
@@ -177,8 +235,9 @@ const jobs = computed(() => {
   return val.workflows[selected_job.workflow_idx]?.jobs.jobs.map(job => {
     return {
       run_name: selected_job.run_name,
-      job, icon: icon(job.status, job.conclusion),
-      steps: job.steps.map(step => ({ step, icon: icon(step.status, step.conclusion) }))
+      job,
+      steps: job.steps.map(step => ({ step, icon: icon(step.status, step.conclusion) })),
+      icon: icon(job.status, job.conclusion),
     };
   }) ?? [];
 });
@@ -190,6 +249,17 @@ function sum(arr: any) {
   return arr.reduce((accumulator, currentNumber) => accumulator + currentNumber, 0);
 };
 
+const green = ref("green");
+const red = ref("red");
+onMounted(() => {
+  // 获取元素的计算后的样式
+  const styles = window.getComputedStyle(document.documentElement);
+
+  // 获取CSS变量的值
+  green.value = styles.getPropertyValue('--p-emerald-500').trim();
+  red.value = styles.getPropertyValue('--p-red-500').trim();
+});
+
 const jobsInfo = computed(() => {
   const val = data.value;
   const workflow_idx = selectedJob.value?.workflow_idx ?? null;
@@ -197,18 +267,33 @@ const jobsInfo = computed(() => {
 
   const j = val.workflows[workflow_idx].jobs;
   const jj = val.workflows[workflow_idx].jobs.jobs;
+
+  const total_jobs = j.total_count;
+  const completed_jobs = jj.filter(job => job.status === "completed").length;
+  const success_jobs = jj.filter(job => job.conclusion === "success").length;
+
+  const total_steps = sum(jj.map(job => job.steps.length));
+  const completed_steps = sum(jj.map(job => job.steps.filter(step => step.status === "completed").length));
+  const success_steps = sum(jj.map(job => job.steps.filter(step => step.conclusion === "success").length));
+
   return {
     jobs: {
-      total: j.total_count,
-      completed: jj.filter(job => job.status === "completed").length,
-      success: jj.filter(job => job.conclusion === "success").length,
+      total: total_jobs,
+      completed: completed_jobs,
+      completed_ratio: Math.round((completed_jobs / total_jobs) * 100),
+      completed_color: (completed_jobs === total_jobs) ? green.value : red.value,
+      success: success_jobs,
+      successs_ratio: Math.round((success_jobs / total_jobs) * 100),
+      success_color: (success_jobs === total_jobs) ? green.value : red.value,
     },
-    steps:
-    {
-      total: sum(jj.map(job => job.steps.length)),
-      completed: sum(jj.map(job => job.steps.filter(step => step.status === "completed").length)),
-      success: sum(jj.map(job => job.steps.filter(step => step.conclusion === "success").length)),
-
+    steps: {
+      total: total_steps,
+      completed: completed_steps,
+      completed_ratio: Math.round((completed_steps / total_steps) * 100),
+      completed_color: (completed_steps === total_steps) ? green.value : red.value,
+      success: success_steps,
+      successs_ratio: Math.round((success_steps / total_steps) * 100),
+      success_color: (success_steps === total_steps) ? green.value : red.value,
     }
   }
 });
