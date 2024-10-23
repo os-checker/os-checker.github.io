@@ -6,7 +6,7 @@
         :maxSelectedLabels="3" placeholder="Select Repos" />
     </div>
 
-    <Message severity="secondary" >
+    <Message severity="secondary">
       Repo Count: {{ summariesInfo.total_repos }} in total, {{ summariesInfo.good }} good, and
       {{ summariesInfo.zero_history }} with zero history
     </Message>
@@ -100,6 +100,13 @@
 
   </Dialog>
 
+  <div style="padding-top: 20px; padding-left: 10px;">
+    使用说明：第 1 个表为仓库 Github Action 总运行数和最近更新的情况；
+
+    点击第 1 个表的一行，则更新第 2 个 Workflow 明细情况表；
+
+    点击第 2 个明细表的一行，则弹出具体 Jobs 的运行情况。
+  </div>
 </template>
 
 <script setup lang="ts">
