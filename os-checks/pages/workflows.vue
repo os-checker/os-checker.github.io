@@ -5,7 +5,7 @@
 
   <Dialog v-model:visible="visible" modal :style="{ width: '70%' }">
     <template #header>
-      <span style="display: inline-flex; gap: 40px; font-size: large;">
+      <span style="display: inline-flex; justify-content: center; gap: 40px; font-size: large;">
         <div>
           <NuxtLink :to="dialogHeader.repo_url" target="_blank">
             <Tag icon="pi pi-github" severity="info">
@@ -14,7 +14,14 @@
           </NuxtLink>
         </div>
 
-        <div><i>{{ dialogHeader.run_name }}</i></div>
+        <div>
+          <NuxtLink :to="dialogHeader.run_url" target="_blank">
+            <Tag icon="pi pi-external-link" severity="contrast">
+              {{ dialogHeader.run_name }}
+            </Tag>
+          </NuxtLink>
+        </div>
+
         <div><b>{{ dialogHeader.title }}</b></div>
       </span>
     </template>
@@ -76,8 +83,8 @@ import type { Workflows } from '~/shared/workflows';
 
 const visible = ref(false);
 
-type Header = { repo: string, repo_url: string, run_name: string, title: string };
-const dialogHeader = ref<Header>({ repo: "", repo_url: "", run_name: "", title: "" });
+type Header = { repo: string, repo_url: string, run_name: string, run_url: string, title: string };
+const dialogHeader = ref<Header>({ repo: "", repo_url: "", run_name: "", run_url: "", title: "" });
 
 const data = ref<Workflows>();
 
@@ -181,7 +188,8 @@ function onRowSelectedJob(event: DataTableRowSelectEvent) {
   const title = workflow.run.display_title;
   const repo = `${val.user}/${val.repo}`;
   const repo_url = `https://github.com/${repo}`;
-  dialogHeader.value = { repo, repo_url, run_name, title };
+  const run_url = workflow.run.html_url;
+  dialogHeader.value = { repo, repo_url, run_name, run_url, title };
   visible.value = true;
 }
 
