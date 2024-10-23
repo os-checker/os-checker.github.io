@@ -41,6 +41,8 @@ export type Workflow = {
 };
 
 export type Job = {
+  name: string,
+  // seems identical to run.name, not job name
   workflow_name: string,
   html_url: string,
   status: string,
