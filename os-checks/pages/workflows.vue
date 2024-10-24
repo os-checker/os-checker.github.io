@@ -48,8 +48,11 @@
     <Accordion :value="jobsIdx" multiple>
       <AccordionPanel v-for="(job, idx) in jobs" :key="job.job.id" :value="idx.toString()">
         <AccordionHeader>
-          <Tag :value="idx + 1" :severity="job.job_tag"></Tag>
-          <b> {{ job.job.name }} </b>
+          <div>
+            <Tag :value="idx + 1" :severity="job.job_tag"></Tag>
+            ( {{ job.job_duration_sec }} secs )
+          </div>
+          <b style="font-size: large"> {{ job.job.name }} </b>
         </AccordionHeader>
 
         <AccordionContent>
@@ -312,10 +315,13 @@ const jobs = computed(() => {
 
   return val.workflows[selected_job.workflow_idx]?.jobs.jobs.map(job => {
     const job_success = job.conclusion === "success";
+    const job_duration_sec = job.steps.reduce((acc, step) => acc + step.duration_sec, 0);
+
     return {
       job,
       job_success,
       job_tag: job_success ? "success" : "danger",
+      job_duration_sec,
       steps: job.steps.map(step => ({ step, icon: icon(step.status, step.conclusion) })),
       icon: icon(job.status, job.conclusion),
     };
