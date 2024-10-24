@@ -40,7 +40,7 @@
       </span>
     </template>
 
-    <div v-if="jobsInfo" style="display: flex; justify-content: space-evenly; margin: 5px 10px; gap: 20px;">
+    <div v-if="jobsInfo" style="display: flex; justify-content: space-evenly; margin: 5px 50px 5px 0px; gap: 20px;">
       <WorkflowRatioCard title="Jobs" :data="jobsInfo.jobs" />
       <WorkflowRatioCard title="Steps" :data="jobsInfo.steps" />
     </div>
@@ -48,11 +48,11 @@
     <Accordion :value="jobsIdx" multiple>
       <AccordionPanel v-for="(job, idx) in jobs" :key="job.job.id" :value="idx.toString()">
         <AccordionHeader>
-          <div>
-            <Tag :value="idx + 1" :severity="job.job_tag"></Tag>
+          <Tag :value="idx + 1" :severity="job.job_tag" style="flex-grow: 0"></Tag>
+          <b style="font-size: large; flex-grow: 1; text-align: center;"> {{ job.job.name }} </b>
+          <span style="flex-grow: 0; margin-right: 5px; font-size: smaller;">
             ( {{ job.job_duration_sec }} secs )
-          </div>
-          <b style="font-size: large"> {{ job.job.name }} </b>
+          </span>
         </AccordionHeader>
 
         <AccordionContent>
@@ -420,5 +420,10 @@ const jobsInfo = computed(() => {
   font-size: small;
   color: gray;
   justify-self: end;
+}
+
+.p-card-body {
+  padding: 0.4rem !important;
+  gap: 0 !important
 }
 </style>
