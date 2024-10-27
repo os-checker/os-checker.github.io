@@ -17,6 +17,8 @@ githubFetch<PassCountRepos>({
 
 // pick data columns
 const selectedColumns = ref(dataColumns.value);
+// Label to display after exceeding max selected labels.
+const selectedItemsLabel = computed(() => `${selectedColumns.value.length} checkers are selected; click to customize columns displayed`);
 const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
 
 const basic = useBasicStore();
@@ -98,7 +100,8 @@ const progressRatio = computed(() => {
 
           <div>
             <MultiSelect :modelValue="selectedColumns" @update:modelValue="onToggle" :options="dataColumns"
-              optionLabel="header" class="w-full sm:w-64" display="chip" />
+              :maxSelectedLabels="8" :selectedItemsLabel="selectedItemsLabel" optionLabel="header"
+              class="w-full sm:w-64" display="chip" />
           </div>
 
           <div>
