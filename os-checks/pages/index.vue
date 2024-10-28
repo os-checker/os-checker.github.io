@@ -114,11 +114,11 @@ const progressRatio = computed(() => {
         </div>
       </template>
 
-      <Column field="idx" header="序号" expander style="min-width: 80px" />
+      <Column field="idx" header="序号" expander frozen style="min-width: 80px" />
 
-      <Column field="user" header="User" sortable style="min-width: 160px" />
+      <Column field="user" header="User" sortable frozen style="min-width: 160px" />
 
-      <Column field="repo" header="Repo" sortable style="min-width: 200px">
+      <Column field="repo" header="Repo" sortable frozen style="min-width: 200px">
         <!-- PrimeVue 的 bug，不支持 #body="{data}" https://github.com/primefaces/primevue/issues/5855 -->
         <template #body="{ node: { data } }">
           <NuxtLink :to="`/${data.user}/${data.repo}`" class="nav-link">
@@ -127,7 +127,7 @@ const progressRatio = computed(() => {
         </template>
       </Column>
 
-      <Column field="pkg" header="Package" sortable style="width: 200px" />
+      <Column field="pkg" header="Package" frozen sortable style="min-width: 180px" />
 
       <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
 
