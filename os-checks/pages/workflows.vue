@@ -241,7 +241,9 @@ const runColumns = [
   // { field: "updated_at", header: "Updated" },
 ]
 
-function fmtDateTime(utc: string) {
+function fmtDateTime(utc: string | null) {
+  if (!utc) { return "null"; }
+
   const date = new Date(utc);
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，所以加1
@@ -277,7 +279,7 @@ const runSelected = computed(() => {
 
 // https://github.com/os-checker/database/blob/debug/plugin/github-api/workflows/Byte-OS/polyhal.json
 
-function icon(status: string, conclusion: string) {
+function icon(status: string, conclusion: string | null) {
   if (status === "completed") {
     switch (conclusion) {
       case "success": return { icon: "pi pi-check", color: "#607D8B" };
@@ -348,7 +350,7 @@ const jobsInfo = computed(() => {
   const j = val.workflows[workflow_idx].jobs;
   const jj = val.workflows[workflow_idx].jobs.jobs;
 
-  const is_success = (s: string) => s === "success" || s === "skipped";
+  const is_success = (s: string | null) => s === "success" || s === "skipped";
 
   const total_jobs = j.total_count;
   const completed_jobs = jj.filter(job => job.status === "completed").length;

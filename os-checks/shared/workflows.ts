@@ -20,7 +20,8 @@ export type Workflow = {
     html_url: string,
     event: string,
     status: string,
-    conclusion: string,
+    // conclusion is null when status is "in_progress"
+    conclusion: string | null,
     run_attempt: number,
     run_started_at: string,
     created_at: string,
@@ -48,10 +49,11 @@ export type Job = {
   workflow_name: string,
   html_url: string,
   status: string,
-  conclusion: string,
+  conclusion: string | null,
   created_at: string,
   started_at: string,
-  completed_at: number,
+  // completed_at is null when status is "in_progress"
+  completed_at: number | null,
   duration_sec: string,
   steps: Step[],
   id: number,
@@ -60,10 +62,11 @@ export type Job = {
 export type Step = {
   name: string,
   status: string,
-  conclusion: string,
+  conclusion: string | null,
   number: number,
-  started_at: string,
-  completed_at: string,
+  // cancel or in progress can make these null
+  started_at: string | null,
+  completed_at: string | null,
   duration_sec: number,
 }
 
@@ -89,7 +92,7 @@ export type LastWorkflow = {
   workflows: Workflow[],
 }
 
-export function summary_to_workflows(summary: Summary ): Workflows {
+export function summary_to_workflows(summary: Summary): Workflows {
   return {
     user: summary.user,
     repo: summary.repo,
