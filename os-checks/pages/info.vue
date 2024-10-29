@@ -1,13 +1,22 @@
 <template>
   <div>
     <DataTable :value="summaryTable" tableStyle="min-width: 50rem; margin: 10px 10px;" scrollable scrollHeight="800px"
-      showGridlines selectionMode="single" v-model:selection="selectedPkg">
-      <!-- <template #header> -->
-      <!--     <div style="text-align:left"> -->
-      <!--         <MultiSelect :modelValue="selectedColumns" :options="columns" optionLabel="header" @update:modelValue="onToggle" -->
-      <!--             display="chip" placeholder="Select Columns" /> -->
-      <!--     </div> -->
-      <!-- </template> -->
+      showGridlines selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
+      :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories', 'os_categories']">
+
+      <template #header>
+        <div style="display: flex; justify-content: center">
+          <div style="width: 50%">
+            <IconField>
+              <InputIcon>
+                <i class="pi pi-search" />
+              </InputIcon>
+              <InputText style="width: 100%" v-model="filters['global'].value" placeholder="Global Search" />
+            </IconField>
+          </div>
+        </div>
+      </template>
+
       <Column frozen field="idx" header="Idx" />
       <Column frozen field="user" header="User" style="min-width: 150px;" />
       <Column frozen field="repo" header="Repo" style="min-width: 180px;" />
@@ -92,6 +101,12 @@
 
 <script setup lang="ts">
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
+import { FilterMatchMode } from '@primevue/core/api';
+
+// interactive filter/search inputs
+const filters = ref<any>({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
 
 const summaries = ref<PkgInfo[]>([]);
 
@@ -166,6 +181,8 @@ const summaryTable = computed(() => {
     return val;
   });
 });
+
+
 
 const dialogShow = ref(false);
 const dialogHeader = ref<{ repo: string, repo_url: string, pkg_name: string, pkg: Pkg } | null>();
