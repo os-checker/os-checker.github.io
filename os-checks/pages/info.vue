@@ -1,7 +1,7 @@
 <template>
   <div>
     <DataTable :value="summaryTable" tableStyle="min-width: 50rem; margin: 10px 10px;" scrollable scrollHeight="800px"
-      showGridlines selectionMode="single" v-model:selection="selectedPkg" @row-click="rowClick">
+      showGridlines selectionMode="single" v-model:selection="selectedPkg">
       <!-- <template #header> -->
       <!--     <div style="text-align:left"> -->
       <!--         <MultiSelect :modelValue="selectedColumns" :options="columns" optionLabel="header" @update:modelValue="onToggle" -->
@@ -16,13 +16,7 @@
       <Column field="version" header="Version" style="text-align: center;" />
       <Column field="dependencies" header="Depen-dencies" style="text-align: center;" />
 
-      <Column field="testcases" header="TestCases" style="text-align: center;">
-        <template #body="{ data }">
-          <div style="color: var(--p-indigo-400); font-weight: bold; text-decoration: underline;"
-            @click="() => handleClick(data.user, data.repo, data.pkg, data.testcases)">{{ data.testcases }}
-          </div>
-        </template>
-      </Column>
+      <Column field="testcases" header="TestCases" style="text-align: center;" />
 
       <Column field="tests" header="Tests" style="text-align: center;" />
       <Column field="examples" header="Examples" style="text-align: center;" />
@@ -56,13 +50,48 @@
 
     </DataTable>
 
-    <Dialog v-model:visible="showTestCases" modal header="Test Cases"></Dialog>
+    <Dialog v-model:visible="dialogShow" modal :style="{ width: '70%' }">
+      <template #header>
+        <span style="display: inline-flex; justify-content: center; gap: 40px; font-size: larger; font-weight: bold;">
+          <div>
+            <NuxtLink :to="dialogHeader?.repo_url" target="_blank">
+              <Tag icon="pi pi-github" severity="info" style="font-weight: bold;">
+                {{ dialogHeader?.repo }}
+              </Tag>
+            </NuxtLink>
+          </div>
+
+          <div>Test Cases of package
+            <span style="color: var(--p-emerald-500); margin-right: 5px;">{{ dialogHeader?.pkg_name }}</span>
+          </div>
+        </span>
+      </template>
+
+      <div>
+        <div class="dialog-header">
+          Description: <b style="color: var(--p-emerald-500)">{{ dialogHeader?.pkg.description }}</b>
+        </div>
+        <div class="dialog-header">
+          Categories:
+          <Tag v-for="tag of dialogHeader?.pkg.categories" severity="warn" :value="tag" style="margin-right: 6px;" />
+        </div>
+        <div class="dialog-header">
+          OS Categories:
+          <Tag v-for="tag of dialogHeader?.pkg.os_categories" severity="warn" :value="tag" style="margin-right: 6px;" />
+        </div>
+        <div class="dialog-header">
+          Authors:
+          <Tag v-for="tag of dialogHeader?.pkg.author" severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>
+        </div>
+
+        <InfoTestCases :tests="testCases" />
+      </div>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { DataTableRowClickEvent } from 'primevue/datatable';
-import type { PkgInfo } from '~/shared/info';
+import type { Pkg, PkgInfo, Test } from '~/shared/info';
 
 const summaries = ref<PkgInfo[]>([]);
 
@@ -114,23 +143,37 @@ const summaryTable = computed(() => {
   }).flat();
 });
 
-type SelectedRow = { user: string, repo: string, pkg: string };
+const dialogShow = ref(false);
+const dialogHeader = ref<{ repo: string, repo_url: string, pkg_name: string, pkg: Pkg } | null>();
+const testCases = ref<Test[]>([]);
+
+type SelectedRow = { user: string, repo: string, pkg: string, testcases: number };
 const selectedPkg = ref<SelectedRow | null>(null);
-// watch(selectedPkg, (val) => console.log(val));
+watch(selectedPkg, val => {
 
-const showTestCases = ref(false);
+  if (!val?.testcases) { return; }
 
-function handleClick(user: string, repo: string, pkg: string, n: number) {
-  if (n === 0) { return; }
+  // for now, pop up a dialog to display testcases only if any 
+  dialogShow.value = true;
 
-  console.log(user, repo, pkg);
-  showTestCases.value = true;
-}
+  const pkg = summaries.value
+    .find(summary => summary.user === val.user && summary.repo === val.repo)
+    ?.pkgs[val.pkg];
 
-function rowClick(event: DataTableRowClickEvent) {
-  const data = event.data;
-  if (data.testcases === 0) { return; }
-  // console.log(event);
+  if (!pkg?.testcases) { return; }
 
-}
+  const repo = `${val.user}/${val.repo}`;
+  const repo_url = `https://github.com/${repo}`;
+  dialogHeader.value = { repo, repo_url, pkg_name: val.pkg, pkg };
+
+  testCases.value = pkg.testcases.tests;
+});
+
+
 </script>
+
+<style lang="css">
+.dialog-header {
+  margin-bottom: 10px;
+}
+</style>
