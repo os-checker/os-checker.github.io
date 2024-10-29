@@ -7,17 +7,24 @@
 
       <template #header>
         <div style="display: flex; justify-content: space-between;">
-          <div>
+          <div style="display: flex; gap: 20px;">
             <MultiSelect v-model="selectedCategories" display="chip" :options="categories" filter :maxSelectedLabels="4"
               placeholder="Select Categories" />
+
+            <MultiSelect v-model="selectedOSCategories" display="chip" :options="os_categories" filter
+              :maxSelectedLabels="4" placeholder="Select OS Categories" />
+
+            <MultiSelect v-model="selectedAuthors" display="chip" :options="authors" filter :maxSelectedLabels="4"
+              placeholder="Select Authors" />
           </div>
 
-          <div style="width: 40%">
+          <div style="width: 30%">
             <IconField>
               <InputIcon>
                 <i class="pi pi-search" />
               </InputIcon>
-              <InputText style="width: 100%" v-model="filters['global'].value" placeholder="Global Search" />
+              <InputText style="width: 100%" v-model="filters['global'].value"
+                placeholder="Search in all text columns" />
             </IconField>
           </div>
 
@@ -109,7 +116,6 @@
 <script setup lang="ts">
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
-import type { Summary } from '~/shared/workflows';
 
 // interactive filter/search inputs
 const filters = ref<any>({
@@ -123,23 +129,6 @@ githubFetch<PkgInfo[]>({
 }).then(val => {
   summaries.value = val;
 });
-
-const summaryColumns = [
-  // { field: "idx", header: "Idx" },
-  // { field: "user", header: "User" },
-  // { field: "repo", header: "Repo" },
-  // { field: "pkg", header: "Package" },
-  { field: "version", header: "Version" },
-  { field: "dependencies", header: "Depen-dencies" },
-  { field: "testcases", header: "TestCases" },
-  { field: "tests", header: "Tests" },
-  { field: "examples", header: "Examples" },
-  { field: "benches", header: "Benches" },
-  // { field: "author", header: "Author" },
-  // { field: "description", header: "Description" },
-  // { field: "categories", header: "Categories" },
-  // { field: "os_categories", header: "OS Categories" },
-];
 
 const summaryTable = computed<SummaryTable[]>(() => {
   const value = summaries.value.map(val => {
@@ -195,14 +184,36 @@ const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
 
 const categories = computed(() => [...new Set(summaryTable.value.map(val => val.categories).flat().filter(c => c))].sort());
+const os_categories = computed(() => [...new Set(summaryTable.value.map(val => val.os_categories).flat().filter(c => c))].sort());
+const authors = computed(() => [...new Set(summaryTable.value.map(val => val.author).flat().filter(c => c))].sort());
 const selectedCategories = ref<string[]>([]);
-watch(selectedCategories, cat => {
-  if (cat.length === 0) {
+const selectedOSCategories = ref<string[]>([]);
+const selectedAuthors = ref<string[]>([]);
+watchEffect(() => {
+  const cat = selectedCategories.value;
+  const os_cat = selectedOSCategories.value;
+  const au = selectedAuthors.value;
+
+  const is_empty_cat = cat.length === 0;
+  const is_empty_os_cat = os_cat.length === 0;
+  const is_empty_au = au.length === 0;
+
+  // reset
+  if (is_empty_cat && is_empty_os_cat && is_empty_au) {
     data.value = summaryTable.value;
     return;
   }
 
-  data.value = summaryTable.value.filter(val => cat.find(c => val.categories?.find(vc => vc === c)));
+  data.value = summaryTable.value.filter(val => {
+    const find_cat = cat.find(c => val.categories?.find(vc => vc === c));
+    const find_os_cat = os_cat.find(o => val.os_categories?.find(vo => vo === o));
+    const find_au = au.find(a => val.author?.find(va => va === a));
+
+    return (is_empty_cat ? true : find_cat) && (is_empty_os_cat ? true : find_os_cat) && (is_empty_au ? true : find_au)
+  }).map((x, idx) => {
+    x.idx = idx + 1;
+    return x;
+  });
 });
 
 const dialogShow = ref(false);
