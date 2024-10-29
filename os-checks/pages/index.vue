@@ -147,13 +147,13 @@ const progressRatio = computed(() => {
 }
 
 .nav-link {
-  color: #336ad7;
+  color: var(--p-indigo-500);
   /* 统一的链接颜色 */
   text-decoration: none;
 }
 
 .nav-link.router-link-active {
-  color: #336ad7;
+  color: var(--p-indigo-500);
   /* 重置激活链接的颜色 */
 }
 
