@@ -119,12 +119,10 @@ const summaryColumns = [
 ];
 
 const summaryTable = computed(() => {
-  let idx = 0;
-  return summaries.value.map(val => {
+  const value = summaries.value.map(val => {
     return Object.entries(val.pkgs).map(([name, pkg]) => {
-      idx += 1;
       return {
-        idx,
+        idx: 0,
         user: val.user,
         repo: val.repo,
         pkg: name,
@@ -141,6 +139,32 @@ const summaryTable = computed(() => {
       }
     })
   }).flat();
+
+  return value.sort((a, b) => {
+    const a_test = a.testcases ?? 0;
+    const b_test = b.testcases ?? 0;
+    if (a_test < b_test) {
+      return 1;
+    } else if (a_test > b_test) {
+      return -1;
+    } else if (a.user < b.user) {
+      return -1;
+    } else if (a.user > b.user) {
+      return 1;
+    } else if (a.repo < b.repo) {
+      return -1;
+    } else if (a.repo > b.repo) {
+      return 1;
+    } else if (a.pkg < b.pkg) {
+      return -1;
+    } else if (a.pkg > b.pkg) {
+      return 1;
+    }
+    return 0;
+  }).map((val, idx) => {
+    val.idx = idx + 1;
+    return val;
+  });
 });
 
 const dialogShow = ref(false);
