@@ -23,6 +23,10 @@
         <Button title="Github Workflows" icon="pi pi-bell" />
       </NuxtLink>
 
+      <NuxtLink to="/info">
+        <Button title="Package & Testcase Infomation" icon="pi pi-microchip" />
+      </NuxtLink>
+
     </div>
 
     <div class="topBarRight">
