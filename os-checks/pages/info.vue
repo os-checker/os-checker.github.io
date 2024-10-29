@@ -1,11 +1,12 @@
 <template>
   <div>
-    <DataTable :value="summaryTable" tableStyle="min-width: 50rem; margin: 10px 10px;" scrollable scrollHeight="800px"
-      showGridlines selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
-      :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories', 'os_categories']">
+    <DataTable :value="summaryTable" tableStyle="min-width: 50rem;" scrollable scrollHeight="800px" showGridlines
+      selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
+      :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories', 'os_categories']" removableSort
+      sortMode="multiple" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <template #header>
-        <div style="display: flex; justify-content: center">
+        <div style="display: flex; justify-content: center; ">
           <div style="width: 50%">
             <IconField>
               <InputIcon>
@@ -17,21 +18,21 @@
         </div>
       </template>
 
-      <Column frozen field="idx" header="Idx" />
-      <Column frozen field="user" header="User" style="min-width: 150px;" />
-      <Column frozen field="repo" header="Repo" style="min-width: 180px;" />
-      <Column frozen field="pkg" header="Package" style="min-width: 200px;" />
+      <Column frozen sortable field="idx" header="Idx" />
+      <Column frozen sortable field="user" header="User" style="min-width: 150px;" />
+      <Column frozen sortable field="repo" header="Repo" style="min-width: 180px;" />
+      <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
-      <Column field="version" header="Version" style="text-align: center;" />
-      <Column field="dependencies" header="Depen-dencies" style="text-align: center;" />
+      <Column sortable field="version" header="Version" style="text-align: center;" />
+      <Column sortable field="dependencies" header="Depen-dencies" style="text-align: center;" />
 
-      <Column field="testcases" header="TestCases" style="text-align: center;" />
+      <Column sortable field="testcases" header="TestCases" style="text-align: center;" />
 
-      <Column field="tests" header="Tests" style="text-align: center;" />
-      <Column field="examples" header="Examples" style="text-align: center;" />
-      <Column field="benches" header="Benches" style="text-align: center;" />
+      <Column sortable field="tests" header="Tests" style="text-align: center;" />
+      <Column sortable field="examples" header="Examples" style="text-align: center;" />
+      <Column sortable field="benches" header="Benches" style="text-align: center;" />
 
-      <Column field="categories" header="Categories" style="min-width: 210px;">
+      <Column sortable field="categories" header="Categories" style="min-width: 210px;">
         <template #body="{ data: { categories } }">
           <div v-for="tag of categories">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -39,7 +40,7 @@
         </template>
       </Column>
 
-      <Column field="os_categories" header="OS Categories">
+      <Column sortable field="os_categories" header="OS Categories">
         <template #body="{ data: { os_categories } }">
           <div v-for="tag of os_categories">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -49,7 +50,7 @@
 
       <Column field="description" header="Description" style="min-width: 400px;" />
 
-      <Column field="author" header="Author" style="min-width: 400px;">
+      <Column sortable field="author" header="Author" style="min-width: 400px;">
         <template #body="{ data: { author } }">
           <div v-for="tag of author">
             <Tag severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>
