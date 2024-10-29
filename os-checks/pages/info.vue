@@ -1,13 +1,18 @@
 <template>
   <div>
-    <DataTable :value="summaryTable" tableStyle="min-width: 50rem;" scrollable scrollHeight="800px" showGridlines
+    <DataTable :value="data" tableStyle="min-width: 50rem;" scrollable scrollHeight="800px" showGridlines
       selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
       :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories', 'os_categories']" removableSort
       sortMode="multiple" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <template #header>
-        <div style="display: flex; justify-content: center; ">
-          <div style="width: 50%">
+        <div style="display: flex; justify-content: space-between;">
+          <div>
+            <MultiSelect v-model="selectedCategories" display="chip" :options="categories" filter :maxSelectedLabels="4"
+              placeholder="Select Categories" />
+          </div>
+
+          <div style="width: 40%">
             <IconField>
               <InputIcon>
                 <i class="pi pi-search" />
@@ -15,6 +20,7 @@
               <InputText style="width: 100%" v-model="filters['global'].value" placeholder="Global Search" />
             </IconField>
           </div>
+
         </div>
       </template>
 
@@ -26,7 +32,7 @@
       <Column sortable field="version" header="Version" style="text-align: center;" />
       <Column sortable field="dependencies" header="Depen-dencies" style="text-align: center;" />
 
-      <Column sortable field="testcases" header="TestCases" style="text-align: center;" />
+      <Column sortable field="testcases" header="Test Cases" style="text-align: center;" />
 
       <Column sortable field="tests" header="Tests" style="text-align: center;" />
       <Column sortable field="examples" header="Examples" style="text-align: center;" />
@@ -103,6 +109,7 @@
 <script setup lang="ts">
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
+import type { Summary } from '~/shared/workflows';
 
 // interactive filter/search inputs
 const filters = ref<any>({
@@ -134,7 +141,7 @@ const summaryColumns = [
   // { field: "os_categories", header: "OS Categories" },
 ];
 
-const summaryTable = computed(() => {
+const summaryTable = computed<SummaryTable[]>(() => {
   const value = summaries.value.map(val => {
     return Object.entries(val.pkgs).map(([name, pkg]) => {
       return {
@@ -183,7 +190,20 @@ const summaryTable = computed(() => {
   });
 });
 
+type SummaryTable = { idx: number; user: string; repo: string; pkg: string; version: string; dependencies: number | null; testcases: number | null; tests: number | null; examples: number | null; benches: number | null; author: string[] | null; description: string[]; categories: string[] | null; os_categories: string[] | null; };
+const data = ref<SummaryTable[]>([]);
+watch(summaryTable, (val) => data.value = val);
 
+const categories = computed(() => [...new Set(summaryTable.value.map(val => val.categories).flat().filter(c => c))].sort());
+const selectedCategories = ref<string[]>([]);
+watch(selectedCategories, cat => {
+  if (cat.length === 0) {
+    data.value = summaryTable.value;
+    return;
+  }
+
+  data.value = summaryTable.value.filter(val => cat.find(c => val.categories?.find(vc => vc === c)));
+});
 
 const dialogShow = ref(false);
 const dialogHeader = ref<{ repo: string, repo_url: string, pkg_name: string, pkg: Pkg } | null>();
