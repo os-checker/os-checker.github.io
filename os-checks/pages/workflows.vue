@@ -411,7 +411,7 @@ const jobsInfo = computed(() => {
 
 .timeline-steps {
   display: inline-grid;
-  grid-template-columns: 6fr 3fr 0.5fr;
+  grid-template-columns: minmax(500px, 60%) minmax(280px, 3fr) minmax(80px, 0.5fr);
 }
 
 .timeline-title {
