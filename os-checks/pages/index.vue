@@ -146,17 +146,6 @@ const progressRatio = computed(() => {
   justify-content: space-between;
 }
 
-.nav-link {
-  color: var(--p-indigo-500);
-  /* 统一的链接颜色 */
-  text-decoration: none;
-}
-
-.nav-link.router-link-active {
-  color: var(--p-indigo-500);
-  /* 重置激活链接的颜色 */
-}
-
 .home-table {
   margin: 2px 10px;
   height: 50%;

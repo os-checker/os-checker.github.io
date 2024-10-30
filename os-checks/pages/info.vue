@@ -1,7 +1,7 @@
 <template>
   <div>
-    <DataTable :value="data" tableStyle="min-width: 50rem;" scrollable scrollHeight="800px" showGridlines
-      selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
+    <DataTable :value="data" tableStyle="min-width: 50rem; margin: 0 5px 0 0;" scrollable scrollHeight="800px"
+      showGridlines selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
       :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories', 'os_categories']" removableSort
       sortMode="multiple" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
@@ -33,7 +33,15 @@
 
       <Column frozen sortable field="idx" header="Idx" />
       <Column frozen sortable field="user" header="User" style="min-width: 150px;" />
-      <Column frozen sortable field="repo" header="Repo" style="min-width: 180px;" />
+
+      <Column frozen sortable field="repo" header="Repo" style="min-width: 180px;">
+        <template #body="{ data }">
+          <NuxtLink :to="`https://github.com/${data.user}/${data.repo}`" target="_blank" class="nav-link">
+            {{ data.repo }}
+          </NuxtLink>
+        </template>
+      </Column>
+
       <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
       <Column sortable field="version" header="Version" style="text-align: center;" />
