@@ -37,6 +37,8 @@
       <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
       <Column sortable field="version" header="Version" style="text-align: center;" />
+      <Column sortable field="lib" header="Lib" style="text-align: center;" />
+      <Column sortable field="bin" header="Bin" style="text-align: center;" />
       <Column sortable field="dependencies" header="Depen-dencies" style="text-align: center;" />
 
       <Column sortable field="testcases" header="Test Cases" style="text-align: center;" />
@@ -140,6 +142,8 @@ const summaryTable = computed<SummaryTable[]>(() => {
         repo: val.repo,
         pkg: name,
         version: pkg.version,
+        lib: pkg.lib ? "✅" : null,
+        bin: pkg.bin ? "✅" : null,
         dependencies: pkg.dependencies || null,
         testcases: pkg.testcases ? pkg.testcases.pkg_tests_count : null,
         tests: pkg.tests || null,
