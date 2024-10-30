@@ -24,7 +24,7 @@
               placeholder="Select Crate Kind" />
           </div>
 
-          <div style="width: 30%">
+          <div>
             <IconField>
               <InputIcon>
                 <i class="pi pi-search" />
