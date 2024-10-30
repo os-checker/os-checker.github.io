@@ -115,6 +115,7 @@
 
 <script setup lang="ts">
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
+import { unique_field } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
 
 // interactive filter/search inputs
@@ -179,13 +180,13 @@ const summaryTable = computed<SummaryTable[]>(() => {
   });
 });
 
-type SummaryTable = { idx: number; user: string; repo: string; pkg: string; version: string; dependencies: number | null; testcases: number | null; tests: number | null; examples: number | null; benches: number | null; author: string[] | null; description: string[]; categories: string[] | null; os_categories: string[] | null; };
+type SummaryTable = { idx: number; user: string; repo: string; pkg: string; version: string; dependencies: number | null; testcases: number | null; tests: number | null; examples: number | null; benches: number | null; author: string[] | null; description: string; categories: string[] | null; os_categories: string[] | null; };
 const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
 
-const categories = computed(() => [...new Set(summaryTable.value.map(val => val.categories).flat().filter(c => c))].sort());
-const os_categories = computed(() => [...new Set(summaryTable.value.map(val => val.os_categories).flat().filter(c => c))].sort());
-const authors = computed(() => [...new Set(summaryTable.value.map(val => val.author).flat().filter(c => c))].sort());
+const categories = computed(() => unique_field(summaries.value, pkg => pkg.categories));
+const os_categories = computed(() => unique_field(summaries.value, pkg => pkg.os_categories));
+const authors = computed(() => unique_field(summaries.value, pkg => pkg.author));
 const selectedCategories = ref<string[]>([]);
 const selectedOSCategories = ref<string[]>([]);
 const selectedAuthors = ref<string[]>([]);

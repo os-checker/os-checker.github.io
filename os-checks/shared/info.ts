@@ -14,7 +14,7 @@ export type Pkg = {
   examples: number,
   benches: number,
   author: string[]
-  description: string[],
+  description: string,
   categories: string[]
   os_categories: string[],
 }
@@ -31,4 +31,9 @@ export type Test = {
   binary_name: string,
   binary_path: string,
   testcases: string[]
+}
+
+export function unique_field(summaries: PkgInfo[], cb: (_: Pkg) => string[]): string[] {
+  const arr = summaries.map(s => Object.values(s.pkgs).map(pkg => cb(pkg).flat()).flat()).flat();
+  return [...new Set(arr)].sort();
 }
