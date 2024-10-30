@@ -104,7 +104,7 @@
         </div>
         <div class="dialog-header">
           Authors:
-          <Tag v-for="tag of dialogHeader?.pkg.author" severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>
+          <Tag v-for="tag of dialogHeader?.pkg.author" severity="info" :value="tag" style="margin-right: 6px;"></Tag>
         </div>
 
         <InfoTestCases :tests="testCases" />
