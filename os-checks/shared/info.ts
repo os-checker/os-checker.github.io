@@ -13,7 +13,7 @@ export type Pkg = {
   tests: number,
   examples: number,
   benches: number,
-  author: string[]
+  authors: string[],
   description: string,
   categories: string[]
   os_categories: string[],
@@ -29,7 +29,7 @@ export type Test = {
   id: string,
   kind: string,
   binary_name: string,
-  binary_path: string,
+  // binary_path: string,
   testcases: string[]
 }
 

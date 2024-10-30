@@ -114,7 +114,7 @@
         </div>
         <div class="dialog-header">
           Authors:
-          <Tag v-for="tag of dialogHeader?.pkg.author" severity="info" :value="tag" style="margin-right: 6px;"></Tag>
+          <Tag v-for="tag of dialogHeader?.pkg.authors" severity="info" :value="tag" style="margin-right: 6px;"></Tag>
         </div>
 
         <InfoTestCases :tests="testCases" />
@@ -157,7 +157,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         tests: pkg.tests || null,
         examples: pkg.examples || null,
         benches: pkg.benches || null,
-        author: pkg.author.length === 0 ? null : pkg.author,
+        author: pkg.authors.length === 0 ? null : pkg.authors,
         description: pkg.description,
         categories: pkg.categories.length === 0 ? null : pkg.categories,
         os_categories: pkg.os_categories.length === 0 ? null : pkg.os_categories,
@@ -198,7 +198,7 @@ watch(summaryTable, (val) => data.value = val);
 
 const categories = computed(() => unique_field(summaries.value, pkg => pkg.categories));
 const os_categories = computed(() => unique_field(summaries.value, pkg => pkg.os_categories));
-const authors = computed(() => unique_field(summaries.value, pkg => pkg.author));
+const authors = computed(() => unique_field(summaries.value, pkg => pkg.authors));
 const selectedCategories = ref<string[]>([]);
 const selectedOSCategories = ref<string[]>([]);
 const selectedAuthors = ref<string[]>([]);
