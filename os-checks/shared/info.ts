@@ -15,6 +15,7 @@ export type Pkg = {
   benches: number,
   authors: string[],
   description: string,
+  keywords: string[],
   categories: string[]
   os_categories: string[],
 }

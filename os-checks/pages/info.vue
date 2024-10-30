@@ -14,6 +14,9 @@
             <MultiSelect v-model="selectedOSCategories" display="chip" :options="os_categories" filter
               :maxSelectedLabels="4" placeholder="Select OS Categories" />
 
+            <MultiSelect v-model="selectedKeywords" display="chip" :options="keywords" filter :maxSelectedLabels="4"
+              placeholder="Select Keywords" />
+
             <MultiSelect v-model="selectedAuthors" display="chip" :options="authors" filter :maxSelectedLabels="4"
               placeholder="Select Authors" />
 
@@ -58,6 +61,14 @@
       <Column sortable field="examples" header="Examples" style="text-align: center;" />
       <Column sortable field="benches" header="Benches" style="text-align: center;" />
 
+      <Column sortable field="os_categories" header="OS Categories">
+        <template #body="{ data: { os_categories } }">
+          <div v-for="tag of os_categories">
+            <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
+          </div>
+        </template>
+      </Column>
+
       <Column sortable field="categories" header="Categories" style="min-width: 210px;">
         <template #body="{ data: { categories } }">
           <div v-for="tag of categories">
@@ -66,9 +77,9 @@
         </template>
       </Column>
 
-      <Column sortable field="os_categories" header="OS Categories">
-        <template #body="{ data: { os_categories } }">
-          <div v-for="tag of os_categories">
+      <Column sortable field="keywords" header="KeyWords">
+        <template #body="{ data: { keywords } }">
+          <div v-for="tag of keywords">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
           </div>
         </template>
@@ -114,6 +125,10 @@
         <div class="dialog-header">
           OS Categories:
           <Tag v-for="tag of dialogHeader?.pkg.os_categories" severity="warn" :value="tag" style="margin-right: 6px;" />
+        </div>
+        <div class="dialog-header">
+          KeyWords:
+          <Tag v-for="tag of dialogHeader?.pkg.keywords" severity="warn" :value="tag" style="margin-right: 6px;" />
         </div>
         <div class="dialog-header">
           Authors:
@@ -162,6 +177,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         benches: pkg.benches || null,
         author: pkg.authors.length === 0 ? null : pkg.authors,
         description: pkg.description,
+        keywords: pkg.keywords.length === 0 ? null : pkg.keywords,
         categories: pkg.categories.length === 0 ? null : pkg.categories,
         os_categories: pkg.os_categories.length === 0 ? null : pkg.os_categories,
       }
@@ -198,7 +214,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
 type SummaryTable = {
   idx: number; user: string; repo: string; pkg: string; version: string;
   lib: string | null; bin: string | null; dependencies: number | null; testcases: number | null;
-  tests: number | null; examples: number | null; benches: number | null;
+  tests: number | null; examples: number | null; benches: number | null; keywords: string[] | null;
   author: string[] | null; description: string; categories: string[] | null; os_categories: string[] | null;
 };
 const data = ref<SummaryTable[]>([]);
@@ -206,6 +222,7 @@ watch(summaryTable, (val) => data.value = val);
 
 const categories = computed(() => unique_field(summaries.value, pkg => pkg.categories));
 const os_categories = computed(() => unique_field(summaries.value, pkg => pkg.os_categories));
+const keywords = computed(() => unique_field(summaries.value, pkg => pkg.keywords));
 const authors = computed(() => unique_field(summaries.value, pkg => pkg.authors));
 const kinds = computed(() => {
   const val = summaries.value;
@@ -227,21 +244,24 @@ const kinds = computed(() => {
 });
 const selectedCategories = ref<string[]>([]);
 const selectedOSCategories = ref<string[]>([]);
-const selectedKinds = ref<string[]>([]);
+const selectedKeywords = ref<string[]>([]);
 const selectedAuthors = ref<string[]>([]);
+const selectedKinds = ref<string[]>([]);
 watchEffect(() => {
   const cat = selectedCategories.value;
   const os_cat = selectedOSCategories.value;
+  const keywords = selectedKeywords.value;
   const au = selectedAuthors.value;
   const ks = selectedKinds.value;
 
   const is_empty_cat = cat.length === 0;
   const is_empty_os_cat = os_cat.length === 0;
+  const is_empty_keywords = keywords.length === 0;
   const is_empty_au = au.length === 0;
   const is_empty_k = ks.length === 0;
 
   // reset
-  if (is_empty_cat && is_empty_os_cat && is_empty_au && is_empty_k) {
+  if (is_empty_cat && is_empty_os_cat && is_empty_keywords && is_empty_au && is_empty_k) {
     data.value = summaryTable.value;
     return;
   }
@@ -249,6 +269,7 @@ watchEffect(() => {
   data.value = summaryTable.value.filter(val => {
     const find_cat = cat.find(c => val.categories?.find(vc => vc === c));
     const find_os_cat = os_cat.find(o => val.os_categories?.find(vo => vo === o));
+    const find_keywords = keywords.find(k => val.keywords?.find(kw => kw === k));
     const find_au = au.find(a => val.author?.find(va => va === a));
     let find_k = true;
     for (const k of ks) {
@@ -264,6 +285,7 @@ watchEffect(() => {
     }
 
     return (is_empty_cat ? true : find_cat) && (is_empty_os_cat ? true : find_os_cat)
+      && (is_empty_keywords ? true : find_keywords)
       && (is_empty_au ? true : find_au) && (is_empty_k ? true : find_k);
   }).map((x, idx) => {
     x.idx = idx + 1;
