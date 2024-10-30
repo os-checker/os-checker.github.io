@@ -16,6 +16,9 @@
 
             <MultiSelect v-model="selectedAuthors" display="chip" :options="authors" filter :maxSelectedLabels="4"
               placeholder="Select Authors" />
+
+            <MultiSelect v-model="selectedKinds" display="chip" :options="kinds" filter :maxSelectedLabels="4"
+              placeholder="Select Crate Kind" />
           </div>
 
           <div style="width: 30%">
@@ -125,7 +128,7 @@
 
 <script setup lang="ts">
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
-import { unique_field } from '~/shared/info';
+import { unique_field, unique_field_bool } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
 
 // interactive filter/search inputs
@@ -192,27 +195,53 @@ const summaryTable = computed<SummaryTable[]>(() => {
   });
 });
 
-type SummaryTable = { idx: number; user: string; repo: string; pkg: string; version: string; dependencies: number | null; testcases: number | null; tests: number | null; examples: number | null; benches: number | null; author: string[] | null; description: string; categories: string[] | null; os_categories: string[] | null; };
+type SummaryTable = {
+  idx: number; user: string; repo: string; pkg: string; version: string;
+  lib: string | null; bin: string | null; dependencies: number | null; testcases: number | null;
+  tests: number | null; examples: number | null; benches: number | null;
+  author: string[] | null; description: string; categories: string[] | null; os_categories: string[] | null;
+};
 const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
 
 const categories = computed(() => unique_field(summaries.value, pkg => pkg.categories));
 const os_categories = computed(() => unique_field(summaries.value, pkg => pkg.os_categories));
 const authors = computed(() => unique_field(summaries.value, pkg => pkg.authors));
+const kinds = computed(() => {
+  const val = summaries.value;
+  const is_lib = unique_field_bool(val, pkg => pkg.lib);
+  const is_bin = unique_field_bool(val, pkg => pkg.bin);
+  const is_testcases = unique_field_bool(val, pkg => pkg.testcases?.pkg_tests_count ? true : false);
+  const is_tests = unique_field_bool(val, pkg => pkg.tests > 0);
+  const is_examples = unique_field_bool(val, pkg => pkg.examples > 0);
+  const is_benches = unique_field_bool(val, pkg => pkg.benches > 0);
+
+  let arr = [];
+  if (is_lib) { arr.push("Lib"); }
+  if (is_bin) { arr.push("Bin"); }
+  if (is_testcases) { arr.push("TestCases"); }
+  if (is_tests) { arr.push("Tests"); }
+  if (is_examples) { arr.push("Examples"); }
+  if (is_benches) { arr.push("Benches"); }
+  return arr;
+});
 const selectedCategories = ref<string[]>([]);
 const selectedOSCategories = ref<string[]>([]);
+const selectedKinds = ref<string[]>([]);
 const selectedAuthors = ref<string[]>([]);
 watchEffect(() => {
   const cat = selectedCategories.value;
   const os_cat = selectedOSCategories.value;
   const au = selectedAuthors.value;
+  const ks = selectedKinds.value;
 
   const is_empty_cat = cat.length === 0;
   const is_empty_os_cat = os_cat.length === 0;
   const is_empty_au = au.length === 0;
+  const is_empty_k = ks.length === 0;
 
   // reset
-  if (is_empty_cat && is_empty_os_cat && is_empty_au) {
+  if (is_empty_cat && is_empty_os_cat && is_empty_au && is_empty_k) {
     data.value = summaryTable.value;
     return;
   }
@@ -221,8 +250,21 @@ watchEffect(() => {
     const find_cat = cat.find(c => val.categories?.find(vc => vc === c));
     const find_os_cat = os_cat.find(o => val.os_categories?.find(vo => vo === o));
     const find_au = au.find(a => val.author?.find(va => va === a));
+    let find_k = true;
+    for (const k of ks) {
+      switch (k) {
+        case "Lib": { find_k &&= val.lib === '✅'; continue; };
+        case "Bin": { find_k &&= val.bin === '✅'; continue; };
+        case "TestCases": { find_k &&= val.testcases ? true : false; continue; };
+        case "Tests": { find_k &&= val.tests ? true : false; continue; };
+        case "Examples": { find_k &&= val.examples ? true : false; continue; };
+        case "Benches": { find_k &&= val.benches ? true : false; continue; };
+        default: ;
+      }
+    }
 
-    return (is_empty_cat ? true : find_cat) && (is_empty_os_cat ? true : find_os_cat) && (is_empty_au ? true : find_au)
+    return (is_empty_cat ? true : find_cat) && (is_empty_os_cat ? true : find_os_cat)
+      && (is_empty_au ? true : find_au) && (is_empty_k ? true : find_k);
   }).map((x, idx) => {
     x.idx = idx + 1;
     return x;
