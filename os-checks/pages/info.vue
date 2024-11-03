@@ -2,17 +2,14 @@
   <div>
     <DataTable :value="data" tableStyle="min-width: 50rem; margin: 0 5px 0 0;" scrollable scrollHeight="800px"
       showGridlines selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
-      :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories', 'os_categories']" removableSort
-      sortMode="multiple" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
+      :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']" removableSort sortMode="multiple"
+      paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <template #header>
         <div style="display: flex; justify-content: space-between;">
           <div style="display: flex; gap: 20px;">
             <MultiSelect v-model="selectedCategories" display="chip" :options="categories" filter :maxSelectedLabels="4"
               placeholder="Select Categories" />
-
-            <MultiSelect v-model="selectedOSCategories" display="chip" :options="os_categories" filter
-              :maxSelectedLabels="4" placeholder="Select OS Categories" />
 
             <MultiSelect v-model="selectedKeywords" display="chip" :options="keywords" filter :maxSelectedLabels="4"
               placeholder="Select Keywords" />
@@ -60,14 +57,6 @@
       <Column sortable field="tests" header="Tests" style="text-align: center;" />
       <Column sortable field="examples" header="Examples" style="text-align: center;" />
       <Column sortable field="benches" header="Benches" style="text-align: center;" />
-
-      <Column sortable field="os_categories" header="OS Categories">
-        <template #body="{ data: { os_categories } }">
-          <div v-for="tag of os_categories">
-            <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
-          </div>
-        </template>
-      </Column>
 
       <Column sortable field="categories" header="Categories" style="min-width: 210px;">
         <template #body="{ data: { categories } }">
@@ -221,7 +210,6 @@ const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
 
 const categories = computed(() => unique_field(summaries.value, pkg => pkg.categories));
-const os_categories = computed(() => unique_field(summaries.value, pkg => pkg.os_categories));
 const keywords = computed(() => unique_field(summaries.value, pkg => pkg.keywords));
 const authors = computed(() => unique_field(summaries.value, pkg => pkg.authors));
 const kinds = computed(() => {
@@ -268,7 +256,6 @@ watchEffect(() => {
 
   data.value = summaryTable.value.filter(val => {
     const find_cat = cat.find(c => val.categories?.find(vc => vc === c));
-    const find_os_cat = os_cat.find(o => val.os_categories?.find(vo => vo === o));
     const find_keywords = keywords.find(k => val.keywords?.find(kw => kw === k));
     const find_au = au.find(a => val.author?.find(va => va === a));
     let find_k = true;
@@ -284,7 +271,7 @@ watchEffect(() => {
       }
     }
 
-    return (is_empty_cat ? true : find_cat) && (is_empty_os_cat ? true : find_os_cat)
+    return (is_empty_cat ? true : find_cat)
       && (is_empty_keywords ? true : find_keywords)
       && (is_empty_au ? true : find_au) && (is_empty_k ? true : find_k);
   }).map((x, idx) => {
