@@ -1,6 +1,6 @@
 <template>
   <div>
-    <DataTable :value="data" tableStyle="min-width: 50rem; margin: 0 5px 0 0;" scrollable scrollHeight="800px"
+    <DataTable :value="data" tableStyle="min-width: 50rem; margin: 0 5px 0 0;" scrollable :scrollHeight="tableHeight"
       showGridlines selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
       :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']" removableSort sortMode="multiple"
       paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
@@ -337,6 +337,15 @@ watch(selectedPkg, val => {
   dialogHeader.value = { repo, repo_url, pkg_name: val.pkg, pkg };
 
   testCases.value = pkg.testcases.tests;
+});
+
+
+const tableHeight = ref("800px");
+onMounted(() => {
+  window.addEventListener('resize', () => {
+    const viewportHeight = window.innerHeight;
+    tableHeight.value = `${viewportHeight * 0.8}px`;
+  });
 });
 
 </script>
