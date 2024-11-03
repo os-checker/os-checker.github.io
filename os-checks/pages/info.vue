@@ -66,6 +66,14 @@
         </template>
       </Column>
 
+      <Column field="latest_doc" header="Latest Doc" style="text-align: center;">
+        <template #body="{ data }">
+          <NuxtLink v-if="data.latest_doc" :to="data.latest_doc" target="_blank" class="nav-link">
+            <Button icon="pi pi-external-link" />
+          </NuxtLink>
+        </template>
+      </Column>
+
       <Column field="homepage" header="Home Page" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
@@ -164,6 +172,10 @@ githubFetch<PkgInfo[]>({
   summaries.value = val;
 });
 
+const docs_url = "https://os-checker.github.io/docs/docs.json"
+const docs = ref();
+$fetch(docs_url).then(text => docs.value = text);
+
 const summaryTable = computed<SummaryTable[]>(() => {
   const value = summaries.value.map(val => {
     return Object.entries(val.pkgs).map(([name, pkg]) => {
@@ -188,6 +200,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         documentation: pkg.documentation,
         readme: pkg.readme,
         homepage: pkg.homepage,
+        latest_doc: docs.value[val.user]?.[val.repo]?.[name]
       }
     })
   }).flat();
@@ -224,7 +237,7 @@ type SummaryTable = {
   lib: string | null; bin: string | null; dependencies: number | null; testcases: number | null;
   tests: number | null; examples: number | null; benches: number | null; keywords: string[] | null;
   author: string[] | null; description: string; categories: string[] | null;
-  documentation: string | null; readme: string | null; homepage: string | null;
+  documentation: string | null; readme: string | null; homepage: string | null; latest_doc: string | null;
 };
 const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
@@ -325,7 +338,6 @@ watch(selectedPkg, val => {
 
   testCases.value = pkg.testcases.tests;
 });
-
 
 </script>
 
