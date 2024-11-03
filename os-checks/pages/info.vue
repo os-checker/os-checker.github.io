@@ -58,6 +58,22 @@
       <Column sortable field="examples" header="Examples" style="text-align: center;" />
       <Column sortable field="benches" header="Benches" style="text-align: center;" />
 
+      <Column field="documentation" header="Doc" style="text-align: center;">
+        <template #body="{ data }">
+          <NuxtLink v-if="data.documentation" :to="data.documentation" target="_blank" class="nav-link">
+            <Button icon="pi pi-external-link" />
+          </NuxtLink>
+        </template>
+      </Column>
+
+      <Column field="homepage" header="Home Page" style="text-align: center;">
+        <template #body="{ data }">
+          <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
+            <Button icon="pi pi-external-link" />
+          </NuxtLink>
+        </template>
+      </Column>
+
       <Column sortable field="categories" header="Categories" style="min-width: 210px;">
         <template #body="{ data: { categories } }">
           <div v-for="tag of categories">
@@ -168,7 +184,10 @@ const summaryTable = computed<SummaryTable[]>(() => {
         description: pkg.description,
         keywords: pkg.keywords.length === 0 ? null : pkg.keywords,
         categories: pkg.categories.length === 0 ? null : pkg.categories,
-        os_categories: pkg.os_categories.length === 0 ? null : pkg.os_categories,
+        // os_categories: pkg.os_categories.length === 0 ? null : pkg.os_categories,
+        documentation: pkg.documentation,
+        readme: pkg.readme,
+        homepage: pkg.homepage,
       }
     })
   }).flat();
@@ -204,7 +223,8 @@ type SummaryTable = {
   idx: number; user: string; repo: string; pkg: string; version: string;
   lib: string | null; bin: string | null; dependencies: number | null; testcases: number | null;
   tests: number | null; examples: number | null; benches: number | null; keywords: string[] | null;
-  author: string[] | null; description: string; categories: string[] | null; os_categories: string[] | null;
+  author: string[] | null; description: string; categories: string[] | null;
+  documentation: string | null; readme: string | null; homepage: string | null;
 };
 const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
