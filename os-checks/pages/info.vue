@@ -136,10 +136,6 @@
           <Tag v-for="tag of dialogHeader?.pkg.categories" severity="warn" :value="tag" style="margin-right: 6px;" />
         </div>
         <div class="dialog-header">
-          OS Categories:
-          <Tag v-for="tag of dialogHeader?.pkg.os_categories" severity="warn" :value="tag" style="margin-right: 6px;" />
-        </div>
-        <div class="dialog-header">
           KeyWords:
           <Tag v-for="tag of dialogHeader?.pkg.keywords" severity="warn" :value="tag" style="margin-right: 6px;" />
         </div>
