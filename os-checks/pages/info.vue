@@ -61,7 +61,7 @@
       <Column field="documentation" header="Doc" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.documentation" :to="data.documentation" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" />
+            <Button icon="pi pi-external-link" link />
           </NuxtLink>
         </template>
       </Column>
@@ -69,7 +69,7 @@
       <Column field="latest_doc" header="Latest Doc" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.latest_doc" :to="data.latest_doc" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" />
+            <Button icon="pi pi-external-link" link />
           </NuxtLink>
         </template>
       </Column>
@@ -77,7 +77,7 @@
       <Column field="homepage" header="Home Page" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" />
+            <Button icon="pi pi-external-link" link />
           </NuxtLink>
         </template>
       </Column>
