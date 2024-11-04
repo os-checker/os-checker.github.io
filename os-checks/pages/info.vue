@@ -316,23 +316,22 @@ const testCases = ref<Test[]>([]);
 type SelectedRow = { user: string, repo: string, pkg: string, testcases: number };
 const selectedPkg = ref<SelectedRow | null>(null);
 watch(selectedPkg, val => {
-
-  if (!val?.testcases) { return; }
-
   // for now, pop up a dialog to display testcases only if any 
   dialogShow.value = true;
+
+  if (!val) { return; }
 
   const pkg = summaries.value
     .find(summary => summary.user === val.user && summary.repo === val.repo)
     ?.pkgs[val.pkg];
 
-  if (!pkg?.testcases) { return; }
+  if (!pkg) { return; }
 
   const repo = `${val.user}/${val.repo}`;
   const repo_url = `https://github.com/${repo}`;
   dialogHeader.value = { repo, repo_url, pkg_name: val.pkg, pkg };
 
-  testCases.value = pkg.testcases.tests;
+  testCases.value = pkg.testcases?.tests ?? [];
 });
 
 
