@@ -128,18 +128,18 @@
       </template>
 
       <div>
-        <div class="dialog-header">
+        <div v-if="dialogHeader?.pkg.description" class="dialog-header">
           Description: <b style="color: var(--p-emerald-500)">{{ dialogHeader?.pkg.description }}</b>
         </div>
-        <div class="dialog-header">
+        <div v-if="dialogHeader?.pkg.categories.length !== 0" class="dialog-header">
           Categories:
           <Tag v-for="tag of dialogHeader?.pkg.categories" severity="warn" :value="tag" style="margin-right: 6px;" />
         </div>
-        <div class="dialog-header">
+        <div v-if="dialogHeader?.pkg.keywords.length !== 0" class="dialog-header">
           KeyWords:
           <Tag v-for="tag of dialogHeader?.pkg.keywords" severity="warn" :value="tag" style="margin-right: 6px;" />
         </div>
-        <div class="dialog-header">
+        <div v-if="dialogHeader?.pkg.authors.length !== 0" class="dialog-header">
           Authors:
           <Tag v-for="tag of dialogHeader?.pkg.authors" severity="info" :value="tag" style="margin-right: 6px;"></Tag>
         </div>
