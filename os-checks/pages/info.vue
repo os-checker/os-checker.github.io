@@ -82,7 +82,7 @@
         </template>
       </Column>
 
-      <Column sortable field="categories" header="Categories" style="min-width: 210px;">
+      <Column sortable field="categories" header="Categories" style="min-width: 200px;">
         <template #body="{ data: { categories } }">
           <div v-for="tag of categories">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -90,7 +90,7 @@
         </template>
       </Column>
 
-      <Column sortable field="keywords" header="KeyWords">
+      <Column sortable field="keywords" header="KeyWords" style="min-width: 150px;">
         <template #body="{ data: { keywords } }">
           <div v-for="tag of keywords">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -98,9 +98,9 @@
         </template>
       </Column>
 
-      <Column field="description" header="Description" style="min-width: 400px;" />
+      <Column field="description" header="Description" style="min-width: 280px;" />
 
-      <Column sortable field="author" header="Author" style="min-width: 400px;">
+      <Column sortable field="author" header="Author" style="min-width: 300px;">
         <template #body="{ data: { author } }">
           <div v-for="tag of author">
             <Tag severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>
