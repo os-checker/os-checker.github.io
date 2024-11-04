@@ -1,6 +1,7 @@
 <template>
 
   <DataTable :value="data" showGridlines>
+    <template #empty><b> No testcases found. </b></template>
 
     <Column field="idx" header="Idx" />
     <Column field="binary_name" header="Binary Name" />
