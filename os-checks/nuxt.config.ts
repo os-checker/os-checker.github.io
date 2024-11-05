@@ -25,6 +25,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       debug: process.env.DEBUG ? true : false,
+      docs_url: process.env.DOCS_URL,
     }
   }
 })

@@ -168,9 +168,15 @@ githubFetch<PkgInfo[]>({
   summaries.value = val;
 });
 
-const docs_url = "https://os-checker.github.io/docs/docs.json"
+// 需要构建期间设置了 DOCS_URL 环境变量，它指向 rustdoc 仓库的部署地址，来构造 docs.json 地址。
+function defaultDocs(): string {
+  const runtimeConfig = useRuntimeConfig();
+  const url = runtimeConfig.public.docs_url ?? "https://os-checker.github.io/docs";
+  return url.replace(/\/$/, "") + "/docs.json";
+}
+const docs_json_url = defaultDocs();
 const docs = ref();
-$fetch(docs_url).then(text => docs.value = text);
+$fetch(docs_json_url).then(val => docs.value = val);
 
 const summaryTable = computed<SummaryTable[]>(() => {
   const value = summaries.value.map(val => {
