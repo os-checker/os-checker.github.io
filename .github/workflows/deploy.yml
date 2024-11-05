@@ -12,12 +12,12 @@ jobs:
     - uses: actions/checkout@v4  
       
     - name: Build and Generate dist
-      run: cd os-checks && npm install && npm run generate && cp -LR dist ~
+      run: cd os-checks && npm install && npm run generate && sudo cp -LR dist /
 
     - name: Upload pages artifacts
       uses: actions/upload-pages-artifact@v3
       with:
-        path: ~/dist
+        path: /dist
 
   # Deploy job
   deploy:
