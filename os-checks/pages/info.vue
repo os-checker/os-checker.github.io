@@ -343,6 +343,8 @@ watch(selectedPkg, val => {
 
 const tableHeight = ref("800px");
 onMounted(() => {
+  const viewportHeight = window.innerHeight;
+  tableHeight.value = `${viewportHeight * 0.8}px`;
   window.addEventListener('resize', () => {
     const viewportHeight = window.innerHeight;
     tableHeight.value = `${viewportHeight * 0.8}px`;
