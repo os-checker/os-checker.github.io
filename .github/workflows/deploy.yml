@@ -5,7 +5,7 @@ on:
     branches: [ main, feat/* ]
 
 env:
-  DOCS_URL: ${{ env.DOCS_URL }}
+  DOCS_URL: ${{ $env.DOCS_URL }}
 
 jobs:  
   build:  
