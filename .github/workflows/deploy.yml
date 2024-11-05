@@ -11,7 +11,7 @@ jobs:
     steps:  
     - uses: actions/checkout@v4  
       
-    - name: Load and Run Docker image
+    - name: Build and Generate dist
       run: cd os-checks && npm install && npm run generate && cp -LR dist ~
 
     - name: Upload pages artifacts
