@@ -1,4 +1,4 @@
-# os-checker Docker
+# os-checker WebUI
 
 [![Deploy WebUI](https://github.com/os-checker/os-checker.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/os-checker/os-checker.github.io/actions/workflows/deploy.yml)
 
