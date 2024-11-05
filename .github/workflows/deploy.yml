@@ -12,12 +12,12 @@ jobs:
     - uses: actions/checkout@v4  
       
     - name: Load and Run Docker image
-      run: cd os-checks && npm install && npm run generate && cp -LR dist /check/
+      run: cd os-checks && npm install && npm run generate && cp -LR dist ~
 
     - name: Upload pages artifacts
       uses: actions/upload-pages-artifact@v3
       with:
-        path: /check/dist/
+        path: ~/dist
 
   # Deploy job
   deploy:
