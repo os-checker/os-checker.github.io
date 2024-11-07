@@ -116,16 +116,7 @@
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import { type Workflows, type Summary, summary_to_workflows } from '~/shared/workflows';
 
-const green = ref("green");
-const red = ref("red");
-onMounted(() => {
-  // 获取元素的计算后的样式
-  const styles = window.getComputedStyle(document.documentElement);
-
-  // 获取CSS变量的值
-  green.value = styles.getPropertyValue('--p-emerald-500').trim();
-  red.value = styles.getPropertyValue('--p-red-500').trim();
-});
+const { color } = storeToRefs(useColorStore());
 
 const visible = ref(false);
 
@@ -286,7 +277,7 @@ function icon(status: string, conclusion: string | null) {
       case "skipped": return { icon: "pi pi-filter-slash", color: "#807D8B" };
     }
   }
-  return { icon: "pi pi-times", color: red.value };
+  return { icon: "pi pi-times", color: color.value.red };
 }
 
 const selectedJob = ref<{ workflow_idx: number, run_name: string } | null>();
@@ -365,19 +356,19 @@ const jobsInfo = computed(() => {
       total: total_jobs,
       completed: completed_jobs,
       completed_ratio: Math.round((completed_jobs / total_jobs) * 100),
-      completed_color: (completed_jobs === total_jobs) ? green.value : red.value,
+      completed_color: (completed_jobs === total_jobs) ? color.value.green : color.value.red,
       success: success_jobs,
       successs_ratio: Math.round((success_jobs / total_jobs) * 100),
-      success_color: (success_jobs === total_jobs) ? green.value : red.value,
+      success_color: (success_jobs === total_jobs) ? color.value.green : color.value.red,
     },
     steps: {
       total: total_steps,
       completed: completed_steps,
       completed_ratio: Math.round((completed_steps / total_steps) * 100),
-      completed_color: (completed_steps === total_steps) ? green.value : red.value,
+      completed_color: (completed_steps === total_steps) ? color.value.green : color.value.red,
       success: success_steps,
       successs_ratio: Math.round((success_steps / total_steps) * 100),
-      success_color: (success_steps === total_steps) ? green.value : red.value,
+      success_color: (success_steps === total_steps) ? color.value.green : color.value.red,
     }
   }
 });
