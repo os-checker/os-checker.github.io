@@ -25,6 +25,8 @@ export type Pkg = {
 
 export type TestCases = {
   tests: Test[],
+  failed: number,
+  duration_ms: number,
   pkg_tests_count: number,
   workspace_tests_count: number,
 }
@@ -34,7 +36,9 @@ export type Test = {
   kind: string,
   binary_name: string,
   // binary_path: string,
-  testcases: TestCase[]
+  testcases: TestCase[],
+  failed: number,
+  duration_ms: number,
 }
 
 export type TestCase = {

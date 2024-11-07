@@ -143,6 +143,20 @@
           Authors:
           <Tag v-for="tag of dialogHeader?.pkg.authors" severity="info" :value="tag" style="margin-right: 6px;"></Tag>
         </div>
+        <div v-if="dialogHeader?.testcase_count !== 0" class="dialog-header">
+          Test Cases:
+          Duration: {{ dialogHeader?.testcase_ms }}ms,
+          Total: {{ dialogHeader?.testcase_count }},
+
+          <span v-if="dialogHeader?.testcase_failed === 0" style="color: green; font-weight: bold">
+            All passed!
+          </span>
+          <span v-else style="color: red; font-weight: bold">
+            Failed
+            ({{ Math.round(100 * (dialogHeader?.testcase_failed ?? 0) / (dialogHeader?.testcase_count ?? 0)) }}%)
+            : {{ dialogHeader?.testcase_failed }}
+          </span>
+        </div>
 
         <InfoTestCases :tests="testCases" />
       </div>
@@ -316,10 +330,13 @@ watchEffect(() => {
 });
 
 const dialogShow = ref(false);
-const dialogHeader = ref<{ repo: string, repo_url: string, pkg_name: string, pkg: Pkg } | null>();
+const dialogHeader = ref<{
+  repo: string, repo_url: string, pkg_name: string, pkg: Pkg,
+  testcase_count: number, testcase_failed: number, testcase_ms: number
+} | null>();
 const testCases = ref<Test[]>([]);
 
-type SelectedRow = { user: string, repo: string, pkg: string, testcases: number };
+type SelectedRow = { user: string, repo: string, pkg: string };
 const selectedPkg = ref<SelectedRow | null>(null);
 watch(selectedPkg, val => {
   // for now, pop up a dialog to display testcases only if any 
@@ -335,7 +352,13 @@ watch(selectedPkg, val => {
 
   const repo = `${val.user}/${val.repo}`;
   const repo_url = `https://github.com/${repo}`;
-  dialogHeader.value = { repo, repo_url, pkg_name: val.pkg, pkg };
+
+  dialogHeader.value = {
+    repo, repo_url, pkg_name: val.pkg, pkg,
+    testcase_count: pkg.testcases?.pkg_tests_count ?? 0,
+    testcase_failed: pkg.testcases?.failed ?? 0,
+    testcase_ms: pkg.testcases?.duration_ms ?? 0,
+  };
 
   testCases.value = pkg.testcases?.tests ?? [];
 });
