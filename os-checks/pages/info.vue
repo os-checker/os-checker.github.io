@@ -129,22 +129,23 @@
 
       <div>
         <div v-if="dialogHeader?.pkg.description" class="dialog-header">
-          Description: <b style="color: var(--p-emerald-500)">{{ dialogHeader?.pkg.description }}</b>
+          <b style="margin-right: 5px">Description:</b> <b style="color: var(--p-emerald-500)">{{
+            dialogHeader?.pkg.description }}</b>
         </div>
         <div v-if="dialogHeader?.pkg.categories.length !== 0" class="dialog-header">
-          Categories:
+          <b style="margin-right: 5px">Categories:</b>
           <Tag v-for="tag of dialogHeader?.pkg.categories" severity="warn" :value="tag" style="margin-right: 6px;" />
         </div>
         <div v-if="dialogHeader?.pkg.keywords.length !== 0" class="dialog-header">
-          KeyWords:
+          <b style="margin-right: 5px">KeyWords:</b>
           <Tag v-for="tag of dialogHeader?.pkg.keywords" severity="warn" :value="tag" style="margin-right: 6px;" />
         </div>
         <div v-if="dialogHeader?.pkg.authors.length !== 0" class="dialog-header">
-          Authors:
+          <b style="margin-right: 5px">Authors:</b>
           <Tag v-for="tag of dialogHeader?.pkg.authors" severity="info" :value="tag" style="margin-right: 6px;"></Tag>
         </div>
         <div v-if="dialogHeader?.testcase_count !== 0" class="dialog-header">
-          Test Cases:
+          <b style="margin-right: 5px">Test Cases:</b>
           Duration: {{ dialogHeader?.testcase_ms }}ms,
           Total: {{ dialogHeader?.testcase_count }},
 
