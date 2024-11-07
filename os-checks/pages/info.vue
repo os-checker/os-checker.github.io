@@ -155,10 +155,10 @@
           Duration: {{ dialogHeader?.testcase_ms }}ms,
           Total: {{ dialogHeader?.testcase_count }},
 
-          <span v-if="dialogHeader?.testcase_failed === 0" style="color: green; font-weight: bold">
+          <span v-if="dialogHeader?.testcase_failed === 0" :style="{ color: color.green, 'font-weight': 'bold' }">
             All passed!
           </span>
-          <span v-else style="color: red; font-weight: bold">
+          <span v-else :style="{ color: color.red, 'font-weight': 'bold' }">
             Failed
             ({{ Math.round(100 * (dialogHeader?.testcase_failed ?? 0) / (dialogHeader?.testcase_count ?? 0)) }}%)
             : {{ dialogHeader?.testcase_failed }}
