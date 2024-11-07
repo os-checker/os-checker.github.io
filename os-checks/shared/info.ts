@@ -34,7 +34,13 @@ export type Test = {
   kind: string,
   binary_name: string,
   // binary_path: string,
-  testcases: string[]
+  testcases: TestCase[]
+}
+
+export type TestCase = {
+  name: string,
+  status: string | null,
+  duration_ms: number | null,
 }
 
 export function unique_field(summaries: PkgInfo[], cb: (_: Pkg) => string[]): string[] {
