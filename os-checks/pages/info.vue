@@ -176,6 +176,8 @@ import type { Pkg, PkgInfo, Test } from '~/shared/info';
 import { unique_field, unique_field_bool } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
 
+const { color } = storeToRefs(useColorStore());
+
 // interactive filter/search inputs
 const filters = ref<any>({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -202,12 +204,12 @@ $fetch(docs_json_url).then(val => docs.value = val);
 const summaryTable = computed<SummaryTable[]>(() => {
   const value = summaries.value.map(val => {
     return Object.entries(val.pkgs).map(([name, pkg]) => {
-      let color = null;
+      let testcases_color = null;
       if (pkg.testcases?.pkg_tests_count) {
         if (pkg.testcases?.failed === 0) {
-          color = "green";
+          testcases_color = color.value.green;
         } else {
-          color = "red";
+          testcases_color = color.value.red;
         }
       }
       return {
@@ -220,7 +222,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         bin: pkg.bin ? "✅" : null,
         dependencies: pkg.dependencies || null,
         testcases: pkg.testcases?.pkg_tests_count ?? null,
-        testcases_color: color,
+        testcases_color,
         tests: pkg.tests || null,
         examples: pkg.examples || null,
         benches: pkg.benches || null,
@@ -232,7 +234,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         documentation: pkg.documentation,
         readme: pkg.readme,
         homepage: pkg.homepage,
-        latest_doc: docs.value[val.user]?.[val.repo]?.[name]
+        latest_doc: docs.value[val.user]?.[val.repo]?.[name] ?? null
       }
     })
   }).flat();
