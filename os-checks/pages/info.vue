@@ -52,7 +52,13 @@
       <Column sortable field="bin" header="Bin" style="text-align: center;" />
       <Column sortable field="dependencies" header="Depen-dencies" style="text-align: center;" />
 
-      <Column sortable field="testcases" header="Test Cases" style="text-align: center;" />
+      <Column sortable field="testcases" header="Test Cases" style="text-align: center; font-weight: bold">
+        <template #body="{ data }">
+          <span :style="{ color: data.testcases_color }">
+            {{ data.testcases }}
+          </span>
+        </template>
+      </Column>
 
       <Column sortable field="tests" header="Tests" style="text-align: center;" />
       <Column sortable field="examples" header="Examples" style="text-align: center;" />
@@ -196,6 +202,14 @@ $fetch(docs_json_url).then(val => docs.value = val);
 const summaryTable = computed<SummaryTable[]>(() => {
   const value = summaries.value.map(val => {
     return Object.entries(val.pkgs).map(([name, pkg]) => {
+      let color = null;
+      if (pkg.testcases?.pkg_tests_count) {
+        if (pkg.testcases?.failed === 0) {
+          color = "green";
+        } else {
+          color = "red";
+        }
+      }
       return {
         idx: 0,
         user: val.user,
@@ -205,7 +219,8 @@ const summaryTable = computed<SummaryTable[]>(() => {
         lib: pkg.lib ? "✅" : null,
         bin: pkg.bin ? "✅" : null,
         dependencies: pkg.dependencies || null,
-        testcases: pkg.testcases ? pkg.testcases.pkg_tests_count : null,
+        testcases: pkg.testcases?.pkg_tests_count ?? null,
+        testcases_color: color,
         tests: pkg.tests || null,
         examples: pkg.examples || null,
         benches: pkg.benches || null,
@@ -251,7 +266,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
 
 type SummaryTable = {
   idx: number; user: string; repo: string; pkg: string; version: string;
-  lib: string | null; bin: string | null; dependencies: number | null; testcases: number | null;
+  lib: string | null; bin: string | null; dependencies: number | null; testcases: number | null; testcases_color: string | null;
   tests: number | null; examples: number | null; benches: number | null; keywords: string[] | null;
   author: string[] | null; description: string; categories: string[] | null;
   documentation: string | null; readme: string | null; homepage: string | null; latest_doc: string | null;
