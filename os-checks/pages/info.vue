@@ -1,23 +1,23 @@
 <template>
   <div>
     <DataTable :value="data" tableStyle="min-width: 50rem; margin: 0 5px 0 0;" scrollable :scrollHeight="tableHeight"
-      showGridlines selectionMode="single" v-model:selection="selectedPkg" v-model:filters="filters"
+      showGridlines selectionMode="single" v-model:selection="selectedPkg" v-model:filters="selected.text"
       :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']" removableSort sortMode="multiple"
       paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <template #header>
         <div style="display: flex; justify-content: space-between;">
           <div style="display: flex; gap: 20px;">
-            <MultiSelect v-model="selectedCategories" display="chip" :options="categories" filter :maxSelectedLabels="4"
-              placeholder="Select Categories" />
+            <MultiSelect v-model="selected.categories" display="chip" :options="categories" filter
+              :maxSelectedLabels="4" placeholder="Select Categories" />
 
-            <MultiSelect v-model="selectedKeywords" display="chip" :options="keywords" filter :maxSelectedLabels="4"
+            <MultiSelect v-model="selected.keywords" display="chip" :options="keywords" filter :maxSelectedLabels="4"
               placeholder="Select Keywords" />
 
-            <MultiSelect v-model="selectedAuthors" display="chip" :options="authors" filter :maxSelectedLabels="4"
+            <MultiSelect v-model="selected.authors" display="chip" :options="authors" filter :maxSelectedLabels="4"
               placeholder="Select Authors" />
 
-            <MultiSelect v-model="selectedKinds" display="chip" :options="kinds" filter :maxSelectedLabels="4"
+            <MultiSelect v-model="selected.kinds" display="chip" :options="kinds" filter :maxSelectedLabels="4"
               placeholder="Select Crate Kinds" />
           </div>
 
@@ -26,7 +26,7 @@
               <InputIcon>
                 <i class="pi pi-search" />
               </InputIcon>
-              <InputText style="width: 100%" v-model="filters['global'].value"
+              <InputText style="width: 100%" v-model="selected.text['global'].value"
                 placeholder="Search in all text columns" />
             </IconField>
           </div>
@@ -178,11 +178,6 @@ import { FilterMatchMode } from '@primevue/core/api';
 
 const { color } = storeToRefs(useColorStore());
 
-// interactive filter/search inputs
-const filters = ref<any>({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-});
-
 const summaries = ref<PkgInfo[]>([]);
 
 githubFetch<PkgInfo[]>({
@@ -297,15 +292,23 @@ const kinds = computed(() => {
   if (is_benches) { arr.push("Benches"); }
   return arr;
 });
-const selectedCategories = ref<string[]>([]);
-const selectedKeywords = ref<string[]>([]);
-const selectedAuthors = ref<string[]>([]);
-const selectedKinds = ref<string[]>([]);
+
+const selected = reactive<{
+  categories: string[],
+  keywords: string[],
+  authors: string[],
+  kinds: string[],
+  text: any
+}>({
+  categories: [], keywords: [], authors: [], kinds: [],
+  // interactive filter/search inputs
+  text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, }
+});
 watchEffect(() => {
-  const cat = selectedCategories.value;
-  const keywords = selectedKeywords.value;
-  const au = selectedAuthors.value;
-  const ks = selectedKinds.value;
+  const cat = selected.categories;
+  const keywords = selected.keywords;
+  const au = selected.authors;
+  const ks = selected.kinds;
 
   const is_empty_cat = cat.length === 0;
   const is_empty_keywords = keywords.length === 0;
@@ -397,19 +400,19 @@ function updateFilter(query: {
   kinds?: string,
   text?: string,
 }) {
-  if (query.categories) { selectedCategories.value = query.categories.split(","); }
-  if (query.keywords) { selectedKeywords.value = query.keywords.split(","); }
-  if (query.authors) { selectedAuthors.value = query.authors.split(","); }
+  if (query.categories) { selected.categories = query.categories.split(","); }
+  if (query.keywords) { selected.keywords = query.keywords.split(","); }
+  if (query.authors) { selected.authors = query.authors.split(","); }
 
   if (query.kinds) {
     const filter = new Set([
       "Lib", "Bin", "TestCases", "Tests", "Examples", "Benches"
     ]);
-    selectedKinds.value = query.kinds.split(",").filter(k => filter.has(k));
+    selected.kinds = query.kinds.split(",").filter(k => filter.has(k));
   }
 
   if (query.text) {
-    filters.value.global.value = decodeURIComponent(query.text);
+    selected.text.global.value = decodeURIComponent(query.text);
   }
 }
 updateFilter(route.query);
