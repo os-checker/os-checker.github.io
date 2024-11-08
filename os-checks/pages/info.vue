@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <DataTable :value="data" tableStyle="min-width: 50rem; margin: 0 5px 0 0;" scrollable :scrollHeight="tableHeight"
-      showGridlines selectionMode="single" v-model:selection="selectedPkg" v-model:filters="selected.text"
+  <div style="margin: 0 8px">
+    <DataTable :value="data" scrollable :scrollHeight="tableHeight" showGridlines
+      selectionMode="single" v-model:selection="selectedPkg" v-model:filters="selected.text"
       :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']" removableSort sortMode="multiple"
       paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
@@ -24,13 +24,10 @@
               placeholder="Select Columns" />
           </div>
 
-          <div>
+          <div style="width: 120px">
             <IconField>
-              <InputIcon>
-                <i class="pi pi-search" />
-              </InputIcon>
-              <InputText style="width: 100%" v-model="selected.text['global'].value"
-                placeholder="Search in all text columns" />
+              <InputIcon> <i class="pi pi-search" /> </InputIcon>
+              <InputText v-model="selected.text['global'].value" placeholder="Search" />
             </IconField>
           </div>
 
