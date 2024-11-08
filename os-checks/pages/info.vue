@@ -1,13 +1,13 @@
 <template>
   <div style="margin: 0 8px">
-    <DataTable :value="data" scrollable :scrollHeight="tableHeight" showGridlines
-      selectionMode="single" v-model:selection="selectedPkg" v-model:filters="selected.text"
+    <DataTable :value="data" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
+      v-model:selection="selectedPkg" v-model:filters="selected.text"
       :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']" removableSort sortMode="multiple"
       paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <template #header>
         <div style="display: flex; justify-content: space-between;">
-          <div style="display: flex; gap: 20px;">
+          <div style="display: flex; gap: 10px;">
             <MultiSelect v-model="selected.categories" display="chip" :options="categories" filter
               :maxSelectedLabels="4" placeholder="Select Categories" />
 
@@ -24,10 +24,10 @@
               placeholder="Select Columns" />
           </div>
 
-          <div style="width: 120px">
+          <div>
             <IconField>
               <InputIcon> <i class="pi pi-search" /> </InputIcon>
-              <InputText v-model="selected.text['global'].value" placeholder="Search" />
+              <InputText style="width: 120px" v-model="selected.text['global'].value" placeholder="Search" />
             </IconField>
           </div>
 
