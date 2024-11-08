@@ -184,7 +184,7 @@ const { color } = storeToRefs(useColorStore());
 
 const summaries = ref<PkgInfo[]>([]);
 
-const display = reactive<{ digits: boolean, links: boolean, texts: boolean }>({ digits: true, links: true, texts: true });
+const display = reactive<{ digits: boolean, links: boolean, texts: boolean }>({ digits: true, links: false, texts: false });
 
 githubFetch<PkgInfo[]>({
   path: "plugin/cargo/info/summaries.json"
@@ -317,7 +317,10 @@ const selected = reactive<{
 watch(() => selected.displays, (disp) => {
   if (disp.length === 0) {
     //@ts-ignore
-    Object.keys(display).map(k => display[k] = true);
+    // Object.keys(display).map(k => display[k] = true);
+    display.digits = true;
+    display.links = false;
+    display.texts = false;
     return;
   }
 
