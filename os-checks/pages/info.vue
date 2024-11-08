@@ -315,7 +315,6 @@ const selected = reactive<{
   displays: []
 });
 watch(() => selected.displays, (disp) => {
-  console.log("disp", disp, "disp.length", disp.length);
   if (disp.length === 0) {
     //@ts-ignore
     Object.keys(display).map(k => display[k] = true);
