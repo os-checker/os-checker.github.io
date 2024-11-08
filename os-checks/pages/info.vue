@@ -19,6 +19,9 @@
 
             <MultiSelect v-model="selected.kinds" display="chip" :options="kinds" filter :maxSelectedLabels="4"
               placeholder="Select Crate Kinds" />
+
+            <MultiSelect v-model="selected.displays" display="chip" :options="displays" filter :maxSelectedLabels="4"
+              placeholder="Select Columns" />
           </div>
 
           <div>
@@ -48,11 +51,12 @@
       <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
       <Column sortable field="version" header="Version" style="text-align: center;" />
-      <Column sortable field="lib" header="Lib" style="text-align: center;" />
-      <Column sortable field="bin" header="Bin" style="text-align: center;" />
-      <Column sortable field="dependencies" header="Depen-dencies" style="text-align: center;" />
+      <Column sortable v-if="display.digits" field="lib" header="Lib" style="text-align: center;" />
+      <Column sortable v-if="display.digits" field="bin" header="Bin" style="text-align: center;" />
+      <Column sortable v-if="display.digits" field="dependencies" header="Depen-dencies" style="text-align: center;" />
 
-      <Column sortable field="testcases" header="Test Cases" style="text-align: center; font-weight: bold">
+      <Column sortable v-if="display.digits" field="testcases" header="Test Cases"
+        style="text-align: center; font-weight: bold">
         <template #body="{ data }">
           <span :style="{ color: data.testcases_color }">
             {{ data.testcases }}
@@ -60,11 +64,11 @@
         </template>
       </Column>
 
-      <Column sortable field="tests" header="Tests" style="text-align: center;" />
-      <Column sortable field="examples" header="Examples" style="text-align: center;" />
-      <Column sortable field="benches" header="Benches" style="text-align: center;" />
+      <Column sortable v-if="display.digits" field="tests" header="Tests" style="text-align: center;" />
+      <Column sortable v-if="display.digits" field="examples" header="Examples" style="text-align: center;" />
+      <Column sortable v-if="display.digits" field="benches" header="Benches" style="text-align: center;" />
 
-      <Column field="documentation" header="Doc" style="text-align: center;">
+      <Column v-if="display.links" field="documentation" header="Doc" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.documentation" :to="data.documentation" target="_blank" class="nav-link">
             <Button icon="pi pi-external-link" link />
@@ -72,7 +76,7 @@
         </template>
       </Column>
 
-      <Column field="latest_doc" header="Latest Doc" style="text-align: center;">
+      <Column v-if="display.links" field="latest_doc" header="Latest Doc" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.latest_doc" :to="data.latest_doc" target="_blank" class="nav-link">
             <Button icon="pi pi-external-link" link />
@@ -80,7 +84,7 @@
         </template>
       </Column>
 
-      <Column field="homepage" header="Home Page" style="text-align: center;">
+      <Column v-if="display.links" field="homepage" header="Home Page" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
             <Button icon="pi pi-external-link" link />
@@ -88,7 +92,7 @@
         </template>
       </Column>
 
-      <Column sortable field="categories" header="Categories" style="min-width: 200px;">
+      <Column v-if="display.texts" sortable field="categories" header="Categories" style="min-width: 200px;">
         <template #body="{ data: { categories } }">
           <div v-for="tag of categories">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -96,7 +100,7 @@
         </template>
       </Column>
 
-      <Column sortable field="keywords" header="KeyWords" style="min-width: 150px;">
+      <Column v-if="display.texts" sortable field="keywords" header="KeyWords" style="min-width: 150px;">
         <template #body="{ data: { keywords } }">
           <div v-for="tag of keywords">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -104,9 +108,9 @@
         </template>
       </Column>
 
-      <Column field="description" header="Description" style="min-width: 280px;" />
+      <Column v-if="display.texts" field="description" header="Description" style="min-width: 280px;" />
 
-      <Column sortable field="author" header="Author" style="min-width: 300px;">
+      <Column v-if="display.texts" sortable field="author" header="Author" style="min-width: 300px;">
         <template #body="{ data: { author } }">
           <div v-for="tag of author">
             <Tag severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -180,6 +184,8 @@ const { color } = storeToRefs(useColorStore());
 
 const summaries = ref<PkgInfo[]>([]);
 
+const display = reactive<{ digits: boolean, links: boolean, texts: boolean }>({ digits: true, links: true, texts: true });
+
 githubFetch<PkgInfo[]>({
   path: "plugin/cargo/info/summaries.json"
 }).then(val => {
@@ -229,7 +235,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         documentation: pkg.documentation,
         readme: pkg.readme,
         homepage: pkg.homepage,
-        latest_doc: docs.value[val.user]?.[val.repo]?.[name] ?? null
+        latest_doc: docs.value?.[val.user]?.[val.repo]?.[name] ?? null
       }
     })
   }).flat();
@@ -292,18 +298,36 @@ const kinds = computed(() => {
   if (is_benches) { arr.push("Benches"); }
   return arr;
 });
+const displays = computed(() => Object.keys(display));
 
 const selected = reactive<{
   categories: string[],
   keywords: string[],
   authors: string[],
   kinds: string[],
-  text: any
+  text: any,
+  displays: string[],
 }>({
   categories: [], keywords: [], authors: [], kinds: [],
   // interactive filter/search inputs
-  text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, }
+  text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
+  // columns to be displayed
+  displays: []
 });
+watch(() => selected.displays, (disp) => {
+  console.log("disp", disp, "disp.length", disp.length);
+  if (disp.length === 0) {
+    //@ts-ignore
+    Object.keys(display).map(k => display[k] = true);
+    return;
+  }
+
+  const set = new Set(disp);
+  //@ts-ignore
+  Object.keys(display).map(k => display[k] = set.has(k));
+});
+
+
 watchEffect(() => {
   const cat = selected.categories;
   const keywords = selected.keywords;
@@ -381,7 +405,6 @@ watch(selectedPkg, val => {
   testCases.value = pkg.testcases?.tests ?? [];
 });
 
-
 const tableHeight = ref("800px");
 onMounted(() => {
   const viewportHeight = window.innerHeight;
@@ -440,10 +463,6 @@ watch(selected, (sel) => {
 
   router.push({ path: route.path, query });
 });
-// clear query when the page is loaded
-// if (Object.keys(route.query).length !== 0) {
-//   router.push({ path: route.path });
-// }
 
 useHead({ title: 'Package Information' });
 </script>
