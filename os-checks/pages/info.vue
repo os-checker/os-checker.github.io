@@ -313,7 +313,7 @@ watchEffect(() => {
   const is_empty_k = ks.length === 0;
 
   // reset
-  if (is_empty_cat &&  is_empty_keywords && is_empty_au && is_empty_k) {
+  if (is_empty_cat && is_empty_keywords && is_empty_au && is_empty_k) {
     data.value = summaryTable.value;
     return;
   }
@@ -389,6 +389,39 @@ onMounted(() => {
   });
 });
 
+const route = useRoute();
+function updateFilter(query: {
+  categories?: string,
+  keywords?: string,
+  authors?: string,
+  kind?: string,
+  text?: string,
+}) {
+  if (query.categories) { selectedCategories.value = query.categories.split(","); }
+  if (query.keywords) { selectedKeywords.value = query.keywords.split(","); }
+  if (query.authors) { selectedAuthors.value = query.authors.split(","); }
+
+  if (query.kind) {
+    const filter = new Set([
+      "Lib", "Bin", "TestCases", "Tests", "Examples", "Benches"
+    ]);
+    selectedKinds.value = query.kind.split(",").filter(k => filter.has(k));
+  }
+
+  if (query.text) {
+    filters.value.global.value = decodeURIComponent(query.text);
+  }
+}
+updateFilter(route.query);
+// watch(() => route.query, updateFilter);
+
+// const router = useRouter();
+// clear query when the page is loaded
+// if (Object.keys(route.query).length !== 0) {
+//   router.push({ path: route.path });
+// }
+
+useHead({ title: 'Package Information' });
 </script>
 
 <style lang="css">
