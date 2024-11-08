@@ -400,15 +400,15 @@ function updateFilter(query: {
   kinds?: string,
   text?: string,
 }) {
-  if (query.categories) { selected.categories = query.categories.split(","); }
-  if (query.keywords) { selected.keywords = query.keywords.split(","); }
-  if (query.authors) { selected.authors = query.authors.split(","); }
+  if (query.categories) { selected.categories = decodeURIComponent(query.categories).split(","); }
+  if (query.keywords) { selected.keywords = decodeURIComponent(query.keywords).split(","); }
+  if (query.authors) { selected.authors = decodeURIComponent(query.authors).split(","); }
 
   if (query.kinds) {
     const filter = new Set([
       "Lib", "Bin", "TestCases", "Tests", "Examples", "Benches"
     ]);
-    selected.kinds = query.kinds.split(",").filter(k => filter.has(k));
+    selected.kinds = decodeURIComponent(query.kinds).split(",").filter(k => filter.has(k));
   }
 
   if (query.text) {
@@ -418,7 +418,28 @@ function updateFilter(query: {
 updateFilter(route.query);
 // watch(() => route.query, updateFilter);
 
-// const router = useRouter();
+const router = useRouter();
+watch(selected, (sel) => {
+  let query: any = {};
+  if (sel.categories.length !== 0) {
+    query.categories = encodeURIComponent(sel.categories.join(","));
+  }
+  if (sel.keywords.length !== 0) {
+    query.keywords = encodeURIComponent(sel.keywords.join(","));
+  }
+  if (sel.authors.length !== 0) {
+    // FIXME: what if author string contains `,`
+    query.authors = encodeURIComponent(sel.authors.join(","));
+  }
+  if (sel.kinds.length !== 0) {
+    query.kinds = encodeURIComponent(sel.kinds.join(","));
+  }
+  if (sel.text.global.value) {
+    query.text = encodeURIComponent(sel.text.global.value);
+  }
+
+  router.push({ path: route.path, query });
+});
 // clear query when the page is loaded
 // if (Object.keys(route.query).length !== 0) {
 //   router.push({ path: route.path });
