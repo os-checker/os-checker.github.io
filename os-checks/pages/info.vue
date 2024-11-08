@@ -298,25 +298,22 @@ const kinds = computed(() => {
   return arr;
 });
 const selectedCategories = ref<string[]>([]);
-const selectedOSCategories = ref<string[]>([]);
 const selectedKeywords = ref<string[]>([]);
 const selectedAuthors = ref<string[]>([]);
 const selectedKinds = ref<string[]>([]);
 watchEffect(() => {
   const cat = selectedCategories.value;
-  const os_cat = selectedOSCategories.value;
   const keywords = selectedKeywords.value;
   const au = selectedAuthors.value;
   const ks = selectedKinds.value;
 
   const is_empty_cat = cat.length === 0;
-  const is_empty_os_cat = os_cat.length === 0;
   const is_empty_keywords = keywords.length === 0;
   const is_empty_au = au.length === 0;
   const is_empty_k = ks.length === 0;
 
   // reset
-  if (is_empty_cat && is_empty_os_cat && is_empty_keywords && is_empty_au && is_empty_k) {
+  if (is_empty_cat &&  is_empty_keywords && is_empty_au && is_empty_k) {
     data.value = summaryTable.value;
     return;
   }
