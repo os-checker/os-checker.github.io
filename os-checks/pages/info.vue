@@ -327,7 +327,6 @@ watch(() => selected.displays, (disp) => {
   Object.keys(display).map(k => display[k] = set.has(k));
 });
 
-
 watchEffect(() => {
   const cat = selected.categories;
   const keywords = selected.keywords;
@@ -422,6 +421,7 @@ function updateFilter(query: {
   authors?: string,
   kinds?: string,
   text?: string,
+  displays?: string,
 }) {
   if (query.categories) { selected.categories = decodeURIComponent(query.categories).split(","); }
   if (query.keywords) { selected.keywords = decodeURIComponent(query.keywords).split(","); }
@@ -436,6 +436,11 @@ function updateFilter(query: {
 
   if (query.text) {
     selected.text.global.value = decodeURIComponent(query.text);
+  }
+
+  if (query.displays) {
+    const filter = new Set(displays.value);
+    selected.displays = decodeURIComponent(query.displays).split(",").filter(k => filter.has(k));
   }
 }
 updateFilter(route.query);
@@ -459,6 +464,9 @@ watch(selected, (sel) => {
   }
   if (sel.text.global.value) {
     query.text = encodeURIComponent(sel.text.global.value);
+  }
+  if (sel.displays.length !== 0) {
+    query.displays = encodeURIComponent(sel.displays.join(","));
   }
 
   router.push({ path: route.path, query });
