@@ -18,7 +18,7 @@
               placeholder="Select Authors" />
 
             <MultiSelect v-model="selectedKinds" display="chip" :options="kinds" filter :maxSelectedLabels="4"
-              placeholder="Select Crate Kind" />
+              placeholder="Select Crate Kinds" />
           </div>
 
           <div>
@@ -394,18 +394,18 @@ function updateFilter(query: {
   categories?: string,
   keywords?: string,
   authors?: string,
-  kind?: string,
+  kinds?: string,
   text?: string,
 }) {
   if (query.categories) { selectedCategories.value = query.categories.split(","); }
   if (query.keywords) { selectedKeywords.value = query.keywords.split(","); }
   if (query.authors) { selectedAuthors.value = query.authors.split(","); }
 
-  if (query.kind) {
+  if (query.kinds) {
     const filter = new Set([
       "Lib", "Bin", "TestCases", "Tests", "Examples", "Benches"
     ]);
-    selectedKinds.value = query.kind.split(",").filter(k => filter.has(k));
+    selectedKinds.value = query.kinds.split(",").filter(k => filter.has(k));
   }
 
   if (query.text) {
