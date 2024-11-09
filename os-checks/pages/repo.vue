@@ -7,6 +7,9 @@
 
         <MultiSelect v-model="selected.topics" display="chip" :options="topics" filter :maxSelectedLabels="4"
           placeholder="Select Topics" />
+
+        <MultiSelect v-model="selected.columns" display="chip" :options="columns" filter :maxSelectedLabels="4"
+          placeholder="Select Columns" :showClear="true" />
       </div>
 
       <div>
@@ -34,9 +37,9 @@
         </template>
       </Column>
 
-      <Column sortable field="license" header="License" :pt="ptColumnCenter" />
+      <Column v-if="C['License']" sortable field="license" header="License" :pt="ptColumnCenter" />
 
-      <Column sortable field="homepage" header="Home" :pt="ptColumnCenter">
+      <Column v-if="C['Home']" sortable field="homepage" header="Home" :pt="ptColumnCenter">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
             <!-- <Button icon="pi pi-external-link" link /> a bug when scrolling -->
@@ -45,7 +48,7 @@
         </template>
       </Column>
 
-      <Column sortable field="open_issues_count" header="Open Issues" :pt="ptColumnCenter">
+      <Column v-if="C['Open Issues']" sortable field="open_issues_count" header="Open Issues" :pt="ptColumnCenter">
         <template #body="{ data }">
           <NuxtLink v-if="data.issues" target="_blank" class="nav-link"
             :to="`https://github.com/${data.user}/${data.repo}/issues`">
@@ -54,14 +57,15 @@
         </template>
       </Column>
 
-      <Column sortable field="description" header="Description" style="max-width: 500px; min-width: 300px" />
-      <Column sortable field="created_at" header="Created" :pt="ptColumnCenter" />
-      <Column sortable field="pushed_at" header="Updated" :pt="ptColumnCenter" />
-      <Column sortable field="active_days" header="Active Days" :pt="ptColumnRight" />
-      <Column sortable field="contributions" header="Contri-butions" :pt="ptColumnRight" />
-      <Column sortable field="contributors" header="Contri-butors" :pt="ptColumnRight" />
+      <Column v-if="C['Description']" sortable field="description" header="Description"
+        style="max-width: 500px; min-width: 280px" />
+      <Column v-if="C['Created']" sortable field="created_at" header="Created" :pt="ptColumnCenter" />
+      <Column v-if="C['Updated']" sortable field="pushed_at" header="Updated" :pt="ptColumnCenter" />
+      <Column v-if="C['Active Days']" sortable field="active_days" header="Active Days" :pt="ptColumnRight" />
+      <Column v-if="C['Contri-butions']" sortable field="contributions" header="Contri-butions" :pt="ptColumnRight" />
+      <Column v-if="C['Contri-butors']" sortable field="contributors" header="Contri-butors" :pt="ptColumnRight" />
 
-      <Column sortable field="size" header="Size" :pt="ptColumnRight">
+      <Column v-if="C['Size']" sortable field="size" header="Size" :pt="ptColumnRight">
         <template #body="{ data }">
           <span :style="{ color: (data.size < 1024) ? color.grey : '' }">
             {{ formatBytes(data.size) }}
@@ -69,16 +73,16 @@
         </template>
       </Column>
 
-      <Column sortable field="default_branch" header="Default Branch" :pt="ptColumnCenter" />
-      <Column sortable field="fork" header="Is this Forked" :pt="ptColumnCenter" />
-      <Column sortable field="archived" header="Is this Archived" :pt="ptColumnCenter" />
+      <Column v-if="C['Default Branch']" sortable field="default_branch" header="Default Branch" :pt="ptColumnCenter" />
+      <Column v-if="C['Is This Forked']" sortable field="fork" header="Is This Forked" :pt="ptColumnCenter" />
+      <Column v-if="C['Is This Archived']" sortable field="archived" header="Is This Archived" :pt="ptColumnCenter" />
 
-      <Column sortable field="stargazers" header="Star-gazers" :pt="ptColumnRight" />
-      <Column sortable field="subscribers" header="Sub-scribers" :pt="ptColumnRight" />
-      <Column sortable field="forks" header="Forks" :pt="ptColumnRight" />
-      <Column sortable field="network" header="Net Work" :pt="ptColumnRight" />
+      <Column v-if="C['Star-gazers']" ortable field="stargazers" header="Star-gazers" :pt="ptColumnRight" />
+      <Column v-if="C['Sub-scribers']" ortable field="subscribers" header="Sub-scribers" :pt="ptColumnRight" />
+      <Column v-if="C['Forks']" ortable field="forks" header="Forks" :pt="ptColumnRight" />
+      <Column v-if="C['Net Work']" ortable field="network" header="Net Work" :pt="ptColumnRight" />
 
-      <Column sortable field="discussions" header="Discussions" :pt="ptColumnCenter">
+      <Column v-if="C['Discussions']" sortable field="discussions" header="Discussions" :pt="ptColumnCenter">
         <template #body="{ data }">
           <NuxtLink v-if="data.discussions" target="_blank" class="nav-link"
             :to="`https://github.com/${data.user}/${data.repo}/discussions`">
@@ -87,7 +91,7 @@
         </template>
       </Column>
 
-      <Column sortable field="topics" header="Topics" style="min-width: 180px;">
+      <Column v-if="C['Topics']" sortable field="topics" header="Topics" style="min-width: 180px;">
         <template #body="{ data: { topics } }">
           <div v-for="val of topics">
             <Tag severity="info" :value="val" style="margin-bottom: 5px;" />
@@ -219,13 +223,40 @@ const selectedRepo = ref();
 const licenses = computed(() => [...new Set(repo.value.map(r => r.license))].sort());
 const topics = computed(() => [...new Set(repo.value.map(r => r.topics).flat())].sort());
 
+const columns = ref([
+  "[Columns] Full", "[Columns] Default (Slimmed)", "License", "Home", "Open Issues", "Description", "Created", "Updated",
+  "Active Days", "Contri-butions", "Contri-butors", "Size", "Default Branch",
+  "Is This Forked", "Is This Archived", "Star-gazers", "Sub-scribers",
+  "Forks", "Net Work", "Discussions", "Topics"
+]);
+
+const C = reactive<{ [key: string]: boolean }>({
+  "License": false, "Home": false, "Open Issues": false, "Description": false, "Created": false, "Updated": false,
+  "Active Days": false, "Contri-butions": false, "Contri-butors": false, "Size": false, "Default Branch": false,
+  "Is This Forked": false, "Is This Archived": false, "Star-gazers": false, "Sub-scribers": false,
+  "Forks": false, "Net Work": false, "Discussions": false, "Topics": false
+});
+
+function setDefaultColumns() {
+  const set = new Set([
+    "License", "Home", "Description", "Updated",
+    "Active Days", "Contri-butions", "Contri-butors", "Size",
+  ]);
+  for (const col of Object.keys(C)) {
+    C[col] = set.has(col);
+  }
+}
+setDefaultColumns();
+
 const selected = reactive<{
   licenses: string[],
   topics: string[],
+  columns: string[],
   text: any,
 }>({
   licenses: [],
   topics: [],
+  columns: [],
   text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
 });
 
@@ -240,6 +271,20 @@ watch(selected, (sel) => {
   if (sel.topics.length !== 0) {
     const set = new Set(sel.topics);
     new_data = new_data.filter(val => val.topics.findIndex(t => set.has(t)) !== -1);
+  }
+
+  if (sel.columns.length === 0 || sel.columns.findIndex(c => c === "[Columns] Default (Slimmed)") !== -1) {
+    setDefaultColumns();
+  } else if (sel.columns.findIndex(c => c === "[Columns] Full") !== -1) {
+    // display all columns 
+    for (const col of Object.keys(C)) {
+      C[col] = true;
+    }
+  } else {
+    const set = new Set(sel.columns);
+    for (const col of Object.keys(C)) {
+      C[col] = set.has(col);
+    }
   }
 
   data.value = new_data;
