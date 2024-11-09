@@ -49,8 +49,8 @@
 
       <Column sortable field="size" header="Size" :pt="ptColumnRight">
         <template #body="{ data }">
-          <span :style="{color: (data.size < 1024) ? color.grey: ''}">
-          {{ formatBytes(data.size) }}
+          <span :style="{ color: (data.size < 1024) ? color.grey : '' }">
+            {{ formatBytes(data.size) }}
           </span>
         </template>
       </Column>
@@ -73,6 +73,14 @@
         </template>
       </Column>
 
+      <Column sortable field="topics" header="Topics" style="min-width: 180px;">
+        <template #body="{ data: { topics } }">
+          <div v-for="val of topics">
+            <Tag severity="info" :value="val" style="margin-bottom: 5px;" />
+          </div>
+        </template>
+      </Column>
+
     </DataTable>
   </div>
 </template>
@@ -90,7 +98,7 @@ onMounted(() => {
   });
 });
 
-const {color} = storeToRefs(useColorStore());
+const { color } = storeToRefs(useColorStore());
 
 // styling
 const ptColumnCenter = ref({
