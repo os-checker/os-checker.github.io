@@ -77,10 +77,10 @@
       <Column v-if="C['Is This Forked']" sortable field="fork" header="Is This Forked" :pt="ptColumnCenter" />
       <Column v-if="C['Is This Archived']" sortable field="archived" header="Is This Archived" :pt="ptColumnCenter" />
 
-      <Column v-if="C['Star-gazers']" ortable field="stargazers" header="Star-gazers" :pt="ptColumnRight" />
-      <Column v-if="C['Sub-scribers']" ortable field="subscribers" header="Sub-scribers" :pt="ptColumnRight" />
-      <Column v-if="C['Forks']" ortable field="forks" header="Forks" :pt="ptColumnRight" />
-      <Column v-if="C['Net Work']" ortable field="network" header="Net Work" :pt="ptColumnRight" />
+      <Column v-if="C['Star-gazers']" sortable field="stargazers" header="Star-gazers" :pt="ptColumnRight" />
+      <Column v-if="C['Sub-scribers']" sortable field="subscribers" header="Sub-scribers" :pt="ptColumnRight" />
+      <Column v-if="C['Forks']" sortable field="forks" header="Forks" :pt="ptColumnRight" />
+      <Column v-if="C['Net Work']" sortable field="network" header="Net Work" :pt="ptColumnRight" />
 
       <Column v-if="C['Discussions']" sortable field="discussions" header="Discussions" :pt="ptColumnCenter">
         <template #body="{ data }">
