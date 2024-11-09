@@ -4,6 +4,9 @@
       <div style="display: flex; gap: 10px;">
         <MultiSelect v-model="selected.licenses" display="chip" :options="licenses" filter :maxSelectedLabels="4"
           placeholder="Select License" />
+
+        <MultiSelect v-model="selected.topics" display="chip" :options="topics" filter :maxSelectedLabels="4"
+          placeholder="Select Topics" />
       </div>
 
       <div>
@@ -214,12 +217,15 @@ function formatBytes(bytes: number, decimals = 0) {
 const selectedRepo = ref();
 
 const licenses = computed(() => [...new Set(repo.value.map(r => r.license))].sort());
+const topics = computed(() => [...new Set(repo.value.map(r => r.topics).flat())].sort());
 
 const selected = reactive<{
   licenses: string[],
+  topics: string[],
   text: any,
 }>({
   licenses: [],
+  topics: [],
   text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
 });
 
@@ -229,6 +235,11 @@ watch(selected, (sel) => {
   // empty licenses means all licenses
   if (sel.licenses.length !== 0) {
     new_data = new_data.filter(val => sel.licenses.findIndex(x => x === val.license) !== -1);
+  }
+
+  if (sel.topics.length !== 0) {
+    const set = new Set(sel.topics);
+    new_data = new_data.filter(val => val.topics.findIndex(t => set.has(t)) !== -1);
   }
 
   data.value = new_data;
