@@ -46,7 +46,14 @@
       <Column sortable field="active_days" header="Active Days" :pt="ptColumnRight" />
       <Column sortable field="contributions" header="Contri-butions" :pt="ptColumnRight" />
       <Column sortable field="contributors" header="Contri-butors" :pt="ptColumnRight" />
-      <Column sortable field="size" header="Size (Bytes)" :pt="ptColumnRight" />
+
+      <Column sortable field="size" header="Size" :pt="ptColumnRight">
+        <template #body="{ data }">
+          <span :style="{color: (data.size < 1024) ? color.grey: ''}">
+          {{ formatBytes(data.size) }}
+          </span>
+        </template>
+      </Column>
 
       <Column sortable field="default_branch" header="Default Branch" :pt="ptColumnCenter" />
       <Column sortable field="fork" header="Is this Forked" :pt="ptColumnCenter" />
@@ -82,6 +89,8 @@ onMounted(() => {
     tableHeight.value = `${viewportHeight * 0.8}px`;
   });
 });
+
+const {color} = storeToRefs(useColorStore());
 
 // styling
 const ptColumnCenter = ref({
@@ -165,4 +174,17 @@ const repo = computed<Repo[]>(() => {
   })
 });
 
+function formatBytes(bytes: number, decimals = 0) {
+  if (bytes === 0) {
+    return '0 B';
+  }
+
+  const k = 1024; // 1KB = 1024 bytes
+  const dm = decimals < 0 ? 0 : decimals; // 小数位数
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
 </script>
