@@ -9,7 +9,7 @@
           placeholder="Select Topics" />
 
         <MultiSelect v-model="selected.columns" display="chip" :options="columns" filter :maxSelectedLabels="4"
-          placeholder="Select Columns" :showClear="true" />
+          placeholder="Select Columns" />
       </div>
 
       <div>
