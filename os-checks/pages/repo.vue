@@ -20,7 +20,8 @@
         </template>
       </Column>
 
-      <Column sortable field="license" header="License" style="text-align: center;" :pt="ptColumnHeader" />
+      <Column sortable field="license" header="License" style="text-align: center;"
+        headerStyle="display:flex; justify-content: center;" />
 
     </DataTable>
   </div>
@@ -37,11 +38,6 @@ onMounted(() => {
     const viewportHeight = window.innerHeight;
     tableHeight.value = `${viewportHeight * 0.8}px`;
   });
-});
-
-// styling
-const ptColumnHeader = ref({
-  columnHeaderContent: { style: { "justify-content": "center" } }
 });
 
 const summaries = ref<Output[]>([]);
