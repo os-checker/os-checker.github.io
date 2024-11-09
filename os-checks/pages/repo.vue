@@ -1,13 +1,8 @@
 <template>
   <div style="margin: 0 8px">
-    <!-- <DataTable :value="data" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single" -->
-    <!--   v-model:selection="selectedPkg" v-model:filters="selected.text" -->
-    <!--   :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']" removableSort sortMode="multiple" -->
-    <!--   paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]"> -->
-    <!---->
-    <!-- </DataTable> -->
-    <DataTable :value="repo" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single" removableSort
-      sortMode="multiple" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
+    <DataTable :value="repo" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
+      v-model:selection="selectedRepo" removableSort sortMode="multiple" paginator :rows="10"
+      :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <Column frozen field="idx" header="Idx" />
       <Column frozen sortable field="user" header="User" style="min-width: 150px;" />
@@ -185,9 +180,7 @@ const repo = computed<Repo[]>(() => {
 });
 
 function formatBytes(bytes: number, decimals = 0) {
-  if (bytes === 0) {
-    return '0 B';
-  }
+  if (bytes === 0) { return '0 B'; }
 
   const k = 1024; // 1KB = 1024 bytes
   const dm = decimals < 0 ? 0 : decimals; // 小数位数
@@ -197,4 +190,6 @@ function formatBytes(bytes: number, decimals = 0) {
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
+
+const selectedRepo = ref();
 </script>
