@@ -27,8 +27,8 @@
         <Button title="Package Infomation" icon="pi pi-microchip" />
       </NuxtLink>
 
-      <NuxtLink to="/repo">
-        <Button title="Repository Infomation" icon="pi pi-warehouse" />
+      <NuxtLink to="/repos">
+        <Button title="Repositories Infomation" icon="pi pi-warehouse" />
       </NuxtLink>
 
     </div>

@@ -107,7 +107,7 @@
 import { FilterMatchMode } from '@primevue/core/api';
 import type { Output } from '~/shared/repo';
 
-useHead({ title: 'Repository Information' });
+useHead({ title: 'Repositories Information' });
 
 const tableHeight = ref("800px");
 onMounted(() => {
