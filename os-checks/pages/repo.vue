@@ -1,8 +1,22 @@
 <template>
   <div style="margin: 0 8px">
+    <div class="filter">
+      <div style="display: flex; gap: 10px;">
+      </div>
+
+      <div>
+        <IconField>
+          <InputIcon> <i class="pi pi-search" /> </InputIcon>
+          <InputText style="width: 180px" v-model="selected.text['global'].value" placeholder="Search" />
+        </IconField>
+      </div>
+
+    </div>
+
     <DataTable :value="repo" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
       v-model:selection="selectedRepo" removableSort sortMode="multiple" paginator :rows="10"
-      :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
+      :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]" v-model:filters="selected.text"
+      :globalFilterFields="['user', 'repo', 'description', 'license', 'topics']">
 
       <Column frozen field="idx" header="Idx" />
       <Column frozen sortable field="user" header="User" style="min-width: 150px;" />
@@ -81,6 +95,7 @@
 </template>
 
 <script setup lang="ts">
+import { FilterMatchMode } from '@primevue/core/api';
 import type { Output } from '~/shared/repo';
 
 useHead({ title: 'Repository Information' });
@@ -192,4 +207,16 @@ function formatBytes(bytes: number, decimals = 0) {
 }
 
 const selectedRepo = ref();
+
+const selected = reactive({
+  text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
+});
 </script>
+
+<style lang="css" scoped>
+.filter {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 18px;
+}
+</style>
