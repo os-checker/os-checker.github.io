@@ -24,7 +24,11 @@
       </NuxtLink>
 
       <NuxtLink to="/info">
-        <Button title="Package & Testcase Infomation" icon="pi pi-microchip" />
+        <Button title="Package Infomation" icon="pi pi-microchip" />
+      </NuxtLink>
+
+      <NuxtLink to="/repo">
+        <Button title="Repository Infomation" icon="pi pi-warehouse" />
       </NuxtLink>
 
     </div>
