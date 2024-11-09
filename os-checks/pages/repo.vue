@@ -38,6 +38,15 @@
       <Column sortable field="contributions" header="Contri-butions" :pt="ptColumnRight" />
       <Column sortable field="contributors" header="Contri-butors" :pt="ptColumnRight" />
 
+      <Column sortable field="open_issues_count" header="Open Issues" :pt="ptColumnRight">
+        <template #body="{ data }">
+          <NuxtLink v-if="data.issues" target="_blank" class="nav-link"
+            :to="`https://github.com/${data.user}/${data.repo}/issues`">
+            {{ data.open_issues_count ? data.open_issues_count : null }}
+          </NuxtLink>
+        </template>
+      </Column>
+
     </DataTable>
   </div>
 </template>
@@ -99,9 +108,12 @@ type Repo = {
   fork: boolean,
   archived: boolean,
 
-  issues: string | null,
-  discussions: string | null,
-  wiki: string | null,
+  issues: boolean,
+  discussions: boolean,
+  wiki: boolean,
+  // issues: string | null,
+  // discussions: string | null,
+  // wiki: string | null,
   topics: string[],
 }
 
@@ -129,9 +141,12 @@ const repo = computed<Repo[]>(() => {
       default_branch: info.default_branch,
       fork: info.fork,
       archived: info.archived,
-      issues: info.has_issues ? `https://github.com/${val.user}/${val.repo}/issues` : null,
-      discussions: info.has_discussions ? `https://github.com/${val.user}/${val.repo}/discussions` : null,
-      wiki: info.has_wiki ? `https://github.com/${val.user}/${val.repo}/wiki` : null,
+      issues: info.has_issues,
+      discussions: info.has_discussions,
+      wiki: info.has_wiki,
+      // issues: info.has_issues ? `https://github.com/${val.user}/${val.repo}/issues` : null,
+      // discussions: info.has_discussions ? `https://github.com/${val.user}/${val.repo}/discussions` : null,
+      // wiki: info.has_wiki ? `https://github.com/${val.user}/${val.repo}/wiki` : null,
       topics: info.topics,
     }
   })
