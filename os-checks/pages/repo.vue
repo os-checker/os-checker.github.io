@@ -9,7 +9,7 @@
     <DataTable :value="repo" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single" removableSort
       sortMode="multiple" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
-      <Column frozen sortable field="idx" header="Idx" />
+      <Column frozen field="idx" header="Idx" />
       <Column frozen sortable field="user" header="User" style="min-width: 150px;" />
 
       <Column frozen sortable field="repo" header="Repo" style="min-width: 180px;">
@@ -25,7 +25,17 @@
       <Column sortable field="homepage" header="Home" :pt="ptColumnCenter">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" link />
+            <!-- <Button icon="pi pi-external-link" link /> a bug when scrolling -->
+            link
+          </NuxtLink>
+        </template>
+      </Column>
+
+      <Column sortable field="open_issues_count" header="Open Issues" :pt="ptColumnCenter">
+        <template #body="{ data }">
+          <NuxtLink v-if="data.issues" target="_blank" class="nav-link"
+            :to="`https://github.com/${data.user}/${data.repo}/issues`">
+            {{ data.open_issues_count ? data.open_issues_count : null }}
           </NuxtLink>
         </template>
       </Column>
@@ -34,15 +44,24 @@
       <Column sortable field="created_at" header="Created" :pt="ptColumnCenter" />
       <Column sortable field="pushed_at" header="Updated" :pt="ptColumnCenter" />
       <Column sortable field="active_days" header="Active Days" :pt="ptColumnRight" />
-      <Column sortable field="size" header="Size" :pt="ptColumnRight" />
       <Column sortable field="contributions" header="Contri-butions" :pt="ptColumnRight" />
       <Column sortable field="contributors" header="Contri-butors" :pt="ptColumnRight" />
+      <Column sortable field="size" header="Size (Bytes)" :pt="ptColumnRight" />
 
-      <Column sortable field="open_issues_count" header="Open Issues" :pt="ptColumnRight">
+      <Column sortable field="default_branch" header="Default Branch" :pt="ptColumnCenter" />
+      <Column sortable field="fork" header="Is this Forked" :pt="ptColumnCenter" />
+      <Column sortable field="archived" header="Is this Archived" :pt="ptColumnCenter" />
+
+      <Column sortable field="stargazers" header="Star-gazers" :pt="ptColumnRight" />
+      <Column sortable field="subscribers" header="Sub-scribers" :pt="ptColumnRight" />
+      <Column sortable field="forks" header="Forks" :pt="ptColumnRight" />
+      <Column sortable field="network" header="Net Work" :pt="ptColumnRight" />
+
+      <Column sortable field="discussions" header="Discussions" :pt="ptColumnCenter">
         <template #body="{ data }">
-          <NuxtLink v-if="data.issues" target="_blank" class="nav-link"
-            :to="`https://github.com/${data.user}/${data.repo}/issues`">
-            {{ data.open_issues_count ? data.open_issues_count : null }}
+          <NuxtLink v-if="data.discussions" target="_blank" class="nav-link"
+            :to="`https://github.com/${data.user}/${data.repo}/discussions`">
+            <Button icon="pi pi-external-link" link />
           </NuxtLink>
         </template>
       </Column>
@@ -99,21 +118,18 @@ type Repo = {
   contributors: number,
   open_issues_count: number,
 
-  stargazers: number,
-  subscribers: number,
-  forks: number,
-  network: number,
+  stargazers: number | null,
+  subscribers: number | null,
+  forks: number | null,
+  network: number | null,
 
   default_branch: string,
-  fork: boolean,
-  archived: boolean,
+  fork: string | null,
+  archived: string | null,
 
   issues: boolean,
   discussions: boolean,
-  wiki: boolean,
-  // issues: string | null,
-  // discussions: string | null,
-  // wiki: string | null,
+  // wiki: boolean,
   topics: string[],
 }
 
@@ -134,19 +150,16 @@ const repo = computed<Repo[]>(() => {
       contributions: val.contributions,
       contributors: val.contributors.length,
       open_issues_count: info.open_issues_count,
-      stargazers: info.stargazers_count,
-      subscribers: info.subscribers_count,
-      forks: info.forks_count,
-      network: info.network_count,
+      stargazers: info.stargazers_count ? info.stargazers_count : null,
+      subscribers: info.subscribers_count ? info.subscribers_count : null,
+      forks: info.forks_count ? info.forks_count : null,
+      network: info.network_count ? info.network_count : null,
       default_branch: info.default_branch,
-      fork: info.fork,
-      archived: info.archived,
+      fork: info.fork ? "✅" : null,
+      archived: info.archived ? "✅" : null,
       issues: info.has_issues,
       discussions: info.has_discussions,
-      wiki: info.has_wiki,
-      // issues: info.has_issues ? `https://github.com/${val.user}/${val.repo}/issues` : null,
-      // discussions: info.has_discussions ? `https://github.com/${val.user}/${val.repo}/discussions` : null,
-      // wiki: info.has_wiki ? `https://github.com/${val.user}/${val.repo}/wiki` : null,
+      // wiki: info.has_wiki, // not sure if the value is reliable
       topics: info.topics,
     }
   })
