@@ -290,6 +290,43 @@ watch(selected, (sel) => {
   data.value = new_data;
 });
 
+// route query
+const route = useRoute();
+function updateFilter(query: {
+  licenses?: string,
+  topics?: string,
+  columns?: string,
+  text?: string,
+}) {
+  if (query.licenses) { selected.licenses = decodeURIComponent(query.licenses).split(","); }
+  if (query.topics) { selected.topics = decodeURIComponent(query.topics).split(","); }
+  if (query.columns) { selected.columns = decodeURIComponent(query.columns).split(","); }
+
+  if (query.text) {
+    selected.text.global.value = decodeURIComponent(query.text);
+  }
+}
+updateFilter(route.query);
+
+const router = useRouter();
+watch(selected, (sel) => {
+  let query: any = {};
+  if (sel.licenses.length !== 0) {
+    query.licenses = encodeURIComponent(sel.licenses.join(","));
+  }
+  if (sel.topics.length !== 0) {
+    query.topics = encodeURIComponent(sel.topics.join(","));
+  }
+  if (sel.columns.length !== 0) {
+    query.columns = encodeURIComponent(sel.columns.join(","));
+  }
+  if (sel.text.global.value) {
+    query.text = encodeURIComponent(sel.text.global.value);
+  }
+
+  router.push({ path: route.path, query });
+});
+
 </script>
 
 <style lang="css" scoped>
