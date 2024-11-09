@@ -2,6 +2,8 @@
   <div style="margin: 0 8px">
     <div class="filter">
       <div style="display: flex; gap: 10px;">
+        <MultiSelect v-model="selected.licenses" display="chip" :options="licenses" filter :maxSelectedLabels="4"
+          placeholder="Select License" />
       </div>
 
       <div>
@@ -13,7 +15,7 @@
 
     </div>
 
-    <DataTable :value="repo" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
+    <DataTable :value="data" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
       v-model:selection="selectedRepo" removableSort sortMode="multiple" paginator :rows="10"
       :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]" v-model:filters="selected.text"
       :globalFilterFields="['user', 'repo', 'description', 'license', 'topics']">
@@ -194,6 +196,9 @@ const repo = computed<Repo[]>(() => {
   })
 });
 
+const data = ref<Repo[]>([]);
+watch(repo, (val) => data.value = val);
+
 function formatBytes(bytes: number, decimals = 0) {
   if (bytes === 0) { return '0 B'; }
 
@@ -208,9 +213,27 @@ function formatBytes(bytes: number, decimals = 0) {
 
 const selectedRepo = ref();
 
-const selected = reactive({
+const licenses = computed(() => [...new Set(repo.value.map(r => r.license))].sort());
+
+const selected = reactive<{
+  licenses: string[],
+  text: any,
+}>({
+  licenses: [],
   text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
 });
+
+watch(selected, (sel) => {
+  let new_data = repo.value;
+
+  // empty licenses means all licenses
+  if (sel.licenses.length !== 0) {
+    new_data = new_data.filter(val => sel.licenses.findIndex(x => x === val.license) !== -1);
+  }
+
+  data.value = new_data;
+});
+
 </script>
 
 <style lang="css" scoped>
