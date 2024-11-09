@@ -88,6 +88,8 @@
 <script setup lang="ts">
 import type { Output } from '~/shared/repo';
 
+useHead({ title: 'Repository Information' });
+
 const tableHeight = ref("800px");
 onMounted(() => {
   const viewportHeight = window.innerHeight;
