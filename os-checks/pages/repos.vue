@@ -237,13 +237,13 @@ const C = reactive<{ [key: string]: boolean }>({
   "Forks": false, "Net Work": false, "Discussions": false, "Topics": false
 });
 
+const defaultColumns = new Set([
+  "License", "Home", "Description", "Updated",
+  "Active Days", "Contri-butions", "Contri-butors", "Size",
+]);
 function setDefaultColumns() {
-  const set = new Set([
-    "License", "Home", "Description", "Updated",
-    "Active Days", "Contri-butions", "Contri-butors", "Size",
-  ]);
   for (const col of Object.keys(C)) {
-    C[col] = set.has(col);
+    C[col] = defaultColumns.has(col);
   }
 }
 setDefaultColumns();
@@ -273,18 +273,25 @@ watch(selected, (sel) => {
     new_data = new_data.filter(val => val.topics.findIndex(t => set.has(t)) !== -1);
   }
 
-  if (sel.columns.length === 0 || sel.columns.findIndex(c => c === "[Columns] Default (Slimmed)") !== -1) {
+  if (sel.columns.length === 0) {
     setDefaultColumns();
-  } else if (sel.columns.findIndex(c => c === "[Columns] Full") !== -1) {
+    return;
+  }
+
+  if (sel.columns.findIndex(c => c === "[Columns] Full") !== -1) {
     // display all columns 
     for (const col of Object.keys(C)) {
       C[col] = true;
     }
-  } else {
-    const set = new Set(sel.columns);
-    for (const col of Object.keys(C)) {
-      C[col] = set.has(col);
-    }
+    return;
+  }
+
+  const default_columns = (sel.columns.findIndex(c => c === "[Columns] Default (Slimmed)") !== -1) ?
+    [...defaultColumns] : [];
+  const set = new Set([...sel.columns, ...default_columns]);
+
+  for (const col of Object.keys(C)) {
+    C[col] = set.has(col);
   }
 
   data.value = new_data;
