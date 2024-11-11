@@ -135,9 +135,30 @@
       </template>
 
       <div>
-        <div v-if="dialogHeader?.pkg.description" class="dialog-header">
-          <b style="margin-right: 5px">Description:</b> <b style="color: var(--p-emerald-500)">{{
-            dialogHeader?.pkg.description }}</b>
+        <div v-if="dialogHeader?.pkg.description">
+          <b style="margin-right: 5px">Description:</b>
+          <b style="color: var(--p-emerald-500)">{{ dialogHeader?.pkg.description }}</b>
+        </div>
+        <div v-if="dialogHeader?.pkg.documentation || dialogHeader?.latest_doc || dialogHeader?.pkg.homepage"
+          style="display: flex; gap: 10px; margin-right: 5px; font-weight: bold">
+          <div v-if="dialogHeader?.pkg.documentation">
+            Doc:
+            <NuxtLink :to="dialogHeader?.pkg.documentation" target="_blank" class="nav-link">
+              <Button icon="pi pi-external-link" link />
+            </NuxtLink>
+          </div>
+          <div v-if="dialogHeader?.latest_doc">
+            Latest Doc:
+            <NuxtLink :to="dialogHeader?.latest_doc" target="_blank" class="nav-link">
+              <Button icon="pi pi-external-link" link />
+            </NuxtLink>
+          </div>
+          <div v-if="dialogHeader?.pkg.homepage">
+            Home Page:
+            <NuxtLink :to="dialogHeader?.pkg.homepage" target="_blank" class="nav-link">
+              <Button icon="pi pi-external-link" link />
+            </NuxtLink>
+          </div>
         </div>
         <div v-if="dialogHeader?.pkg.categories.length !== 0" class="dialog-header">
           <b style="margin-right: 5px">Categories:</b>
@@ -382,12 +403,12 @@ function sortsChanged(meta?: DataTableSortMeta[] | null) {
 
 const dialogShow = ref(false);
 const dialogHeader = ref<{
-  repo: string, repo_url: string, pkg_name: string, pkg: Pkg,
-  testcase_count: number, testcase_failed: number, testcase_ms: number
+  repo: string, repo_url: string, pkg_name: string, pkg: Pkg, latest_doc: string | null,
+  testcase_count: number, testcase_failed: number, testcase_ms: number,
 } | null>();
 const testCases = ref<Test[]>([]);
 
-type SelectedRow = { user: string, repo: string, pkg: string };
+type SelectedRow = { user: string, repo: string, pkg: string, latest_doc: string | null };
 const selectedPkg = ref<SelectedRow | null>(null);
 watch(selectedPkg, val => {
   // for now, pop up a dialog to display testcases only if any 
@@ -405,7 +426,7 @@ watch(selectedPkg, val => {
   const repo_url = `https://github.com/${repo}`;
 
   dialogHeader.value = {
-    repo, repo_url, pkg_name: val.pkg, pkg,
+    repo, repo_url, pkg_name: val.pkg, pkg, latest_doc: val.latest_doc,
     testcase_count: pkg.testcases?.pkg_tests_count ?? 0,
     testcase_failed: pkg.testcases?.failed ?? 0,
     testcase_ms: pkg.testcases?.duration_ms ?? 0,

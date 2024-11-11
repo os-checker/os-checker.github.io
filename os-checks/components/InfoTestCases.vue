@@ -1,6 +1,6 @@
 <template>
 
-  <DataTable :value="data" showGridlines>
+  <DataTable :value="data" showGridlines style="margin-top: 10px">
     <template #empty><b> No testcases found. </b></template>
 
     <Column field="idx" header="Idx" />
