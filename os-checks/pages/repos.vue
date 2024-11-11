@@ -8,7 +8,7 @@
         <MultiSelect v-model="selected.topics" display="chip" :options="topics" filter :maxSelectedLabels="4"
           placeholder="Select Topics" />
 
-        <MultiSelect v-model="selected.columns" display="chip" :options="columns" filter :maxSelectedLabels="4"
+        <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => Cols.option(o)" filter :maxSelectedLabels="4"
           placeholder="Select Columns" />
       </div>
 
@@ -37,9 +37,9 @@
         </template>
       </Column>
 
-      <Column v-if="C['License']" sortable field="license" header="License" :pt="ptColumnCenter" />
+      <Column v-if="C.display('license')" sortable field="license" :header="C.name('license')" :pt="ptColumnCenter" />
 
-      <Column v-if="C['Home']" sortable field="homepage" header="Home" :pt="ptColumnCenter">
+      <Column v-if="C.display('homepage')" sortable field="homepage" :header="C.name('homepage')" :pt="ptColumnCenter">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
             <!-- <Button icon="pi pi-external-link" link /> a bug when scrolling -->
@@ -48,7 +48,8 @@
         </template>
       </Column>
 
-      <Column v-if="C['Open Issues']" sortable field="open_issues_count" header="Open Issues" :pt="ptColumnCenter">
+      <Column v-if="C.display('open_issues_count')" sortable field="open_issues_count"
+        :header="C.name('open_issues_count')" :pt="ptColumnCenter">
         <template #body="{ data }">
           <NuxtLink v-if="data.issues" target="_blank" class="nav-link"
             :to="`https://github.com/${data.user}/${data.repo}/issues`">
@@ -57,15 +58,20 @@
         </template>
       </Column>
 
-      <Column v-if="C['Description']" sortable field="description" header="Description"
+      <Column v-if="C.display('description')" sortable field="description" :header="C.name('description')"
         style="max-width: 500px; min-width: 280px" />
-      <Column v-if="C['Created']" sortable field="created_at" header="Created" :pt="ptColumnCenter" />
-      <Column v-if="C['Updated']" sortable field="pushed_at" header="Updated" :pt="ptColumnCenter" />
-      <Column v-if="C['Active Days']" sortable field="active_days" header="Active Days" :pt="ptColumnRight" />
-      <Column v-if="C['Contri-butions']" sortable field="contributions" header="Contri-butions" :pt="ptColumnRight" />
-      <Column v-if="C['Contri-butors']" sortable field="contributors" header="Contri-butors" :pt="ptColumnRight" />
+      <Column v-if="C.display('created_at')" sortable field="created_at" :header="C.name('created_at')"
+        :pt="ptColumnCenter" />
+      <Column v-if="C.display('pushed_at')" sortable field="pushed_at" :header="C.name('pushed_at')"
+        :pt="ptColumnCenter" />
+      <Column v-if="C.display('active_days')" sortable field="active_days" :header="C.name('active_days')"
+        :pt="ptColumnRight" />
+      <Column v-if="C.display('contributions')" sortable field="contributions" :header="C.name('contributions')"
+        :pt="ptColumnRight" />
+      <Column v-if="C.display('contributors')" sortable field="contributors" :header="C.name('contributors')"
+        :pt="ptColumnRight" />
 
-      <Column v-if="C['Size']" sortable field="size" header="Size" :pt="ptColumnRight">
+      <Column v-if="C.display('size')" sortable field="size" :header="C.name('size')" :pt="ptColumnRight">
         <template #body="{ data }">
           <span :style="{ color: (data.size < 1024) ? color.grey : '' }">
             {{ formatBytes(data.size) }}
@@ -73,16 +79,21 @@
         </template>
       </Column>
 
-      <Column v-if="C['Default Branch']" sortable field="default_branch" header="Default Branch" :pt="ptColumnCenter" />
-      <Column v-if="C['Is This Forked']" sortable field="fork" header="Is This Forked" :pt="ptColumnCenter" />
-      <Column v-if="C['Is This Archived']" sortable field="archived" header="Is This Archived" :pt="ptColumnCenter" />
+      <Column v-if="C.display('default_branch')" sortable field="default_branch" :header="C.name('default_branch')"
+        :pt="ptColumnCenter" />
+      <Column v-if="C.display('fork')" sortable field="fork" :header="C.name('fork')" :pt="ptColumnCenter" />
+      <Column v-if="C.display('archived')" sortable field="archived" :header="C.name('archived')"
+        :pt="ptColumnCenter" />
 
-      <Column v-if="C['Star-gazers']" sortable field="stargazers" header="Star-gazers" :pt="ptColumnRight" />
-      <Column v-if="C['Sub-scribers']" sortable field="subscribers" header="Sub-scribers" :pt="ptColumnRight" />
-      <Column v-if="C['Forks']" sortable field="forks" header="Forks" :pt="ptColumnRight" />
-      <Column v-if="C['Net Work']" sortable field="network" header="Net Work" :pt="ptColumnRight" />
+      <Column v-if="C.display('stargazers')" sortable field="stargazers" :header="C.name('stargazers')"
+        :pt="ptColumnRight" />
+      <Column v-if="C.display('subscribers')" sortable field="subscribers" :header="C.name('subscribers')"
+        :pt="ptColumnRight" />
+      <Column v-if="C.display('forks')" sortable field="forks" :header="C.name('forks')" :pt="ptColumnRight" />
+      <Column v-if="C.display('network')" sortable field="network" :header="C.name('network')" :pt="ptColumnRight" />
 
-      <Column v-if="C['Discussions']" sortable field="discussions" header="Discussions" :pt="ptColumnCenter">
+      <Column v-if="C.display('discussions')" sortable field="discussions" :header="C.name('discussions')"
+        :pt="ptColumnCenter">
         <template #body="{ data }">
           <NuxtLink v-if="data.discussions" target="_blank" class="nav-link"
             :to="`https://github.com/${data.user}/${data.repo}/discussions`">
@@ -91,7 +102,7 @@
         </template>
       </Column>
 
-      <Column v-if="C['Topics']" sortable field="topics" header="Topics" style="min-width: 180px;">
+      <Column v-if="C.display('topics')" sortable field="topics" :header="C.name('topics')" style="min-width: 180px;">
         <template #body="{ data: { topics } }">
           <div v-for="val of topics">
             <Tag severity="info" :value="val" style="margin-bottom: 5px;" />
@@ -105,7 +116,7 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
-import { formatBytes } from '~/shared/repos';
+import { formatBytes, Cols } from '~/shared/repos';
 import type { Output, Repo } from '~/shared/repos';
 
 useHead({ title: 'Repositories Information' });
@@ -171,30 +182,9 @@ const selectedRepo = ref();
 const licenses = computed(() => [...new Set(repo.value.map(r => r.license))].sort());
 const topics = computed(() => [...new Set(repo.value.map(r => r.topics).flat())].sort());
 
-const columns = ref([
-  "[Columns] Full", "[Columns] Default (Slimmed)", "License", "Home", "Open Issues", "Description", "Created", "Updated",
-  "Active Days", "Contri-butions", "Contri-butors", "Size", "Default Branch",
-  "Is This Forked", "Is This Archived", "Star-gazers", "Sub-scribers",
-  "Forks", "Net Work", "Discussions", "Topics"
-]);
-
-const C = reactive<{ [key: string]: boolean }>({
-  "License": false, "Home": false, "Open Issues": false, "Description": false, "Created": false, "Updated": false,
-  "Active Days": false, "Contri-butions": false, "Contri-butors": false, "Size": false, "Default Branch": false,
-  "Is This Forked": false, "Is This Archived": false, "Star-gazers": false, "Sub-scribers": false,
-  "Forks": false, "Net Work": false, "Discussions": false, "Topics": false
-});
-
-const defaultColumns = new Set([
-  "License", "Home", "Description", "Updated",
-  "Active Days", "Contri-butions", "Contri-butors", "Size",
-]);
-function setDefaultColumns() {
-  for (const col of Object.keys(C)) {
-    C[col] = defaultColumns.has(col);
-  }
-}
-setDefaultColumns();
+const C = reactive(new Cols());
+C.setDefaultColumns();
+const columns = Cols.options();
 
 const selected = reactive<{
   licenses: string[],
@@ -221,26 +211,7 @@ watch(selected, (sel) => {
     new_data = new_data.filter(val => val.topics.findIndex(t => set.has(t)) !== -1);
   }
 
-  if (sel.columns.length === 0) {
-    setDefaultColumns();
-    return;
-  }
-
-  if (sel.columns.findIndex(c => c === "[Columns] Full") !== -1) {
-    // display all columns 
-    for (const col of Object.keys(C)) {
-      C[col] = true;
-    }
-    return;
-  }
-
-  const default_columns = (sel.columns.findIndex(c => c === "[Columns] Default (Slimmed)") !== -1) ?
-    [...defaultColumns] : [];
-  const set = new Set([...sel.columns, ...default_columns]);
-
-  for (const col of Object.keys(C)) {
-    C[col] = set.has(col);
-  }
+  C.setDisplay(sel.columns);
 
   data.value = new_data;
 });
