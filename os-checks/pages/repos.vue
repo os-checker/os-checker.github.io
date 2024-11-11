@@ -8,8 +8,8 @@
         <MultiSelect v-model="selected.topics" display="chip" :options="topics" filter :maxSelectedLabels="4"
           placeholder="Select Topics" />
 
-        <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => Cols.option(o)" filter :maxSelectedLabels="4"
-          placeholder="Select Columns" />
+        <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => Cols.option(o)"
+          filter :maxSelectedLabels="4" placeholder="Select Columns" />
       </div>
 
       <div>
@@ -22,9 +22,9 @@
     </div>
 
     <DataTable :value="data" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
-      v-model:selection="selectedRepo" removableSort sortMode="multiple" paginator :rows="10"
-      :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]" v-model:filters="selected.text"
-      :globalFilterFields="['user', 'repo', 'description', 'license', 'topics']">
+      v-model:selection="selectedRepo" removableSort sortMode="multiple" :multiSortMeta="selected.sorts"
+      @update:multiSortMeta="sortsChanged" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]"
+      v-model:filters="selected.text" :globalFilterFields="['user', 'repo', 'description', 'license', 'topics']">
 
       <Column frozen field="idx" header="Idx" />
       <Column frozen sortable field="user" header="User" style="min-width: 150px;" />
@@ -116,6 +116,7 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
+import type { DataTableSortMeta } from 'primevue/datatable';
 import { formatBytes, Cols } from '~/shared/repos';
 import type { Output, Repo } from '~/shared/repos';
 
@@ -191,11 +192,13 @@ const selected = reactive<{
   topics: string[],
   columns: string[],
   text: any,
+  sorts: DataTableSortMeta[],
 }>({
   licenses: [],
   topics: [],
   columns: [],
   text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
+  sorts: [],
 });
 
 watch(selected, (sel) => {
@@ -216,6 +219,15 @@ watch(selected, (sel) => {
   data.value = new_data;
 });
 
+// DataTableSortMeta = {field, order}
+// order: 1 ascending, -1 descending
+// e.g. { field: "license", order: 1 }
+function sortsChanged(meta?: DataTableSortMeta[] | null) {
+  if (meta) {
+    selected.sorts = meta;
+  }
+}
+
 // route query
 const route = useRoute();
 function updateFilter(query: {
@@ -223,6 +235,7 @@ function updateFilter(query: {
   topics?: string,
   columns?: string,
   text?: string,
+  sorts?: string,
 }) {
   if (query.licenses) { selected.licenses = decodeURIComponent(query.licenses).split(","); }
   if (query.topics) { selected.topics = decodeURIComponent(query.topics).split(","); }
@@ -230,6 +243,15 @@ function updateFilter(query: {
 
   if (query.text) {
     selected.text.global.value = decodeURIComponent(query.text);
+  }
+
+  if (query.sorts) {
+    const args = decodeURIComponent(query.sorts).split(",");
+    //@ts-ignore
+    selected.sorts = args.map(arg => {
+      let [field, order] = arg.split("=");
+      return { field, order: parseInt(order) };
+    });
   }
 }
 updateFilter(route.query);
@@ -248,6 +270,10 @@ watch(selected, (sel) => {
   }
   if (sel.text.global.value) {
     query.text = encodeURIComponent(sel.text.global.value);
+  }
+  if (sel.sorts.length !== 0) {
+    const args = sel.sorts.map(({ field, order }) => order ? `${field}=${order}` : null);
+    query.sorts = encodeURIComponent(args.filter(x => x).join(","));
   }
 
   router.push({ path: route.path, query });

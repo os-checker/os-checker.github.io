@@ -190,7 +190,6 @@ export class Cols {
 
   setDisplay(cols: string[]) {
     if (cols.length === 0) {
-      console.log("setDisplay 0");
       this.setDefaultColumns();
       return;
     }
