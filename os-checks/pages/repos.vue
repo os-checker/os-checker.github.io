@@ -257,22 +257,25 @@ function updateFilter(query: {
 updateFilter(route.query);
 
 const router = useRouter();
-watch(selected, (sel) => {
+watchEffect(() => {
+  const { licenses, topics, columns, text, sorts } = selected;
+
   let query: any = {};
-  if (sel.licenses.length !== 0) {
-    query.licenses = encodeURIComponent(sel.licenses.join(","));
+
+  if (licenses.length !== 0) {
+    query.licenses = encodeURIComponent(licenses.join(","));
   }
-  if (sel.topics.length !== 0) {
-    query.topics = encodeURIComponent(sel.topics.join(","));
+  if (topics.length !== 0) {
+    query.topics = encodeURIComponent(topics.join(","));
   }
-  if (sel.columns.length !== 0) {
-    query.columns = encodeURIComponent(sel.columns.join(","));
+  if (columns.length !== 0) {
+    query.columns = encodeURIComponent(columns.join(","));
   }
-  if (sel.text.global.value) {
-    query.text = encodeURIComponent(sel.text.global.value);
+  if (text.global.value) {
+    query.text = encodeURIComponent(text.global.value);
   }
-  if (sel.sorts.length !== 0) {
-    const args = sel.sorts.map(({ field, order }) => order ? `${field}=${order}` : null);
+  if (sorts.length !== 0) {
+    const args = sorts.map(({ field, order }) => order ? `${field}=${order}` : null);
     query.sorts = encodeURIComponent(args.filter(x => x).join(","));
   }
 
