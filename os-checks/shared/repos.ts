@@ -116,11 +116,8 @@ export type Repo = {
 export type Col = { display: boolean, name: string, option: string };
 /// reactive Columns
 export const columns: { [key: string]: Col } = {
-  // idx: {display: true, name: "Idx", option: "Idx"},
-  // user: {display: true, name: "User", option: "User"},
-  // repo: {display: true, name: "Repo", option: "Repo"},
   license: { display: false, name: "License", option: "License" },
-  homepage: { display: false, name: "Homepage", option: "Homepage" },
+  homepage: { display: false, name: "Home", option: "Home Page" },
   description: { display: false, name: "Description", option: "Description" },
   created_at: { display: false, name: "Created_at", option: "Created" },
   pushed_at: { display: false, name: "Updated", option: "Updated" },
@@ -141,7 +138,6 @@ export const columns: { [key: string]: Col } = {
   archived: { display: false, name: "Is This Archived", option: "Is This Archived" },
 
   discussions: { display: false, name: "Discussions", option: "Discussions" },
-  // wiki: {display: false, name: "Wiki", option: "Wiki"},
   topics: { display: false, name: "Topics", option: "Topics" },
 };
 
