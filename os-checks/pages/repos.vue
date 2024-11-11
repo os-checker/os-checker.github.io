@@ -105,7 +105,7 @@
 
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
-import type { Output } from '~/shared/repo';
+import type { Output } from '~/shared/repos';
 
 useHead({ title: 'Repositories Information' });
 
