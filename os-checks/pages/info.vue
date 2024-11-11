@@ -2,8 +2,9 @@
   <div style="margin: 0 8px">
     <DataTable :value="data" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
       v-model:selection="selectedPkg" v-model:filters="selected.text" :multiSortMeta="selected.sorts"
-      @update:multiSortMeta="sortsChanged" :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']"
-      removableSort sortMode="multiple" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
+      @update:multiSortMeta="sortsChanged" sortMode="multiple" removableSort paginator :rows="10"
+      :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]"
+      :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories', 'keywords', 'authors']">
 
       <template #header>
         <div style="display: flex; justify-content: space-between;">
@@ -107,9 +108,9 @@
 
       <Column v-if="display.texts" field="description" header="Description" style="min-width: 280px;" />
 
-      <Column v-if="display.texts" sortable field="author" header="Author" style="min-width: 300px;">
-        <template #body="{ data: { author } }">
-          <div v-for="tag of author">
+      <Column v-if="display.texts" sortable field="authors" header="Authors" style="min-width: 300px;">
+        <template #body="{ data: { authors } }">
+          <div v-for="tag of authors">
             <Tag severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>
           </div>
         </template>
@@ -247,7 +248,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         tests: pkg.tests || null,
         examples: pkg.examples || null,
         benches: pkg.benches || null,
-        author: pkg.authors.length === 0 ? null : pkg.authors,
+        authors: pkg.authors.length === 0 ? null : pkg.authors,
         description: pkg.description,
         keywords: pkg.keywords.length === 0 ? null : pkg.keywords,
         categories: pkg.categories.length === 0 ? null : pkg.categories,
@@ -291,7 +292,7 @@ type SummaryTable = {
   idx: number; user: string; repo: string; pkg: string; version: string;
   lib: string | null; bin: string | null; dependencies: number | null; testcases: number | null; testcases_color: string | null;
   tests: number | null; examples: number | null; benches: number | null; keywords: string[] | null;
-  author: string[] | null; description: string; categories: string[] | null;
+  authors: string[] | null; description: string; categories: string[] | null;
   documentation: string | null; readme: string | null; homepage: string | null; latest_doc: string | null;
 };
 const data = ref<SummaryTable[]>([]);
@@ -372,7 +373,7 @@ watchEffect(() => {
   data.value = summaryTable.value.filter(val => {
     const find_cat = cat.find(c => val.categories?.find(vc => vc === c));
     const find_keywords = keywords.find(k => val.keywords?.find(kw => kw === k));
-    const find_au = au.find(a => val.author?.find(va => va === a));
+    const find_au = au.find(a => val.authors?.find(va => va === a));
     let find_k = true;
     for (const k of ks) {
       switch (k) {
