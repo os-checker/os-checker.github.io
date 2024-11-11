@@ -109,17 +109,8 @@ import type { Output } from '~/shared/repo';
 
 useHead({ title: 'Repositories Information' });
 
-const tableHeight = ref("800px");
-onMounted(() => {
-  const viewportHeight = window.innerHeight;
-  tableHeight.value = `${viewportHeight * 0.8}px`;
-  window.addEventListener('resize', () => {
-    const viewportHeight = window.innerHeight;
-    tableHeight.value = `${viewportHeight * 0.8}px`;
-  });
-});
-
-const { color } = storeToRefs(useStyleStore());
+const { color, viewportHeight } = storeToRefs(useStyleStore());
+const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.8)}px`);
 
 // styling
 const ptColumnCenter = ref({

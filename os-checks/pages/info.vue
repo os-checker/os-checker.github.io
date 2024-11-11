@@ -177,7 +177,8 @@ import type { Pkg, PkgInfo, Test } from '~/shared/info';
 import { unique_field, unique_field_bool } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
 
-const { color } = storeToRefs(useStyleStore());
+const { color, viewportHeight } = storeToRefs(useStyleStore());
+const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.8)}px` );
 
 const summaries = ref<PkgInfo[]>([]);
 
@@ -401,16 +402,6 @@ watch(selectedPkg, val => {
   };
 
   testCases.value = pkg.testcases?.tests ?? [];
-});
-
-const tableHeight = ref("800px");
-onMounted(() => {
-  const viewportHeight = window.innerHeight;
-  tableHeight.value = `${viewportHeight * 0.8}px`;
-  window.addEventListener('resize', () => {
-    const viewportHeight = window.innerHeight;
-    tableHeight.value = `${viewportHeight * 0.8}px`;
-  });
 });
 
 const route = useRoute();
