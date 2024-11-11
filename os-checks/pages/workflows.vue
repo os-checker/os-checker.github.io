@@ -116,7 +116,7 @@
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import { type Workflows, type Summary, summary_to_workflows } from '~/shared/workflows';
 
-const { color } = storeToRefs(useColorStore());
+const { color } = storeToRefs(useStyleStore());
 
 const visible = ref(false);
 

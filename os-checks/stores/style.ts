@@ -1,4 +1,4 @@
-export const useColorStore = defineStore('color', () => {
+export const useStyleStore = defineStore('style', () => {
   const color = reactive({ green: "green", red: "red", grey: "grey" });
 
   onMounted(() => {

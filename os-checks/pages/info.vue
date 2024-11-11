@@ -177,7 +177,7 @@ import type { Pkg, PkgInfo, Test } from '~/shared/info';
 import { unique_field, unique_field_bool } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
 
-const { color } = storeToRefs(useColorStore());
+const { color } = storeToRefs(useStyleStore());
 
 const summaries = ref<PkgInfo[]>([]);
 

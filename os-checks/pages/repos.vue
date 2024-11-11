@@ -119,7 +119,7 @@ onMounted(() => {
   });
 });
 
-const { color } = storeToRefs(useColorStore());
+const { color } = storeToRefs(useStyleStore());
 
 // styling
 const ptColumnCenter = ref({
