@@ -1,9 +1,9 @@
 <template>
   <div style="margin: 0 8px">
     <DataTable :value="data" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
-      v-model:selection="selectedPkg" v-model:filters="selected.text"
-      :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']" removableSort sortMode="multiple"
-      paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
+      v-model:selection="selectedPkg" v-model:filters="selected.text" :multiSortMeta="selected.sorts"
+      @update:multiSortMeta="sortsChanged" :globalFilterFields="['user', 'repo', 'pkg', 'description', 'categories']"
+      removableSort sortMode="multiple" paginator :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <template #header>
         <div style="display: flex; justify-content: space-between;">
@@ -176,9 +176,10 @@
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
 import { unique_field, unique_field_bool } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
+import type { DataTableSortMeta } from 'primevue/datatable';
 
 const { color, viewportHeight } = storeToRefs(useStyleStore());
-const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.8)}px` );
+const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.8)}px`);
 
 const summaries = ref<PkgInfo[]>([]);
 
@@ -305,13 +306,16 @@ const selected = reactive<{
   kinds: string[],
   text: any,
   displays: string[],
+  sorts: DataTableSortMeta[],
 }>({
   categories: [], keywords: [], authors: [], kinds: [],
   // interactive filter/search inputs
   text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
   // columns to be displayed
-  displays: []
+  displays: [],
+  sorts: [],
 });
+
 watch(() => selected.displays, (disp) => {
   if (disp.length === 0) {
     //@ts-ignore
@@ -370,6 +374,12 @@ watchEffect(() => {
   });
 });
 
+function sortsChanged(meta?: DataTableSortMeta[] | null) {
+  if (meta) {
+    selected.sorts = meta;
+  }
+}
+
 const dialogShow = ref(false);
 const dialogHeader = ref<{
   repo: string, repo_url: string, pkg_name: string, pkg: Pkg,
@@ -412,6 +422,7 @@ function updateFilter(query: {
   kinds?: string,
   text?: string,
   displays?: string,
+  sorts?: string,
 }) {
   if (query.categories) { selected.categories = decodeURIComponent(query.categories).split(","); }
   if (query.keywords) { selected.keywords = decodeURIComponent(query.keywords).split(","); }
@@ -432,31 +443,46 @@ function updateFilter(query: {
     const filter = new Set(displays.value);
     selected.displays = decodeURIComponent(query.displays).split(",").filter(k => filter.has(k));
   }
+
+  if (query.sorts) {
+    const args = decodeURIComponent(query.sorts).split(",");
+    //@ts-ignore
+    selected.sorts = args.map(arg => {
+      let [field, order] = arg.split("=");
+      return { field, order: parseInt(order) };
+    });
+  }
 }
 updateFilter(route.query);
-// watch(() => route.query, updateFilter);
 
 const router = useRouter();
-watch(selected, (sel) => {
+watchEffect(() => {
+  const { categories, keywords, authors, kinds, text, displays, sorts } = selected;
+
   let query: any = {};
-  if (sel.categories.length !== 0) {
-    query.categories = encodeURIComponent(sel.categories.join(","));
+
+  if (categories.length !== 0) {
+    query.categories = encodeURIComponent(categories.join(","));
   }
-  if (sel.keywords.length !== 0) {
-    query.keywords = encodeURIComponent(sel.keywords.join(","));
+  if (keywords.length !== 0) {
+    query.keywords = encodeURIComponent(keywords.join(","));
   }
-  if (sel.authors.length !== 0) {
+  if (authors.length !== 0) {
     // FIXME: what if author string contains `,`
-    query.authors = encodeURIComponent(sel.authors.join(","));
+    query.authors = encodeURIComponent(authors.join(","));
   }
-  if (sel.kinds.length !== 0) {
-    query.kinds = encodeURIComponent(sel.kinds.join(","));
+  if (kinds.length !== 0) {
+    query.kinds = encodeURIComponent(kinds.join(","));
   }
-  if (sel.text.global.value) {
-    query.text = encodeURIComponent(sel.text.global.value);
+  if (text.global.value) {
+    query.text = encodeURIComponent(text.global.value);
   }
-  if (sel.displays.length !== 0) {
-    query.displays = encodeURIComponent(sel.displays.join(","));
+  if (displays.length !== 0) {
+    query.displays = encodeURIComponent(displays.join(","));
+  }
+  if (sorts.length !== 0) {
+    const args = sorts.map(({ field, order }) => order ? `${field}=${order}` : null);
+    query.sorts = encodeURIComponent(args.filter(x => x).join(","));
   }
 
   router.push({ path: route.path, query });
