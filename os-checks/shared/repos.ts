@@ -68,3 +68,48 @@ export type Output = {
   contributions: number,
   contributors: Contributor[],
 }
+
+export function formatBytes(bytes: number, decimals = 0) {
+  if (bytes === 0) { return '0 B'; }
+
+  const k = 1024; // 1KB = 1024 bytes
+  const dm = decimals < 0 ? 0 : decimals; // 小数位数
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+export type Repo = {
+  idx: number,
+  user: string,
+  repo: string,
+
+  license: string | null,
+  homepage: string | null,
+  description: string | null,
+  created_at: string,
+  pushed_at: string,
+
+  active_days: number,
+  size: number,
+  contributions: number,
+  contributors: number,
+  open_issues_count: number,
+
+  stargazers: number | null,
+  subscribers: number | null,
+  forks: number | null,
+  network: number | null,
+
+  default_branch: string,
+  fork: string | null,
+  archived: string | null,
+
+  issues: boolean,
+  discussions: boolean,
+  // wiki: boolean,
+  topics: string[],
+}
+
