@@ -15,7 +15,7 @@
   <TargetTable :data="workflowSelected" :dataColumns="workflowColumns" :rowSelect="onRowSelectedWorkflow"
     class="workflow-table" />
 
-  <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJob" class="workflow-table" />
+  <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJobs" class="workflow-table" />
 
   <Dialog v-model:visible="visible" modal :style="{ width: '70%' }">
     <template #header>
@@ -161,6 +161,12 @@ function onRowSelectedWorkflow(event: DataTableRowSelectEvent) {
   const found = selectedSummaries.value.find(val => val.user === user && val.repo === repo);
   if (!found) { return; }
   data.value = summary_to_workflows(found);
+
+  // pop up if there is only one workflow
+  const workflows = found.last?.workflows;
+  if (workflows && workflows.length === 1) {
+    selectJobs(workflows[0].run.id);
+  }
 }
 
 type Repo = { idx: number, user: string, repo: string };
@@ -254,8 +260,6 @@ const runSelected = computed(() => {
   }));
 });
 
-// https://github.com/os-checker/database/blob/debug/plugin/github-api/workflows/Byte-OS/polyhal.json
-
 function icon(status: string, conclusion: string | null) {
   if (status === "completed") {
     switch (conclusion) {
@@ -267,11 +271,14 @@ function icon(status: string, conclusion: string | null) {
 }
 
 const selectedJob = ref<{ workflow_idx: number, run_name: string } | null>();
-function onRowSelectedJob(event: DataTableRowSelectEvent) {
+function onRowSelectedJobs(event: DataTableRowSelectEvent) {
+  selectJobs(event.data.id);
+}
+
+function selectJobs(run_id: number) {
   const val = data.value;
   if (!val) { return; }
 
-  const run_id = event.data.id;
   const workflows = val.workflows;
   const workflow_idx = workflows.findIndex(wf => wf.run.id === run_id);
   const workflow = workflows[workflow_idx];
