@@ -13,9 +13,11 @@
   </div>
 
   <TargetTable :data="workflowSelected" :dataColumns="workflowColumns" :rowSelect="onRowSelectedWorkflow"
+    :height="heightWorkflows" :rows="10"
     class="workflow-table" />
 
-  <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJobs" class="workflow-table" />
+  <TargetTable :data="runSelected" :dataColumns="runColumns" :rowSelect="onRowSelectedJobs"
+    :height="heightRuns" class="workflow-table" />
 
   <Dialog v-model:visible="visible" modal :style="{ width: '70%' }">
     <template #header>
@@ -116,7 +118,10 @@
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import { type Workflows, type Summary, summary_to_workflows } from '~/shared/workflows';
 
-const { color } = storeToRefs(useStyleStore());
+const { color, viewportHeight } = storeToRefs(useStyleStore());
+
+const heightWorkflows = computed(() => `${viewportHeight.value * 0.5}px`);
+const heightRuns = computed(() => `${viewportHeight.value * 0.3}px`);
 
 const visible = ref(false);
 
