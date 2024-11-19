@@ -49,9 +49,7 @@
       <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
       <Column sortable field="version" header="Version" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="lib" header="Lib" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="bin" header="Bin" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="dependencies" header="Depen-dencies" style="text-align: center;" />
+
       <Column sortable field="release_count" header="crates.io Releases" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink :to="`https://crates.io/crates/${data.pkg}`" target="_blank" class="nav-link">
@@ -68,6 +66,9 @@
         </template>
       </Column>
 
+      <!-- <Column sortable v-if="display.digits" field="lib" header="Lib" style="text-align: center;" /> -->
+      <!-- <Column sortable v-if="display.digits" field="bin" header="Bin" style="text-align: center;" /> -->
+      <!-- <Column sortable v-if="display.digits" field="dependencies" header="Depen-dencies" style="text-align: center;" /> -->
 
       <Column sortable v-if="display.digits" field="testcases" header="Test Cases"
         style="text-align: center; font-weight: bold">
@@ -78,14 +79,15 @@
         </template>
       </Column>
 
-      <Column sortable v-if="display.digits" field="tests" header="Tests" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="examples" header="Examples" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="benches" header="Benches" style="text-align: center;" />
+      <!-- <Column sortable v-if="display.digits" field="tests" header="Tests" style="text-align: center;" /> -->
+      <!-- <Column sortable v-if="display.digits" field="examples" header="Examples" style="text-align: center;" /> -->
+      <!-- <Column sortable v-if="display.digits" field="benches" header="Benches" style="text-align: center;" /> -->
 
-      <Column v-if="display.links" field="documentation" header="Doc" style="text-align: center;">
+      <Column field="documentation" header="Doc" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.documentation" :to="data.documentation" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" link />
+            link
+            <!-- <Button icon="pi pi-external-link" link /> -->
           </NuxtLink>
         </template>
       </Column>
@@ -93,7 +95,8 @@
       <Column v-if="display.links" field="latest_doc" header="Latest Doc" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.latest_doc" :to="data.latest_doc" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" link />
+            link
+            <!-- <Button icon="pi pi-external-link" link /> -->
           </NuxtLink>
         </template>
       </Column>
@@ -101,7 +104,8 @@
       <Column v-if="display.links" field="homepage" header="Home Page" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" link />
+            link
+            <!-- <Button icon="pi pi-external-link" link /> -->
           </NuxtLink>
         </template>
       </Column>
@@ -122,7 +126,7 @@
         </template>
       </Column>
 
-      <Column v-if="display.texts" field="description" header="Description" style="min-width: 280px;" />
+      <Column field="description" header="Description" style="min-width: 280px;" />
 
       <Column v-if="display.texts" sortable field="authors" header="Authors" style="min-width: 300px;">
         <template #body="{ data: { authors } }">
