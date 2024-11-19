@@ -21,6 +21,8 @@ export type Pkg = {
   keywords: string[],
   categories: string[]
   os_categories: string[],
+  diag_total_count: number | null,
+  release_count: number | null,
 }
 
 export type TestCases = {
