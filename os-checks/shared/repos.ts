@@ -115,6 +115,7 @@ export type Repo = {
   topics: string[],
 }
 
+// *************** Control which columns are displayed ***************
 
 const defaultColumns = [
   "license", "homepage", "description", "pushed_at",
@@ -146,7 +147,6 @@ const columns: { [key: string]: Col } = {
   discussions: { display: false, name: "Discussions", option: "Discussions" },
   topics: { display: false, name: "Topics", option: "Topics" },
 };
-
 
 export class RepoCols extends Cols {
   static init() {

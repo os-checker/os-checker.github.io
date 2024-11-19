@@ -1,3 +1,8 @@
+/** 
+* display: should a column be shown
+* name: columns name which may contain `-` to soft wrap the words
+* option: option name which is shown in selection columns
+*/
 export type Col = { display: boolean, name: string, option: string };
 
 export class Cols {
