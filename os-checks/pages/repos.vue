@@ -8,8 +8,8 @@
         <MultiSelect v-model="selected.topics" display="chip" :options="topics" filter :maxSelectedLabels="4"
           placeholder="Select Topics" />
 
-        <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => Cols.option(o)"
-          filter :maxSelectedLabels="4" placeholder="Select Columns" />
+        <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => C.option(o)" filter
+          :maxSelectedLabels="4" placeholder="Select Columns" />
       </div>
 
       <div>
@@ -117,7 +117,7 @@
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
 import type { DataTableSortMeta } from 'primevue/datatable';
-import { formatBytes, Cols } from '~/shared/repos';
+import { formatBytes, RepoCols } from '~/shared/repos';
 import type { Output, Repo } from '~/shared/repos';
 
 useHead({ title: 'Repositories Information' });
@@ -183,9 +183,9 @@ const selectedRepo = ref();
 const licenses = computed(() => [...new Set(repo.value.map(r => r.license))].sort());
 const topics = computed(() => [...new Set(repo.value.map(r => r.topics).flat())].sort());
 
-const C = reactive(new Cols());
+const C = reactive(RepoCols.init());
 C.setDefaultColumns();
-const columns = Cols.options();
+const columns = C.options();
 
 const selected = reactive<{
   licenses: string[],
