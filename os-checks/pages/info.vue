@@ -52,6 +52,22 @@
       <Column sortable v-if="display.digits" field="lib" header="Lib" style="text-align: center;" />
       <Column sortable v-if="display.digits" field="bin" header="Bin" style="text-align: center;" />
       <Column sortable v-if="display.digits" field="dependencies" header="Depen-dencies" style="text-align: center;" />
+      <Column sortable field="release_count" header="crates.io Releases" style="text-align: center;">
+        <template #body="{ data }">
+          <NuxtLink :to="`https://crates.io/crates/${data.pkg}`" target="_blank" class="nav-link">
+            {{ data.release_count }}
+          </NuxtLink>
+        </template>
+      </Column>
+
+      <Column sortable field="diag_total_count" header="Diag-nostics" style="text-align: center;">
+        <template #body="{ data }">
+          <NuxtLink :to="`/${data.user}/${data.repo}`" target="_blank" class="nav-link">
+            {{ data.diag_total_count }}
+          </NuxtLink>
+        </template>
+      </Column>
+
 
       <Column sortable v-if="display.digits" field="testcases" header="Test Cases"
         style="text-align: center; font-weight: bold">
@@ -256,7 +272,9 @@ const summaryTable = computed<SummaryTable[]>(() => {
         documentation: pkg.documentation,
         readme: pkg.readme,
         homepage: pkg.homepage,
-        latest_doc: docs.value?.[val.user]?.[val.repo]?.[name] ?? null
+        latest_doc: docs.value?.[val.user]?.[val.repo]?.[name] ?? null,
+        diag_total_count: pkg.diag_total_count,
+        release_count: pkg.release_count,
       }
     })
   }).flat();
@@ -294,6 +312,7 @@ type SummaryTable = {
   tests: number | null; examples: number | null; benches: number | null; keywords: string[] | null;
   authors: string[] | null; description: string; categories: string[] | null;
   documentation: string | null; readme: string | null; homepage: string | null; latest_doc: string | null;
+  diag_total_count: number | null; release_count: number | null;
 };
 const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
