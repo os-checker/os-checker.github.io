@@ -22,9 +22,11 @@ export type Pkg = {
   homepage: string | null,
   keywords: string[],
   categories: string[]
-  os_categories: string[],
   diag_total_count: number | null,
+  last_commit_time: string,
   release_count: number | null,
+  last_release_size: number | null,
+  last_release_time: string | null,
 }
 
 export type TestCases = {
@@ -64,12 +66,16 @@ export function unique_field_bool(summaries: PkgInfo[], cb: (_: Pkg) => boolean)
 // *************** Control which columns are displayed ***************
 
 const defaultColumns = [
-  "version", "release_count", "diag_total_count", "testcases", "documentation", "description"
+  "last_commit_time", "version", "release_count", "diag_total_count", "testcases",
+  "documentation", "description"
 ];
 
 const columns: { [key: string]: Col } = {
+  last_commit_time: { display: false, name: "Last Commit", option: "Last Commit Time" },
   version: { display: false, name: "Version", option: "Version" },
   release_count: { display: false, name: "crates.io Releases", option: "crates.io Releases" },
+  last_release_time: { display: false, name: "Last Release", option: "Last Release Time" },
+  last_release_size: { display: false, name: "Release Size", option: "Last Release Size" },
   diag_total_count: { display: false, name: "Diag-nostics", option: "Diagnostics" },
   testcases: { display: false, name: "Test Cases", option: "Test Cases" },
 

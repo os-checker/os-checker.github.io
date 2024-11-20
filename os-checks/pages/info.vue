@@ -21,8 +21,8 @@
             <MultiSelect v-model="selected.kinds" display="chip" :options="kinds" filter :maxSelectedLabels="4"
               placeholder="Select Crate Kinds" />
 
-            <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => C.option(o)" filter 
-              :maxSelectedLabels="4" placeholder="Select Columns" />
+            <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => C.option(o)"
+              filter :maxSelectedLabels="4" placeholder="Select Columns" />
           </div>
 
           <div>
@@ -48,6 +48,9 @@
 
       <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
+      <Column v-if="C.display('last_commit_time')" sortable field="last_commit_time"
+        :header="C.name('last_commit_time')" style="text-align: center;" />
+
       <Column v-if="C.display('version')" sortable field="version" :header="C.name('version')"
         style="text-align: center;" />
 
@@ -59,6 +62,12 @@
           </NuxtLink>
         </template>
       </Column>
+
+      <Column v-if="C.display('last_release_time')" sortable field="last_release_time"
+        :header="C.name('last_release_time')" style="text-align: center; min-width: 120px;" />
+
+      <Column v-if="C.display('last_release_size')" sortable field="last_release_size"
+        :header="C.name('last_release_size')" style="text-align: center" />
 
       <Column v-if="C.display('diag_total_count')" sortable field="diag_total_count"
         :header="C.name('diag_total_count')" style="text-align: center;">
@@ -269,8 +278,11 @@ const summaryTable = computed<SummaryTable[]>(() => {
         user: val.user,
         repo: val.repo,
         pkg: name,
+        last_commit_time: fmtDateTime(pkg.last_commit_time),
         version: pkg.version,
         release_count: pkg.release_count,
+        last_release_time: fmtDateTime(pkg.last_release_time),
+        last_release_size: pkg.last_release_size,
         diag_total_count: pkg.diag_total_count,
         testcases: pkg.testcases?.pkg_tests_count ?? null,
         testcases_color,
@@ -325,7 +337,8 @@ type SummaryTable = {
   tests: number | null; examples: number | null; benches: number | null; keywords: string[] | null;
   authors: string[] | null; description: string; categories: string[] | null;
   documentation: string | null; readme: string | null; homepage: string | null; latest_doc: string | null;
-  diag_total_count: number | null; release_count: number | null;
+  diag_total_count: number | null; last_commit_time: string; release_count: number | null;
+  last_release_size: number | null; last_release_time: string | null;
 };
 const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
