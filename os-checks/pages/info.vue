@@ -48,9 +48,10 @@
 
       <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
-      <Column v-if="C.display('version')" sortable field="version" header="Version" style="text-align: center;" />
+      <Column v-if="C.display('version')" sortable field="version" :header="C.name('version')"
+        style="text-align: center;" />
 
-      <Column v-if="C.display('release_count')" sortable field="release_count" header="crates.io Releases"
+      <Column v-if="C.display('release_count')" sortable field="release_count" :header="C.name('release_count')"
         style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink :to="`https://crates.io/crates/${data.pkg}`" target="_blank" class="nav-link">
@@ -59,8 +60,8 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('diag_total_count')" sortable field="diag_total_count" header="Diag-nostics"
-        style="text-align: center;">
+      <Column v-if="C.display('diag_total_count')" sortable field="diag_total_count"
+        :header="C.name('diag_total_count')" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink :to="`/${data.user}/${data.repo}`" target="_blank" class="nav-link">
             {{ data.diag_total_count }}
@@ -68,7 +69,7 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('testcases')" sortable field="testcases" header="Test Cases"
+      <Column v-if="C.display('testcases')" sortable field="testcases" :header="C.name('testcases')"
         style="text-align: center; font-weight: bold">
         <template #body="{ data }">
           <span :style="{ color: data.testcases_color }">
@@ -77,16 +78,19 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('lib')" sortable field="lib" header="Lib" style="text-align: center;" />
-      <Column v-if="C.display('bin')" sortable field="bin" header="Bin" style="text-align: center;" />
-      <Column v-if="C.display('dependencies')" sortable field="dependencies" header="Depen-dencies"
+      <Column v-if="C.display('lib')" sortable field="lib" :header="C.name('lib')" style="text-align: center;" />
+      <Column v-if="C.display('bin')" sortable field="bin" :header="C.name('bin')" style="text-align: center;" />
+      <Column v-if="C.display('dependencies')" sortable field="dependencies" :header="C.name('dependencies')"
         style="text-align: center;" />
 
-      <Column v-if="C.display('tests')" sortable field="tests" header="Tests" style="text-align: center;" />
-      <Column v-if="C.display('examples')" sortable field="examples" header="Examples" style="text-align: center;" />
-      <Column v-if="C.display('benches')" sortable field="benches" header="Benches" style="text-align: center;" />
+      <Column v-if="C.display('tests')" sortable field="tests" :header="C.name('tests')" style="text-align: center;" />
+      <Column v-if="C.display('examples')" sortable field="examples" :header="C.name('examples')"
+        style="text-align: center;" />
+      <Column v-if="C.display('benches')" sortable field="benches" :header="C.name('benches')"
+        style="text-align: center;" />
 
-      <Column v-if="C.display('documentation')" field="documentation" header="Doc" style="text-align: center;">
+      <Column v-if="C.display('documentation')" field="documentation" :header="C.name('documentation')"
+        style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.documentation" :to="data.documentation" target="_blank" class="nav-link">
             link
@@ -95,7 +99,8 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('latest_doc')" field="latest_doc" header="Latest Doc" style="text-align: center;">
+      <Column v-if="C.display('latest_doc')" field="latest_doc" :header="C.name('latest_doc')"
+        style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.latest_doc" :to="data.latest_doc" target="_blank" class="nav-link">
             link
@@ -104,7 +109,7 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('homepage')" field="homepage" header="Home Page" style="text-align: center;">
+      <Column v-if="C.display('homepage')" field="homepage" :header="C.name('homepage')" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
             link
@@ -113,7 +118,8 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('categories')" sortable field="categories" header="Categories" style="min-width: 200px;">
+      <Column v-if="C.display('categories')" sortable field="categories" :header="C.name('categories')"
+        style="min-width: 200px;">
         <template #body="{ data: { categories } }">
           <div v-for="tag of categories">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -121,7 +127,8 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('keywords')" sortable field="keywords" header="KeyWords" style="min-width: 150px;">
+      <Column v-if="C.display('keywords')" sortable field="keywords" :header="C.name('keywords')"
+        style="min-width: 150px;">
         <template #body="{ data: { keywords } }">
           <div v-for="tag of keywords">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -129,9 +136,11 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('description')" field="description" header="Description" style="min-width: 280px;" />
+      <Column v-if="C.display('description')" field="description" :header="C.name('description')"
+        style="min-width: 280px;" />
 
-      <Column v-if="C.display('authors')" sortable field="authors" header="Authors" style="min-width: 300px;">
+      <Column v-if="C.display('authors')" sortable field="authors" :header="C.name('authors')"
+        style="min-width: 300px;">
         <template #body="{ data: { authors } }">
           <div v-for="tag of authors">
             <Tag severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>

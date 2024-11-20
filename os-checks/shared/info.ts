@@ -71,7 +71,7 @@ const columns: { [key: string]: Col } = {
   version: { display: false, name: "Version", option: "Version" },
   release_count: { display: false, name: "crates.io Releases", option: "crates.io Releases" },
   diag_total_count: { display: false, name: "Diag-nostics", option: "Diagnostics" },
-  testcases: { display: false, name: "Testcases", option: "Testcases" },
+  testcases: { display: false, name: "Test Cases", option: "Test Cases" },
 
   lib: { display: false, name: "Lib", option: "Lib" },
   bin: { display: false, name: "Bin", option: "Bin" },
