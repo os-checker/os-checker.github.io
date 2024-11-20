@@ -21,8 +21,8 @@
             <MultiSelect v-model="selected.kinds" display="chip" :options="kinds" filter :maxSelectedLabels="4"
               placeholder="Select Crate Kinds" />
 
-            <MultiSelect v-model="selected.columns" display="chip" :options="columns" filter :maxSelectedLabels="4"
-              placeholder="Select Columns" />
+            <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => C.option(o)" filter 
+              :maxSelectedLabels="4" placeholder="Select Columns" />
           </div>
 
           <div>
