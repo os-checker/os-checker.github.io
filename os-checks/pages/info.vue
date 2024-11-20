@@ -470,27 +470,24 @@ function updateFilter(query: {
   columns?: string,
   sorts?: string,
 }) {
-  if (query.categories) { selected.categories = decodeURIComponent(query.categories).split(","); }
-  if (query.keywords) { selected.keywords = decodeURIComponent(query.keywords).split(","); }
-  if (query.authors) { selected.authors = decodeURIComponent(query.authors).split(","); }
+  const { categories, keywords, authors, kinds, text, columns, sorts } = query;
 
-  if (query.kinds) {
+  if (categories) { selected.categories = decodeURIComponent(categories).split(","); }
+  if (keywords) { selected.keywords = decodeURIComponent(keywords).split(","); }
+  if (authors) { selected.authors = decodeURIComponent(authors).split(","); }
+
+  if (kinds) {
     const filter = new Set([
       "Lib", "Bin", "TestCases", "Tests", "Examples", "Benches"
     ]);
-    selected.kinds = decodeURIComponent(query.kinds).split(",").filter(k => filter.has(k));
+    selected.kinds = decodeURIComponent(kinds).split(",").filter(k => filter.has(k));
   }
 
-  if (query.text) {
-    selected.text.global.value = decodeURIComponent(query.text);
-  }
+  if (text) { selected.text.global.value = decodeURIComponent(text); }
+  if (columns) { selected.columns = decodeURIComponent(columns).split(","); }
 
-  if (query.columns) {
-    selected.columns = decodeURIComponent(query.columns).split(",");
-  }
-
-  if (query.sorts) {
-    const args = decodeURIComponent(query.sorts).split(",");
+  if (sorts) {
+    const args = decodeURIComponent(sorts).split(",");
     //@ts-ignore
     selected.sorts = args.map(arg => {
       let [field, order] = arg.split("=");
@@ -506,25 +503,18 @@ watchEffect(() => {
 
   let query: any = {};
 
-  if (categories.length !== 0) {
-    query.categories = encodeURIComponent(categories.join(","));
-  }
-  if (keywords.length !== 0) {
-    query.keywords = encodeURIComponent(keywords.join(","));
-  }
+  if (categories.length !== 0) { query.categories = encodeURIComponent(categories.join(",")); }
+  if (keywords.length !== 0) { query.keywords = encodeURIComponent(keywords.join(",")); }
+
   if (authors.length !== 0) {
     // FIXME: what if author string contains `,`
     query.authors = encodeURIComponent(authors.join(","));
   }
-  if (kinds.length !== 0) {
-    query.kinds = encodeURIComponent(kinds.join(","));
-  }
-  if (text.global.value) {
-    query.text = encodeURIComponent(text.global.value);
-  }
-  if (columns.length !== 0) {
-    query.columns = encodeURIComponent(columns.join(","));
-  }
+
+  if (kinds.length !== 0) { query.kinds = encodeURIComponent(kinds.join(",")); }
+  if (text.global.value) { query.text = encodeURIComponent(text.global.value); }
+  if (columns.length !== 0) { query.columns = encodeURIComponent(columns.join(",")); }
+
   if (sorts.length !== 0) {
     const args = sorts.map(({ field, order }) => order ? `${field}=${order}` : null);
     query.sorts = encodeURIComponent(args.filter(x => x).join(","));

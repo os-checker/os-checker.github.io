@@ -237,16 +237,15 @@ function updateFilter(query: {
   text?: string,
   sorts?: string,
 }) {
-  if (query.licenses) { selected.licenses = decodeURIComponent(query.licenses).split(","); }
-  if (query.topics) { selected.topics = decodeURIComponent(query.topics).split(","); }
-  if (query.columns) { selected.columns = decodeURIComponent(query.columns).split(","); }
+  const { licenses, topics, columns, text, sorts } = query;
 
-  if (query.text) {
-    selected.text.global.value = decodeURIComponent(query.text);
-  }
+  if (licenses) { selected.licenses = decodeURIComponent(licenses).split(","); }
+  if (topics) { selected.topics = decodeURIComponent(topics).split(","); }
+  if (columns) { selected.columns = decodeURIComponent(columns).split(","); }
+  if (text) { selected.text.global.value = decodeURIComponent(text); }
 
-  if (query.sorts) {
-    const args = decodeURIComponent(query.sorts).split(",");
+  if (sorts) {
+    const args = decodeURIComponent(sorts).split(",");
     //@ts-ignore
     selected.sorts = args.map(arg => {
       let [field, order] = arg.split("=");
