@@ -237,8 +237,6 @@ const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.8)}px`
 
 const summaries = ref<PkgInfo[]>([]);
 
-const display = reactive<{ digits: boolean, links: boolean, texts: boolean }>({ digits: true, links: false, texts: false });
-
 githubFetch<PkgInfo[]>({
   path: "plugin/cargo/info/summaries.json"
 }).then(val => {
@@ -469,7 +467,7 @@ function updateFilter(query: {
   authors?: string,
   kinds?: string,
   text?: string,
-  // displays?: string,
+  columns?: string,
   sorts?: string,
 }) {
   if (query.categories) { selected.categories = decodeURIComponent(query.categories).split(","); }
@@ -487,10 +485,9 @@ function updateFilter(query: {
     selected.text.global.value = decodeURIComponent(query.text);
   }
 
-  // if (query.displays) {
-  //   const filter = new Set(displays.value);
-  //   selected.columns = decodeURIComponent(query.displays).split(",").filter(k => filter.has(k));
-  // }
+  if (query.columns) {
+    selected.columns = decodeURIComponent(query.columns).split(",");
+  }
 
   if (query.sorts) {
     const args = decodeURIComponent(query.sorts).split(",");
@@ -505,7 +502,7 @@ updateFilter(route.query);
 
 const router = useRouter();
 watchEffect(() => {
-  const { categories, keywords, authors, kinds, text, columns: displays, sorts } = selected;
+  const { categories, keywords, authors, kinds, text, columns, sorts } = selected;
 
   let query: any = {};
 
@@ -525,8 +522,8 @@ watchEffect(() => {
   if (text.global.value) {
     query.text = encodeURIComponent(text.global.value);
   }
-  if (displays.length !== 0) {
-    query.displays = encodeURIComponent(displays.join(","));
+  if (columns.length !== 0) {
+    query.columns = encodeURIComponent(columns.join(","));
   }
   if (sorts.length !== 0) {
     const args = sorts.map(({ field, order }) => order ? `${field}=${order}` : null);
