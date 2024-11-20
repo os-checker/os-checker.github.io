@@ -117,7 +117,8 @@
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
 import type { DataTableSortMeta } from 'primevue/datatable';
-import { formatBytes, RepoCols } from '~/shared/repos';
+import { RepoCols } from '~/shared/repos';
+import { formatBytes } from '~/shared/columns-select';
 import type { Output, Repo } from '~/shared/repos';
 
 useHead({ title: 'Repositories Information' });

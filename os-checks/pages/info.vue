@@ -238,6 +238,7 @@
 <script setup lang="ts">
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
 import { unique_field, unique_field_bool, InfoCols } from '~/shared/info';
+import { formatBytes } from '~/shared/columns-select';
 import { FilterMatchMode } from '@primevue/core/api';
 import type { DataTableSortMeta } from 'primevue/datatable';
 
@@ -282,7 +283,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         version: pkg.version,
         release_count: pkg.release_count,
         last_release_time: fmtDateTime(pkg.last_release_time),
-        last_release_size: pkg.last_release_size,
+        last_release_size:  pkg.last_release_size ? formatBytes(pkg.last_release_size): null,
         diag_total_count: pkg.diag_total_count,
         testcases: pkg.testcases?.pkg_tests_count ?? null,
         testcases_color,
@@ -338,7 +339,7 @@ type SummaryTable = {
   authors: string[] | null; description: string; categories: string[] | null;
   documentation: string | null; readme: string | null; homepage: string | null; latest_doc: string | null;
   diag_total_count: number | null; last_commit_time: string; release_count: number | null;
-  last_release_size: number | null; last_release_time: string | null;
+  last_release_size: string | null; last_release_time: string;
 };
 const data = ref<SummaryTable[]>([]);
 watch(summaryTable, (val) => data.value = val);
