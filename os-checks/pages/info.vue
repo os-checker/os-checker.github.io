@@ -21,8 +21,8 @@
             <MultiSelect v-model="selected.kinds" display="chip" :options="kinds" filter :maxSelectedLabels="4"
               placeholder="Select Crate Kinds" />
 
-            <MultiSelect v-model="selected.displays" display="chip" :options="displays" filter :maxSelectedLabels="4"
-              placeholder="Select Columns" />
+            <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => C.option(o)" filter 
+              :maxSelectedLabels="4" placeholder="Select Columns" />
           </div>
 
           <div>
@@ -48,11 +48,11 @@
 
       <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
-      <Column sortable field="version" header="Version" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="lib" header="Lib" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="bin" header="Bin" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="dependencies" header="Depen-dencies" style="text-align: center;" />
-      <Column sortable field="release_count" header="crates.io Releases" style="text-align: center;">
+      <Column v-if="C.display('version')" sortable field="version" :header="C.name('version')"
+        style="text-align: center;" />
+
+      <Column v-if="C.display('release_count')" sortable field="release_count" :header="C.name('release_count')"
+        style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink :to="`https://crates.io/crates/${data.pkg}`" target="_blank" class="nav-link">
             {{ data.release_count }}
@@ -60,7 +60,8 @@
         </template>
       </Column>
 
-      <Column sortable field="diag_total_count" header="Diag-nostics" style="text-align: center;">
+      <Column v-if="C.display('diag_total_count')" sortable field="diag_total_count"
+        :header="C.name('diag_total_count')" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink :to="`/${data.user}/${data.repo}`" target="_blank" class="nav-link">
             {{ data.diag_total_count }}
@@ -68,8 +69,7 @@
         </template>
       </Column>
 
-
-      <Column sortable v-if="display.digits" field="testcases" header="Test Cases"
+      <Column v-if="C.display('testcases')" sortable field="testcases" :header="C.name('testcases')"
         style="text-align: center; font-weight: bold">
         <template #body="{ data }">
           <span :style="{ color: data.testcases_color }">
@@ -78,35 +78,48 @@
         </template>
       </Column>
 
-      <Column sortable v-if="display.digits" field="tests" header="Tests" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="examples" header="Examples" style="text-align: center;" />
-      <Column sortable v-if="display.digits" field="benches" header="Benches" style="text-align: center;" />
+      <Column v-if="C.display('lib')" sortable field="lib" :header="C.name('lib')" style="text-align: center;" />
+      <Column v-if="C.display('bin')" sortable field="bin" :header="C.name('bin')" style="text-align: center;" />
+      <Column v-if="C.display('dependencies')" sortable field="dependencies" :header="C.name('dependencies')"
+        style="text-align: center;" />
 
-      <Column v-if="display.links" field="documentation" header="Doc" style="text-align: center;">
+      <Column v-if="C.display('tests')" sortable field="tests" :header="C.name('tests')" style="text-align: center;" />
+      <Column v-if="C.display('examples')" sortable field="examples" :header="C.name('examples')"
+        style="text-align: center;" />
+      <Column v-if="C.display('benches')" sortable field="benches" :header="C.name('benches')"
+        style="text-align: center;" />
+
+      <Column v-if="C.display('documentation')" field="documentation" :header="C.name('documentation')"
+        style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.documentation" :to="data.documentation" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" link />
+            link
+            <!-- <Button icon="pi pi-external-link" link /> -->
           </NuxtLink>
         </template>
       </Column>
 
-      <Column v-if="display.links" field="latest_doc" header="Latest Doc" style="text-align: center;">
+      <Column v-if="C.display('latest_doc')" field="latest_doc" :header="C.name('latest_doc')"
+        style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.latest_doc" :to="data.latest_doc" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" link />
+            link
+            <!-- <Button icon="pi pi-external-link" link /> -->
           </NuxtLink>
         </template>
       </Column>
 
-      <Column v-if="display.links" field="homepage" header="Home Page" style="text-align: center;">
+      <Column v-if="C.display('homepage')" field="homepage" :header="C.name('homepage')" style="text-align: center;">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
-            <Button icon="pi pi-external-link" link />
+            link
+            <!-- <Button icon="pi pi-external-link" link /> -->
           </NuxtLink>
         </template>
       </Column>
 
-      <Column v-if="display.texts" sortable field="categories" header="Categories" style="min-width: 200px;">
+      <Column v-if="C.display('categories')" sortable field="categories" :header="C.name('categories')"
+        style="min-width: 200px;">
         <template #body="{ data: { categories } }">
           <div v-for="tag of categories">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -114,7 +127,8 @@
         </template>
       </Column>
 
-      <Column v-if="display.texts" sortable field="keywords" header="KeyWords" style="min-width: 150px;">
+      <Column v-if="C.display('keywords')" sortable field="keywords" :header="C.name('keywords')"
+        style="min-width: 150px;">
         <template #body="{ data: { keywords } }">
           <div v-for="tag of keywords">
             <Tag severity="warn" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -122,9 +136,11 @@
         </template>
       </Column>
 
-      <Column v-if="display.texts" field="description" header="Description" style="min-width: 280px;" />
+      <Column v-if="C.display('description')" field="description" :header="C.name('description')"
+        style="min-width: 280px;" />
 
-      <Column v-if="display.texts" sortable field="authors" header="Authors" style="min-width: 300px;">
+      <Column v-if="C.display('authors')" sortable field="authors" :header="C.name('authors')"
+        style="min-width: 300px;">
         <template #body="{ data: { authors } }">
           <div v-for="tag of authors">
             <Tag severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -212,7 +228,7 @@
 
 <script setup lang="ts">
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
-import { unique_field, unique_field_bool } from '~/shared/info';
+import { unique_field, unique_field_bool, InfoCols } from '~/shared/info';
 import { FilterMatchMode } from '@primevue/core/api';
 import type { DataTableSortMeta } from 'primevue/datatable';
 
@@ -220,8 +236,6 @@ const { color, viewportHeight } = storeToRefs(useStyleStore());
 const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.8)}px`);
 
 const summaries = ref<PkgInfo[]>([]);
-
-const display = reactive<{ digits: boolean, links: boolean, texts: boolean }>({ digits: true, links: false, texts: false });
 
 githubFetch<PkgInfo[]>({
   path: "plugin/cargo/info/summaries.json"
@@ -256,25 +270,24 @@ const summaryTable = computed<SummaryTable[]>(() => {
         repo: val.repo,
         pkg: name,
         version: pkg.version,
+        release_count: pkg.release_count,
+        diag_total_count: pkg.diag_total_count,
+        testcases: pkg.testcases?.pkg_tests_count ?? null,
+        testcases_color,
         lib: pkg.lib ? "✅" : null,
         bin: pkg.bin ? "✅" : null,
         dependencies: pkg.dependencies || null,
-        testcases: pkg.testcases?.pkg_tests_count ?? null,
-        testcases_color,
         tests: pkg.tests || null,
         examples: pkg.examples || null,
         benches: pkg.benches || null,
-        authors: pkg.authors.length === 0 ? null : pkg.authors,
-        description: pkg.description,
-        keywords: pkg.keywords.length === 0 ? null : pkg.keywords,
-        categories: pkg.categories.length === 0 ? null : pkg.categories,
-        // os_categories: pkg.os_categories.length === 0 ? null : pkg.os_categories,
         documentation: pkg.documentation,
+        latest_doc: docs.value?.[val.user]?.[val.repo]?.[name] ?? null,
         readme: pkg.readme,
         homepage: pkg.homepage,
-        latest_doc: docs.value?.[val.user]?.[val.repo]?.[name] ?? null,
-        diag_total_count: pkg.diag_total_count,
-        release_count: pkg.release_count,
+        categories: pkg.categories.length === 0 ? null : pkg.categories,
+        keywords: pkg.keywords.length === 0 ? null : pkg.keywords,
+        description: pkg.description,
+        authors: pkg.authors.length === 0 ? null : pkg.authors,
       }
     })
   }).flat();
@@ -338,7 +351,10 @@ const kinds = computed(() => {
   if (is_benches) { arr.push("Benches"); }
   return arr;
 });
-const displays = computed(() => Object.keys(display));
+
+const C = reactive(InfoCols.init());
+C.setDefaultColumns();
+const columns = C.options();
 
 const selected = reactive<{
   categories: string[],
@@ -346,30 +362,19 @@ const selected = reactive<{
   authors: string[],
   kinds: string[],
   text: any,
-  displays: string[],
+  columns: string[],
   sorts: DataTableSortMeta[],
 }>({
   categories: [], keywords: [], authors: [], kinds: [],
   // interactive filter/search inputs
   text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
   // columns to be displayed
-  displays: [],
+  columns: [],
   sorts: [],
 });
 
-watch(() => selected.displays, (disp) => {
-  if (disp.length === 0) {
-    //@ts-ignore
-    // Object.keys(display).map(k => display[k] = true);
-    display.digits = true;
-    display.links = false;
-    display.texts = false;
-    return;
-  }
-
-  const set = new Set(disp);
-  //@ts-ignore
-  Object.keys(display).map(k => display[k] = set.has(k));
+watch(() => selected.columns, (cols) => {
+  C.setDisplay(cols);
 });
 
 watchEffect(() => {
@@ -462,31 +467,27 @@ function updateFilter(query: {
   authors?: string,
   kinds?: string,
   text?: string,
-  displays?: string,
+  columns?: string,
   sorts?: string,
 }) {
-  if (query.categories) { selected.categories = decodeURIComponent(query.categories).split(","); }
-  if (query.keywords) { selected.keywords = decodeURIComponent(query.keywords).split(","); }
-  if (query.authors) { selected.authors = decodeURIComponent(query.authors).split(","); }
+  const { categories, keywords, authors, kinds, text, columns, sorts } = query;
 
-  if (query.kinds) {
+  if (categories) { selected.categories = decodeURIComponent(categories).split(","); }
+  if (keywords) { selected.keywords = decodeURIComponent(keywords).split(","); }
+  if (authors) { selected.authors = decodeURIComponent(authors).split(","); }
+
+  if (kinds) {
     const filter = new Set([
       "Lib", "Bin", "TestCases", "Tests", "Examples", "Benches"
     ]);
-    selected.kinds = decodeURIComponent(query.kinds).split(",").filter(k => filter.has(k));
+    selected.kinds = decodeURIComponent(kinds).split(",").filter(k => filter.has(k));
   }
 
-  if (query.text) {
-    selected.text.global.value = decodeURIComponent(query.text);
-  }
+  if (text) { selected.text.global.value = decodeURIComponent(text); }
+  if (columns) { selected.columns = decodeURIComponent(columns).split(","); }
 
-  if (query.displays) {
-    const filter = new Set(displays.value);
-    selected.displays = decodeURIComponent(query.displays).split(",").filter(k => filter.has(k));
-  }
-
-  if (query.sorts) {
-    const args = decodeURIComponent(query.sorts).split(",");
+  if (sorts) {
+    const args = decodeURIComponent(sorts).split(",");
     //@ts-ignore
     selected.sorts = args.map(arg => {
       let [field, order] = arg.split("=");
@@ -498,29 +499,22 @@ updateFilter(route.query);
 
 const router = useRouter();
 watchEffect(() => {
-  const { categories, keywords, authors, kinds, text, displays, sorts } = selected;
+  const { categories, keywords, authors, kinds, text, columns, sorts } = selected;
 
   let query: any = {};
 
-  if (categories.length !== 0) {
-    query.categories = encodeURIComponent(categories.join(","));
-  }
-  if (keywords.length !== 0) {
-    query.keywords = encodeURIComponent(keywords.join(","));
-  }
+  if (categories.length !== 0) { query.categories = encodeURIComponent(categories.join(",")); }
+  if (keywords.length !== 0) { query.keywords = encodeURIComponent(keywords.join(",")); }
+
   if (authors.length !== 0) {
     // FIXME: what if author string contains `,`
     query.authors = encodeURIComponent(authors.join(","));
   }
-  if (kinds.length !== 0) {
-    query.kinds = encodeURIComponent(kinds.join(","));
-  }
-  if (text.global.value) {
-    query.text = encodeURIComponent(text.global.value);
-  }
-  if (displays.length !== 0) {
-    query.displays = encodeURIComponent(displays.join(","));
-  }
+
+  if (kinds.length !== 0) { query.kinds = encodeURIComponent(kinds.join(",")); }
+  if (text.global.value) { query.text = encodeURIComponent(text.global.value); }
+  if (columns.length !== 0) { query.columns = encodeURIComponent(columns.join(",")); }
+
   if (sorts.length !== 0) {
     const args = sorts.map(({ field, order }) => order ? `${field}=${order}` : null);
     query.sorts = encodeURIComponent(args.filter(x => x).join(","));

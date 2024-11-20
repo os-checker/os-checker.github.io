@@ -1,3 +1,5 @@
+import { type Col, Cols } from "./columns-select"
+
 export type PkgInfo = {
   user: string,
   repo: string,
@@ -57,4 +59,39 @@ export function unique_field(summaries: PkgInfo[], cb: (_: Pkg) => string[]): st
 export function unique_field_bool(summaries: PkgInfo[], cb: (_: Pkg) => boolean): boolean {
   const arr = summaries.filter(s => Object.values(s.pkgs).filter(cb).length > 0)
   return arr.length > 0;
+}
+
+// *************** Control which columns are displayed ***************
+
+const defaultColumns = [
+  "version", "release_count", "diag_total_count", "testcases", "documentation", "description"
+];
+
+const columns: { [key: string]: Col } = {
+  version: { display: false, name: "Version", option: "Version" },
+  release_count: { display: false, name: "crates.io Releases", option: "crates.io Releases" },
+  diag_total_count: { display: false, name: "Diag-nostics", option: "Diagnostics" },
+  testcases: { display: false, name: "Test Cases", option: "Test Cases" },
+
+  lib: { display: false, name: "Lib", option: "Lib" },
+  bin: { display: false, name: "Bin", option: "Bin" },
+  dependencies: { display: false, name: "Dependencies", option: "Dependencies" },
+  tests: { display: false, name: "Tests", option: "Tests" },
+  examples: { display: false, name: "Examples", option: "Examples" },
+  benches: { display: false, name: "Benches", option: "Benches" },
+
+  documentation: { display: false, name: "Doc", option: "Doc" },
+  latest_doc: { display: false, name: "Latest Doc", option: "Latest Doc" },
+  homepage: { display: false, name: "Home Page", option: "Home Page" },
+  categories: { display: false, name: "Categories", option: "Categories" },
+
+  keywords: { display: false, name: "Keywords", option: "Keywords" },
+  description: { display: false, name: "Description", option: "Description" },
+  authors: { display: false, name: "Authors", option: "Authors" },
+};
+
+export class InfoCols extends Cols {
+  static init() {
+    return new InfoCols(columns, defaultColumns);
+  }
 }

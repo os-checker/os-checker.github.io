@@ -45,12 +45,12 @@ html, body {
 }
 
 .nav-link {
-  color: var(--p-indigo-500);
+  color: var(--p-sky-500);
   /* 统一的链接颜色 */
   text-decoration: none;
 }
 
 .nav-link.router-link-active {
-  color: var(--p-indigo-500);
+  color: var(--p-sky-500);
   /* 重置激活链接的颜色 */
 }

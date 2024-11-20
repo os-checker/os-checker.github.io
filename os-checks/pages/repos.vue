@@ -8,8 +8,8 @@
         <MultiSelect v-model="selected.topics" display="chip" :options="topics" filter :maxSelectedLabels="4"
           placeholder="Select Topics" />
 
-        <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => Cols.option(o)"
-          filter :maxSelectedLabels="4" placeholder="Select Columns" />
+        <MultiSelect v-model="selected.columns" display="chip" :options="columns" :optionLabel="o => C.option(o)" filter
+          :maxSelectedLabels="4" placeholder="Select Columns" />
       </div>
 
       <div>
@@ -117,7 +117,7 @@
 <script setup lang="ts">
 import { FilterMatchMode } from '@primevue/core/api';
 import type { DataTableSortMeta } from 'primevue/datatable';
-import { formatBytes, Cols } from '~/shared/repos';
+import { formatBytes, RepoCols } from '~/shared/repos';
 import type { Output, Repo } from '~/shared/repos';
 
 useHead({ title: 'Repositories Information' });
@@ -183,9 +183,9 @@ const selectedRepo = ref();
 const licenses = computed(() => [...new Set(repo.value.map(r => r.license))].sort());
 const topics = computed(() => [...new Set(repo.value.map(r => r.topics).flat())].sort());
 
-const C = reactive(new Cols());
+const C = reactive(RepoCols.init());
 C.setDefaultColumns();
-const columns = Cols.options();
+const columns = C.options();
 
 const selected = reactive<{
   licenses: string[],
@@ -237,16 +237,15 @@ function updateFilter(query: {
   text?: string,
   sorts?: string,
 }) {
-  if (query.licenses) { selected.licenses = decodeURIComponent(query.licenses).split(","); }
-  if (query.topics) { selected.topics = decodeURIComponent(query.topics).split(","); }
-  if (query.columns) { selected.columns = decodeURIComponent(query.columns).split(","); }
+  const { licenses, topics, columns, text, sorts } = query;
 
-  if (query.text) {
-    selected.text.global.value = decodeURIComponent(query.text);
-  }
+  if (licenses) { selected.licenses = decodeURIComponent(licenses).split(","); }
+  if (topics) { selected.topics = decodeURIComponent(topics).split(","); }
+  if (columns) { selected.columns = decodeURIComponent(columns).split(","); }
+  if (text) { selected.text.global.value = decodeURIComponent(text); }
 
-  if (query.sorts) {
-    const args = decodeURIComponent(query.sorts).split(",");
+  if (sorts) {
+    const args = decodeURIComponent(sorts).split(",");
     //@ts-ignore
     selected.sorts = args.map(arg => {
       let [field, order] = arg.split("=");
