@@ -1,6 +1,6 @@
 
 export default function (utc: string | null) {
-  if (!utc) { return "null"; }
+  if (!utc) { return ""; }
 
   const date = new Date(utc);
   const year = date.getFullYear();
