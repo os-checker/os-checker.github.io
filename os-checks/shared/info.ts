@@ -64,10 +64,7 @@ export function unique_field_bool(summaries: PkgInfo[], cb: (_: Pkg) => boolean)
 // *************** Control which columns are displayed ***************
 
 const defaultColumns = [
-  "version", "release_count", "diag_total_count", "testcases",
-  "lib", "bin", "dependencies", "tests", "examples", "benches",
-  "documentation", "latest_doc", "homepage", "categories",
-  "keywords", "description", "authors",
+  "version", "release_count", "diag_total_count", "testcases", "documentation", "description"
 ];
 
 const columns: { [key: string]: Col } = {
