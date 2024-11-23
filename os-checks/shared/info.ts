@@ -81,7 +81,7 @@ const columns: { [key: string]: Col } = {
 
   lib: { display: false, name: "Lib", option: "Lib" },
   bin: { display: false, name: "Bin", option: "Bin" },
-  dependencies: { display: false, name: "Dependencies", option: "Dependencies" },
+  dependencies: { display: false, name: "Depen-dencies", option: "Dependencies" },
   tests: { display: false, name: "Tests", option: "Tests" },
   examples: { display: false, name: "Examples", option: "Examples" },
   benches: { display: false, name: "Benches", option: "Benches" },
