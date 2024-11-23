@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-10-22',
   app: {
     // baseURL: '/os-checker/',
+    baseURL: process.env.BASE_URL ?? "",
     head: { link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }] }
   },
   devtools: {
