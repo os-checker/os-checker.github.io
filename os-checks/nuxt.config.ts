@@ -27,6 +27,7 @@ export default defineNuxtConfig({
     public: {
       debug: process.env.DEBUG ? true : false,
       docs_url: process.env.DOCS_URL,
+      database_repo: process.env.DATABASE_REPO,
     }
   }
 })
