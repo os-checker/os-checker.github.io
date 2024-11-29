@@ -62,7 +62,7 @@ basic.init_with_and_subscribe_to_current_and_columns((target, columns) => {
 });
 
 // interactive filter/search inputs
-const filters = reactive<{global: string}>({global :""});
+const filters = reactive<{ global: string }>({ global: "" });
 watch(filters, val => console.log(val));
 
 // a single selected row
@@ -79,12 +79,36 @@ const progressRatio = computed(() => {
 });
 
 // Apply route queries.
-function updateFilter(query: {checkers?: string,text?:string}) {
-  const {checkers, text} = query;
+function updateFilter(query: { checkers?: string, text?: string }) {
+  const { checkers, text } = query;
   if (text) {
-    filters.global =  decodeURIComponent(text);
+    filters.global = decodeURIComponent(text);
   }
-  // if (checkers)
+  if (checkers) {
+    const list = decodeURIComponent(checkers).split(",");
+
+    // empty checker query means all checkers
+    if (list.length === 0) {
+      selectedColumns.value = dataColumns.value;
+      return;
+    }
+    if (list[0] === "none") {
+      selectedColumns.value = [];
+      return;
+    }
+
+    let cols: Columns = [];
+    for (const ele of list) {
+      const pos = dataColumns.value.findIndex(col => ele === col.field);
+      if (pos !== -1) {
+        cols.push(dataColumns.value[pos]);
+      }
+    }
+    selectedColumns.value = cols;
+  } else {
+    // empty checker query means all checkers
+    selectedColumns.value = dataColumns.value;
+  }
 }
 const route = useRoute();
 updateFilter(route.query);
@@ -92,10 +116,18 @@ updateFilter(route.query);
 // Reflect queries to URL.
 const router = useRouter();
 watchEffect(() => {
-  let query:any = {};
+  let query: any = {};
 
   if (filters.global) {
-query.text = encodeURIComponent(filters.global);
+    query.text = encodeURIComponent(filters.global);
+  }
+
+  if (selectedColumns.value.length !== dataColumns.value.length) {
+    if (selectedColumns.value.length === 0) {
+      query.checkers = encodeURIComponent("none");
+    } else {
+      query.checkers = encodeURIComponent(selectedColumns.value.map(col => col.field).join(","));
+    }
   }
 
   router.push({ path: route.path, query });
