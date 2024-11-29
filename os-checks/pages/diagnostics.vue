@@ -88,23 +88,16 @@ function updateFilter(query: { checkers?: string, text?: string }) {
     const list = decodeURIComponent(checkers).split(",");
 
     // empty checker query means all checkers
-    if (list.length === 0) {
-      selectedColumns.value = dataColumns.value;
-      return;
-    }
+    // if (list.length === 0) {
+    //   selectedColumns.value = dataColumns.value;
+    //   return;
+    // }
     if (list[0] === "none") {
       selectedColumns.value = [];
       return;
     }
 
-    let cols: Columns = [];
-    for (const ele of list) {
-      const pos = dataColumns.value.findIndex(col => ele === col.field);
-      if (pos !== -1) {
-        cols.push(dataColumns.value[pos]);
-      }
-    }
-    selectedColumns.value = cols;
+    selectedColumns.value = dataColumns.value.filter(col => list.includes(col.field));
   } else {
     // empty checker query means all checkers
     selectedColumns.value = dataColumns.value;
@@ -122,12 +115,10 @@ watchEffect(() => {
     query.text = encodeURIComponent(filters.global);
   }
 
-  if (selectedColumns.value.length !== dataColumns.value.length) {
-    if (selectedColumns.value.length === 0) {
-      query.checkers = encodeURIComponent("none");
-    } else {
-      query.checkers = encodeURIComponent(selectedColumns.value.map(col => col.field).join(","));
-    }
+  if (selectedColumns.value.length === 0) {
+    query.checkers = encodeURIComponent("none");
+  } else if (selectedColumns.value.length !== dataColumns.value.length) {
+    query.checkers = encodeURIComponent(selectedColumns.value.map(col => col.field).join(","));
   }
 
   router.push({ path: route.path, query });
