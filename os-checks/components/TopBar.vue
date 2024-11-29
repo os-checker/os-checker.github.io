@@ -4,7 +4,15 @@
     <div class="topBarLeft">
 
       <NuxtLink to="/">
-        <Button title="主页" icon="pi pi-home" />
+        <Button title="主页" icon="pi pi-box" />
+      </NuxtLink>
+
+      <NuxtLink to="/repos">
+        <Button title="Repositories Infomation" icon="pi pi-warehouse" />
+      </NuxtLink>
+
+      <NuxtLink to="/diagnostics">
+        <Button title="Diagnostics" icon="pi pi-microchip" />
       </NuxtLink>
 
       <NuxtLink to="/file-tree">
@@ -21,14 +29,6 @@
 
       <NuxtLink to="/workflows">
         <Button title="Github Workflows" icon="pi pi-bell" />
-      </NuxtLink>
-
-      <NuxtLink to="/info">
-        <Button title="Package Infomation" icon="pi pi-microchip" />
-      </NuxtLink>
-
-      <NuxtLink to="/repos">
-        <Button title="Repositories Infomation" icon="pi pi-warehouse" />
       </NuxtLink>
 
     </div>
