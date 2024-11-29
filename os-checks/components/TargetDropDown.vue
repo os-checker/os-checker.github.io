@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Select v-model="selected" :options="targets" placeholder="Targets">
+    <Select v-if="visible" v-model="selected" :options="targets" placeholder="Targets">
 
       <template #option="{ option }">
         <Tag severity="danger" class="drop-down-options">{{ tagCount(option) }}</Tag>
@@ -20,10 +20,21 @@
 const defaultTarget = "All-Targets";
 const selected = ref(defaultTarget);
 const targets = ref<string[]>([defaultTarget]);
+const visible = ref(true);
 
 // 随路由页面变化而下载相应的 basic.json
 const route = useRoute();
-watch(() => route.params, () => fetch());
+watch(() => [route.path, route.params], ([path, params]) => {
+  // console.log("path =", path);
+  if (path === "/" || path === "/repos" || path === "/charts" || path === "/target" || path === "/workflows") {
+    visible.value = false;
+    return;
+  } else if (params) {
+  // console.log("path =", path);
+    fetch();
+  }
+  visible.value = true;
+});
 
 const candidates = useBasicStore();
 fetch();
