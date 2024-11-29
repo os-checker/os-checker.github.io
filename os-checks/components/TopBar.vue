@@ -4,7 +4,8 @@
     <div class="topBarLeft">
 
       <NuxtLink to="/">
-        <Button title="主页" icon="pi pi-box" />
+        <Button title="主页" icon="pi pi-box"
+          :style="{ background: bgColor('home'), 'border-color': borderColor('home') }" />
       </NuxtLink>
 
       <NuxtLink to="/repos">
@@ -46,6 +47,44 @@
 
   </div>
 </template>
+
+<script setup lang="ts">
+const active_default = {
+  home: false,
+  repos: false,
+  diagnostics: false,
+  file_tree: false,
+  target: false,
+  workflows: false,
+};
+const active = ref<{ [key: string]: boolean }>(active_default);
+
+const { color } = storeToRefs(useStyleStore());
+function bgColor(page: string) {
+  return active.value[page] ? color.value.orange: color.value.topButton;
+}
+function borderColor(page: string) {
+  return active.value[page] ? color.value.orange_light  : color.value.topButton;
+}
+
+const route = useRoute();
+setActive(route.path);
+watch(() => route.path, setActive);
+
+function setActive(path: string) {
+  active.value = active_default;
+  switch (path) {
+    case "/": { active.value.home = true; return; }
+    case "/repos": { active.value.repos = true; return; }
+    case "/diagnostics": { active.value.diagnostics = true; return; }
+    case "/file_tree": { active.value.file_tree = true; return; }
+    case "/target": { active.value.target = true; return; }
+    case "/workflows": { active.value.workflows = true; return; }
+    default: { }
+  }
+}
+
+</script>
 
 <style scoped>
 .topBarLeft,
