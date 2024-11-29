@@ -4,32 +4,31 @@
     <div class="topBarLeft">
 
       <NuxtLink to="/">
-        <Button title="主页" icon="pi pi-box"
-          :style="{ background: bgColor('home'), 'border-color': borderColor('home') }" />
+        <Button title="主页" icon="pi pi-box" :style="btnStyle('/')" />
       </NuxtLink>
 
       <NuxtLink to="/repos">
-        <Button title="Repositories Infomation" icon="pi pi-warehouse" />
+        <Button title="Repositories Infomation" icon="pi pi-warehouse" :style="btnStyle('/repos')" />
       </NuxtLink>
 
       <NuxtLink to="/diagnostics">
-        <Button title="Diagnostics" icon="pi pi-microchip" />
+        <Button title="Diagnostics" icon="pi pi-microchip" :style="btnStyle('/diagnostics')" />
       </NuxtLink>
 
       <NuxtLink to="/file-tree">
-        <Button title="问题文件树" icon="pi pi-sitemap" />
+        <Button title="问题文件树" icon="pi pi-sitemap" :style="btnStyle('/file-tree')"/>
       </NuxtLink>
 
       <NuxtLink to="/charts">
-        <Button title="统计图" icon="pi pi-chart-bar" />
+        <Button title="统计图" icon="pi pi-chart-bar" :style="btnStyle('/charts')"/>
       </NuxtLink>
 
       <NuxtLink to="/target">
-        <Button title="编译目标明细表" icon="pi pi-objects-column" />
+        <Button title="编译目标明细表" icon="pi pi-objects-column" :style="btnStyle('/target')"/>
       </NuxtLink>
 
       <NuxtLink to="/workflows">
-        <Button title="Github Workflows" icon="pi pi-bell" />
+        <Button title="Github Workflows" icon="pi pi-bell" :style="btnStyle('/workflows')"/>
       </NuxtLink>
 
     </div>
@@ -49,39 +48,25 @@
 </template>
 
 <script setup lang="ts">
-const active_default = {
-  home: false,
-  repos: false,
-  diagnostics: false,
-  file_tree: false,
-  target: false,
-  workflows: false,
-};
-const active = ref<{ [key: string]: boolean }>(active_default);
 
 const { color } = storeToRefs(useStyleStore());
-function bgColor(page: string) {
-  return active.value[page] ? color.value.orange: color.value.topButton;
-}
-function borderColor(page: string) {
-  return active.value[page] ? color.value.orange_light  : color.value.topButton;
-}
+// function bgColor(page: string) {
+//   return active.value[page] ? color.value.orange: color.value.topButton;
+// }
+// function borderColor(page: string) {
+//   return active.value[page] ? color.value.orange_light  : color.value.topButton;
+// }
 
 const route = useRoute();
-setActive(route.path);
-watch(() => route.path, setActive);
+const active = computed(() => route.path);
 
-function setActive(path: string) {
-  active.value = active_default;
-  switch (path) {
-    case "/": { active.value.home = true; return; }
-    case "/repos": { active.value.repos = true; return; }
-    case "/diagnostics": { active.value.diagnostics = true; return; }
-    case "/file_tree": { active.value.file_tree = true; return; }
-    case "/target": { active.value.target = true; return; }
-    case "/workflows": { active.value.workflows = true; return; }
-    default: { }
-  }
+type ButtonStyle = { background: string, "border-color": string, };
+
+function btnStyle(page: string): ButtonStyle {
+  return (page === active.value) ?
+    { background: color.value.orange_light, "border-color": color.value.orange }
+    :
+    { background: color.value.topButton, "border-color": color.value.topButton };
 }
 
 </script>

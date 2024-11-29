@@ -14,7 +14,7 @@ export const useStyleStore = defineStore('style', () => {
     color.red = styles.getPropertyValue('--p-red-500').trim();
     color.grey = styles.getPropertyValue('--p-gray-400').trim();
     color.topButton = styles.getPropertyValue('--p-button-primary-background').trim();
-    color.orange_light = styles.getPropertyValue('--p-orange-300').trim();
+    color.orange_light = styles.getPropertyValue('--p-orange-400').trim();
     color.orange = styles.getPropertyValue('--p-orange-500').trim();
 
     // 视窗高度
