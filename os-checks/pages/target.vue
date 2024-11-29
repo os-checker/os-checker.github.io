@@ -73,6 +73,8 @@
 <script lang="ts" setup>
 import { type Resolved, type Source, type Source2, type UserRepo, resolvedColumns, sourcesColumns } from '~/shared/target';
 
+useHead({ title: 'Target' });
+
 const label = (a: string) => a;
 // const selectedKind = ref<TableKind>(TableKind.Resolved);
 const selectedUser = ref("");

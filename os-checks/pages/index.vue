@@ -537,7 +537,7 @@ watchEffect(() => {
   router.push({ path: route.path, query });
 });
 
-useHead({ title: 'Package Information' });
+useHead({ title: 'Packages Information' });
 </script>
 
 <style lang="css">

@@ -9,6 +9,8 @@ import type { PassCountRepos } from '~/shared/types';
 import type { Context } from 'chartjs-plugin-datalabels';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
+useHead({ title: 'Charts' });
+
 // 无诊断的仓库数量和具有 target 的总仓库
 const passCountRepos = ref<PassCountRepos>({ "": { pass: 0, total: 0 } });
 

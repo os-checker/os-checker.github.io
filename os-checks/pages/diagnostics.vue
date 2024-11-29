@@ -3,6 +3,8 @@ import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
 import type { Columns, PassCountRepo, PassCountRepos } from '~/shared/types';
 
+useHead({ title: 'Diagnostics' });
+
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
 

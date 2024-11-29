@@ -120,6 +120,8 @@
 import type { DataTableRowSelectEvent } from 'primevue/datatable';
 import { type Workflows, type Summary, summary_to_workflows } from '~/shared/workflows';
 
+useHead({ title: 'Github Workflows' });
+
 const { color, viewportHeight } = storeToRefs(useStyleStore());
 
 const heightWorkflows = computed(() => `${viewportHeight.value * 0.5}px`);
