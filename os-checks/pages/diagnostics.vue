@@ -62,7 +62,8 @@ basic.init_with_and_subscribe_to_current_and_columns((target, columns) => {
 });
 
 // interactive filter/search inputs
-const filters = ref<any>({});
+const filters = reactive<{global: string}>({global :""});
+watch(filters, val => console.log(val));
 
 // a single selected row
 const selectedKey = ref();
@@ -75,6 +76,29 @@ const progressRatio = computed(() => {
   } else {
     return 0;
   }
+});
+
+// Apply route queries.
+function updateFilter(query: {checkers?: string,text?:string}) {
+  const {checkers, text} = query;
+  if (text) {
+    filters.global =  decodeURIComponent(text);
+  }
+  // if (checkers)
+}
+const route = useRoute();
+updateFilter(route.query);
+
+// Reflect queries to URL.
+const router = useRouter();
+watchEffect(() => {
+  let query:any = {};
+
+  if (filters.global) {
+query.text = encodeURIComponent(filters.global);
+  }
+
+  router.push({ path: route.path, query });
 });
 </script>
 
