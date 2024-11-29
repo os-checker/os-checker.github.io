@@ -21,22 +21,13 @@ const defaultTarget = "All-Targets";
 const selected = ref(defaultTarget);
 const targets = ref<string[]>([defaultTarget]);
 const visible = ref(true);
+const candidates = useBasicStore();
 
 // 随路由页面变化而下载相应的 basic.json
 const route = useRoute();
-watch(() => [route.path, route.params], ([path, params]) => {
-  // console.log("path =", path);
-  if (path === "/" || path === "/repos" || path === "/charts" || path === "/target" || path === "/workflows") {
-    visible.value = false;
-    return;
-  } else if (params) {
-  // console.log("path =", path);
-    fetch();
-  }
-  visible.value = true;
-});
+change(route.path, route.params);
+watch(() => [route.path, route.params], ([path, params]) => change(path as string, params));
 
-const candidates = useBasicStore();
 fetch();
 watch(selected, (val) => candidates.update_current(val));
 
@@ -52,6 +43,17 @@ function fetch() {
   });
 }
 
+function change(path: string, params: any) {
+  // console.log("path =", path);
+  if (path === "/" || path === "/repos" || path === "/charts" || path === "/target" || path === "/workflows") {
+    visible.value = false;
+    return;
+  } else if (params) {
+    // console.log("path =", path);
+    fetch();
+  }
+  visible.value = true;
+}
 </script>
 
 <style scoped>
