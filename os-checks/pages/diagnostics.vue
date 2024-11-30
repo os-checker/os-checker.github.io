@@ -5,6 +5,9 @@ import type { Columns, PassCountRepo, PassCountRepos } from '~/shared/types';
 
 useHead({ title: 'Diagnostics' });
 
+const { viewportHeight } = storeToRefs(useStyleStore());
+const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.75)}px`);
+
 // fetch JSON data from content dir
 const nodes = ref<TreeNode[]>([])
 
@@ -95,7 +98,8 @@ const progressRatio = computed(() => {
     </div>
 
     <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
-      scrollable scrollHeight="82vh" v-model:selectionKeys="selectedKey" selectionMode="single">
+      scrollable :scrollHeight="tableHeight" v-model:selectionKeys="selectedKey" selectionMode="single" paginator
+      :rows="10" :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <template #header>
         <div class="header">
