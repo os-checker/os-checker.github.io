@@ -31,6 +31,8 @@ basic.init_with_and_subscribe_to_current_and_columns((target, columns) => {
     selectedPassCountRepo.value = selected_pass_count_repo;
   }
 
+  console.log(target, columns);
+
   dataColumns.value = columns;
   selectedColumns.value = columns;
 
@@ -142,7 +144,8 @@ watchEffect(() => {
     </div>
 
     <TreeTable :value="nodes" tableStyle="min-width: 50rem" :filters="filters" removableSort sortMode="multiple"
-      scrollable scrollHeight="82vh" v-model:selectionKeys="selectedKey" selectionMode="single">
+      scrollable scrollHeight="82vh" v-model:selectionKeys="selectedKey" selectionMode="single" paginator :rows="10"
+      :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]">
 
       <template #header>
         <div class="header">

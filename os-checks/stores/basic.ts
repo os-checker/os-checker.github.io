@@ -37,10 +37,19 @@ export const useBasicStore = defineStore('targets', {
     },
 
     init_with_and_subscribe_to_current_and_columns(init: (target: string, columns: Columns) => void): void {
-      // init(this.current, this.columns);
+      init(this.current, this.columns);
 
       const { current, columns } = storeToRefs(this);
-      watchEffect(() => init(current.value, columns.value));
+      const basic = reactive({ current, columns });
+      watch(basic, (val, old) => {
+        if (!val.current.value) return;
+
+        // 下拉框更新导致数据变化，因此如果所选 target 和列相同，不要初始化获取表格数据。
+        // 列变化的情况是从 [] 到 [all checkers]。
+        if (val.current.value === old.current.value && val.columns.value === old.columns.value) return;
+
+        init(val.current.value, val.columns.value);
+      });
     },
   }
 })
