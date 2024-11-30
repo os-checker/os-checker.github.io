@@ -9,6 +9,7 @@ useHead({ title: 'Diagnostics' });
 const nodes = ref<TreeNode[]>([])
 
 const dataColumns = ref<Columns>([]);
+const queryColumns = ref<Columns>([]);
 
 // 无诊断的仓库数量和具有 target 的总仓库
 const selectedPassCountRepo = ref<PassCountRepo>({ pass: 0, total: 0 });
@@ -18,7 +19,7 @@ githubFetch<PassCountRepos>({
 }).then(data => passCountRepos.value = data);
 
 // pick data columns
-const selectedColumns = ref(dataColumns.value);
+const selectedColumns = ref(queryColumns.value);
 // Label to display after exceeding max selected labels.
 const selectedItemsLabel = computed(() => `${selectedColumns.value.length} checkers are selected; click to customize columns displayed`);
 const onToggle = (val: any) => selectedColumns.value = dataColumns.value.filter(col => val.includes(col));
@@ -34,7 +35,7 @@ basic.init_with_and_subscribe_to_current_and_columns((target, columns) => {
   console.log(target, columns);
 
   dataColumns.value = columns;
-  selectedColumns.value = columns;
+  selectedColumns.value = queryColumns.value.length ? columns : queryColumns.value;
 
   const path = `ui/home/split/${target}.json`;
   githubFetch<TreeNode[]>({ path })
@@ -95,18 +96,19 @@ function updateFilter(query: { checkers?: string, text?: string }) {
     //   return;
     // }
     if (list[0] === "none") {
-      selectedColumns.value = [];
+      queryColumns.value = [];
       return;
     }
 
-    selectedColumns.value = dataColumns.value.filter(col => list.includes(col.field));
+    queryColumns.value = dataColumns.value.filter(col => list.includes(col.field));
   } else {
     // empty checker query means all checkers
-    selectedColumns.value = dataColumns.value;
+    queryColumns.value = dataColumns.value;
   }
 }
 const route = useRoute();
 updateFilter(route.query);
+// watch(queryColumns, cols => selectedColumns.value = cols);
 
 // Reflect queries to URL.
 const router = useRouter();
