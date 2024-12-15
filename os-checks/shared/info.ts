@@ -51,6 +51,10 @@ export type TestCase = {
   name: string,
   status: string | null,
   duration_ms: number | null,
+  error: string | null,
+  miri_pass: boolean,
+  miri_output: string | null,
+  miri_timeout: boolean,
 }
 
 export function unique_field(summaries: PkgInfo[], cb: (_: Pkg) => string[]): string[] {

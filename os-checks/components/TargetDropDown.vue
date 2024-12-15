@@ -45,7 +45,8 @@ function fetch() {
 
 function change(path: string, params: any) {
   // console.log("path =", path);
-  if (path === "/" || path === "/repos" || path === "/charts" || path === "/target" || path === "/workflows") {
+  const excludes = ["/", "/repos", "/charts", "/target", "/workflows", "/testcases"];
+  if (excludes.findIndex(p => p === path) !== -1) {
     visible.value = false;
     return;
   } else if (params) {
