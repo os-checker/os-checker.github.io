@@ -11,24 +11,28 @@
         <Button title="Repositories Infomation" icon="pi pi-warehouse" :style="btnStyle('/repos')" />
       </NuxtLink>
 
+      <NuxtLink to="/testcases">
+        <Button title="Test Cases" icon="pi pi-code" :style="btnStyle('/testcases')" />
+      </NuxtLink>
+
       <NuxtLink to="/diagnostics">
         <Button title="Diagnostics" icon="pi pi-microchip" :style="btnStyle('/diagnostics')" />
       </NuxtLink>
 
       <NuxtLink to="/file-tree">
-        <Button title="问题文件树" icon="pi pi-sitemap" :style="btnStyle('/file-tree')"/>
+        <Button title="问题文件树" icon="pi pi-sitemap" :style="btnStyle('/file-tree')" />
       </NuxtLink>
 
       <NuxtLink to="/charts">
-        <Button title="统计图" icon="pi pi-chart-bar" :style="btnStyle('/charts')"/>
+        <Button title="统计图" icon="pi pi-chart-bar" :style="btnStyle('/charts')" />
       </NuxtLink>
 
       <NuxtLink to="/target">
-        <Button title="编译目标明细表" icon="pi pi-objects-column" :style="btnStyle('/target')"/>
+        <Button title="编译目标明细表" icon="pi pi-objects-column" :style="btnStyle('/target')" />
       </NuxtLink>
 
       <NuxtLink to="/workflows">
-        <Button title="Github Workflows" icon="pi pi-bell" :style="btnStyle('/workflows')"/>
+        <Button title="Github Workflows" icon="pi pi-bell" :style="btnStyle('/workflows')" />
       </NuxtLink>
 
     </div>

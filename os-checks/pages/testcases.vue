@@ -181,5 +181,5 @@ const selected = reactive<{
   sorts: [],
 });
 
-
+useHead({ title: 'Test Cases' });
 </script>
