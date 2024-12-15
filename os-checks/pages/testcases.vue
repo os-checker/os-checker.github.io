@@ -38,6 +38,55 @@
 
   </DataTable>
 
+  <Dialog v-model:visible="dialogShow" modal :style="{ width: '70%' }">
+    <template #header>
+      <span style="display: inline-flex; justify-content:center; gap: 40px; font-size: larger; font-weight: bold;">
+        <div>
+          <NuxtLink :to="`https://github.com/${selectedTest!.user}/${selectedTest!.repo}`" target="_blank">
+            <Tag icon="pi pi-github" severity="info" style="font-weight: bold;">
+              {{ `${selectedTest!.user} / ${selectedTest!.repo}` }}
+            </Tag>
+          </NuxtLink>
+        </div>
+
+        <div style="margin-top: 3.2px;">Test Name:
+          <span style="color: var(--p-rose-500); margin-right: 5px">
+            {{ selectedTest!.name }}
+          </span>
+        </div>
+      </span>
+    </template>
+
+    <div style="padding: 3px;">
+      <b style="margin-right: 5px">Pkg:</b>
+      <Tag severity="warn" :value="selectedTest!.pkg" style="margin-right: 6px;" />
+      <b style="margin-right: 5px">Test Binary:</b>
+      <Tag severity="warn" :value="selectedTest!.bin" style="margin-right: 6px;" />
+      <b style="margin-right: 5px">Test Name:</b>
+      <Tag severity="warn" :value="selectedTest!.name" style="margin-right: 6px;" />
+      <b style="margin-right: 5px">Test Pass:</b>
+      {{ selectedTest!.test_pass }}
+      <b style="margin-right: 5px">Miri Pass:</b>
+      {{ selectedTest!.miri_pass }}
+    </div>
+
+    <Accordion value="0">
+      <AccordionPanel value="0" v-if="selectedTest?.test_error">
+        <AccordionHeader>Test Error</AccordionHeader>
+        <AccordionContent>
+          <CodeBlock :snippets="selectedTest?.test_error ? [selectedTest.test_error] : []" />
+        </AccordionContent>
+      </AccordionPanel>
+      <AccordionPanel value="1" v-if="selectedTest?.miri_output">
+        <AccordionHeader>Miri Output</AccordionHeader>
+        <AccordionContent>
+          <CodeBlock :snippets="selectedTest?.miri_output ? [selectedTest.miri_output] : []" />
+        </AccordionContent>
+      </AccordionPanel>
+    </Accordion>
+
+  </Dialog>
+
 </template>
 
 <script setup lang="ts">
@@ -56,9 +105,14 @@ const ptColumnRight = ref({
   columnHeaderContent: { style: { "justify-content": "right" } },
   bodyCell: { style: { "text-align": "right" } }
 });
+highlightRust();
 
 const testcases = ref<TestResult[]>([]);
 const selectedTest = ref<TestResult | null>(null);
+
+// pop up details
+const dialogShow = ref(false);
+watch(selectedTest, sel => dialogShow.value = sel ? true : false);
 
 githubFetch<PkgInfo[]>({
   path: "plugin/cargo/info/summaries.json"
@@ -126,5 +180,6 @@ const selected = reactive<{
   text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
   sorts: [],
 });
+
 
 </script>
