@@ -283,7 +283,7 @@ const summaryTable = computed<SummaryTable[]>(() => {
         version: pkg.version,
         release_count: pkg.release_count,
         last_release_time: fmtDateTime(pkg.last_release_time),
-        last_release_size:  pkg.last_release_size ? formatBytes(pkg.last_release_size): null,
+        last_release_size: pkg.last_release_size ? formatBytes(pkg.last_release_size) : null,
         diag_total_count: pkg.diag_total_count,
         testcases: pkg.testcases?.pkg_tests_count ?? null,
         testcases_color,
@@ -306,11 +306,11 @@ const summaryTable = computed<SummaryTable[]>(() => {
   }).flat();
 
   return value.sort((a, b) => {
-    const a_test = a.testcases ?? 0;
-    const b_test = b.testcases ?? 0;
-    if (a_test < b_test) {
+    const a_time = a.last_commit_time;
+    const b_time = b.last_commit_time;
+    if (a_time < b_time) {
       return 1;
-    } else if (a_test > b_test) {
+    } else if (a_time > b_time) {
       return -1;
     } else if (a.user < b.user) {
       return -1;
