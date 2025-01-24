@@ -38,7 +38,7 @@
 
   </DataTable>
 
-  <Dialog v-model:visible="dialogShow" modal :style="{ width: '70%' }">
+  <Dialog v-model:visible="dialogShow" modal :style="{ width: '93%' }">
     <template #header>
       <span style="display: inline-flex; justify-content:center; gap: 40px; font-size: larger; font-weight: bold;">
         <div>
