@@ -14,3 +14,17 @@ export type FileTree = {
   data: Datum[]
 }
 
+export type CheckerResult = {
+  kind: string,
+  raw: string[],
+  lang: string,
+  severity: Severity,
+  disabled: boolean, // 对于空数组，禁用选项卡
+};
+
+export enum Severity {
+  Danger = "danger",
+  Warn = "warn",
+  Info = "info",
+  Disabled = "secondary",
+}

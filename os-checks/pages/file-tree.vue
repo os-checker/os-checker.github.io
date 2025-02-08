@@ -38,11 +38,13 @@
       </div>
     </div>
 
-    <FileTree :fetch_path="(target: string) => `ui/file-tree/split/${target}.json`" />
+    <FileTree2 :get="got" />
   </div>
 </template>
 
 <script lang="ts" setup>
+import { get, getEmpty } from '~/shared/file-tree/utils';
+
 useHead({ title: 'Issue File Tree' });
 
 const label = (a: string) => a;
@@ -61,6 +63,9 @@ const checkers = ref([]);
 const targets = ref([]);
 const features = ref([]);
 
+const path = `ui/repos/Azure-stars/elf_parser_rs/All-Targets.json`;
+const got = ref(getEmpty());
+got.value = get(path);
 </script>
 
 <style scoped>
