@@ -67,22 +67,34 @@ const features = ref([]);
 
 const got = ref<Get>(getEmpty());
 
-// Get user/repo list for filters
+// Get user/repo list for filters.
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
   .then(data => user_repo.value = data);
 
+// Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
 watch(users, (val) => selectedUser.value = val[0] ?? "");
 const repos = computed(() => user_repo.value[selectedUser.value]);
 watch(repos, (val) => selectedRepo.value = val[0] ?? "");
-watch(() => ({ user_: selectedUser.value, repo_: selectedRepo.value }),
-  ({ user_, repo_ }) => {
-    if (user_ && repo_)
-      get(`ui/repos/${user_}/${repo_}/All-Targets.json`);
+
+// Update got state.
+watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selectedTarget.value }),
+  ({ user, repo, target }) => {
+    if (user && repo) {
+      const target_ = (target === "") ? "All-Targets" : target;
+      get(`ui/repos/${user}/${repo}/${target_}.json`);
+    }
   }
 );
 
+// // Get  
+// watch(() => got.fileTree, ft => {});
+
+// Download raw report JSON. 
+// NOTE: this function should mutate got state in the template.
+// If the fn is moved to a module file, the state of got will be
+// broken. See https://github.com/os-checker/os-checker.github.io/issues/138
 function get(path: string) {
   githubFetch<FileTree>({ path })
     .then((file_tree) => {
