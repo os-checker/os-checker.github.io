@@ -95,7 +95,7 @@ export function get(path: string): Get {
       // fileTree.value = { kinds_order: [], data: [] };
     });
 
-  // console.log("got")
+  console.log("utils got", got);
   return got;
 }
 

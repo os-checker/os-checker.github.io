@@ -4,23 +4,14 @@ import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
 type Props = { get: Get };
 const { get } = defineProps<Props>();
-const got = ref(get);
-
-watch(() => get, (val) => {
-  got.value = val;
-  console.log("get", val, val.fileTree)
-});
-
-watch(() => got.value.fileTree.data, data => console.log("watch got fileTree", data.length));
 
 console.log("FileTree2", get.tabs.length)
-const nodes = ref<TreeNode[]>([]);
-watch(() => get.fileTree.data, data => {
-  console.log("computed fileTree.data", data.length)
-  nodes.value = [];
+const nodes = computed<TreeNode[]>(() => {
+  console.log("computed fileTree.data", get.fileTree.data.length)
+  let nodes = [];
 
   let key = 0;
-  for (const datum of data) {
+  for (const datum of get.fileTree.data) {
     let node: TreeNode = {
       key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.pkg}`, children: [],
     };
@@ -39,9 +30,10 @@ watch(() => get.fileTree.data, data => {
       user: datum.user, repo: datum.repo, pkg: datum.pkg,
       total: datum.count, fmt: count_fmt, clippy_warn: count_clippy_warn, clippy_error: count_clippy_error
     };
-    nodes.value.push(node);
+    nodes.push(node);
   }
-  console.log("nodes", nodes.value.length)
+  console.log("nodes", nodes.length);
+  return nodes;
 });
 
 const selectedKey = ref({});
@@ -50,7 +42,7 @@ watch(selectedKey, (key) => {
   if (val !== undefined) {
     get.tabs = val.results;
     get.selectedTab = val.selectedTab;
-  };
+  }
 });
 </script>
 
