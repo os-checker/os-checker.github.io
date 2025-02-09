@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
+import type { FileTree } from '~/shared/file-tree';
 import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
-type Props = { get: Get };
-const { get } = defineProps<Props>();
+type Props = { get: Get, pkg?: string };
+const { get, pkg } = defineProps<Props>();
+
+const filtered_fileTree = computed<FileTree>(() => {
+  const ft = get.fileTree;
+  if (!pkg || pkg === "All-Pkgs") return ft;
+  const data = ft.data.filter(node => node.pkg === pkg);
+  return { ...ft, ...{ data } }
+});
 
 console.log("FileTree2", get.tabs.length)
 const nodes = computed<TreeNode[]>(() => {
-  console.log("computed fileTree.data", get.fileTree.data.length)
+  console.log("computed fileTree.data", filtered_fileTree.value.data.length)
   let nodes = [];
 
   let key = 0;
-  for (const datum of get.fileTree.data) {
+  for (const datum of filtered_fileTree.value.data) {
     let node: TreeNode = {
       key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.pkg}`, children: [],
     };
@@ -37,13 +45,14 @@ const nodes = computed<TreeNode[]>(() => {
 });
 
 const selectedKey = ref({});
-watch(selectedKey, (key) => {
-  const val = updateSelectedKey(key, nodes.value, get.fileTree);
-  if (val !== undefined) {
-    get.tabs = val.results;
-    get.selectedTab = val.selectedTab;
-  }
-});
+watch(() => ({ key: selectedKey.value, n: nodes.value, ft: filtered_fileTree.value }),
+  ({ key, n, ft }) => {
+    const val = updateSelectedKey(key, n, ft);
+    if (val !== undefined) {
+      get.tabs = val.results;
+      get.selectedTab = val.selectedTab;
+    }
+  });
 </script>
 
 <template>

@@ -32,13 +32,12 @@
 
         <span class="input">Features:</span>
         <span class="select">
-          <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label"
-            placeholder="All" />
+          <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label" placeholder="" />
         </span>
       </div>
     </div>
 
-    <FileTree2 :get="got" />
+    <FileTree2 :get="got" :pkg="selectedPkg" />
   </div>
 </template>
 
@@ -47,6 +46,7 @@ import type { FetchError } from 'ofetch';
 import { Severity, type FileTree } from '~/shared/file-tree';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
+import type { Basic } from '~/shared/types';
 
 useHead({ title: 'Issue File Tree' });
 highlightRust();
@@ -60,12 +60,8 @@ const selectedChecker = ref("");
 const selectedTarget = ref("");
 const selectedFeatures = ref("");
 
-const pkgs = ref([]);
-const checkers = ref([]);
-const targets = ref([]);
-const features = ref([]);
-
 const got = ref<Get>(getEmpty());
+const basic = ref<Basic | null>(null);
 
 // Get user/repo list for filters.
 const user_repo = ref<UserRepo>({});
@@ -84,12 +80,24 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
     if (user && repo) {
       const target_ = (target === "") ? "All-Targets" : target;
       get(`ui/repos/${user}/${repo}/${target_}.json`);
+      getBasic(`ui/repos/${user}/${repo}/basic.json`);
     }
   }
 );
 
-// // Get  
-// watch(() => got.fileTree, ft => {});
+watch(basic, val => {
+  console.log(val);
+});
+const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
+const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
+const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
+const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
+
+// update filetree
+// watch(selectedPkg, pkg => {
+//   const data = got.value.fileTree.data.filter(node => pkg === "" || pkg === "All-Pkgs" || node.pkg == pkg);
+//   got_filtered.value.fileTree.data = data;
+// });
 
 // Download raw report JSON. 
 // NOTE: this function should mutate got state in the template.
@@ -133,6 +141,12 @@ function get(path: string) {
       // selectedTab.value = "Not Exists!";
       // fileTree.value = { kinds_order: [], data: [] };
     });
+}
+
+function getBasic(path: string) {
+  githubFetch<Basic>({ path })
+    .then(val => basic.value = val)
+    .catch(err => console.log(err))
 }
 </script>
 
