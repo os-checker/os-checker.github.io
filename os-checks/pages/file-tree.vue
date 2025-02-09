@@ -38,16 +38,12 @@
       </div>
     </div>
 
-    <!-- <Button severity="info">{{ fileTree.data.length }}</Button> -->
-    <!---->
-    <!-- <Print :get="got" :tmp="tmp" :file-tree="fileTree" :tabs="got.tabs" :selected-tab="got.selectedTab" /> -->
     <FileTree2 :get="got" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { FetchError } from 'ofetch';
-import Button from 'primevue/button';
 import { Severity, type FileTree } from '~/shared/file-tree';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
@@ -64,53 +60,32 @@ const selectedChecker = ref("");
 const selectedTarget = ref("");
 const selectedFeatures = ref("");
 
-// const users = ref([]);
-// const repos = ref([]);
 const pkgs = ref([]);
 const checkers = ref([]);
 const targets = ref([]);
 const features = ref([]);
 
-// const path = ref(`ui/repos/Azure-stars/elf_parser_rs/All-Targets.json`);
 const got = ref<Get>(getEmpty());
-const tmp = ref("");
-// got.value = get(path);
-// const got = ref(get(path));
 
-const fileTree = ref<FileTree>(getEmpty().fileTree);
-
+// Get user/repo list for filters
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
   .then(data => user_repo.value = data);
-console.log(user_repo);
+
 const users = computed(() => Object.keys(user_repo.value).sort());
 watch(users, (val) => selectedUser.value = val[0] ?? "");
 const repos = computed(() => user_repo.value[selectedUser.value]);
 watch(repos, (val) => selectedRepo.value = val[0] ?? "");
 watch(() => ({ user_: selectedUser.value, repo_: selectedRepo.value }),
   ({ user_, repo_ }) => {
-    if (user_ && repo_) {
+    if (user_ && repo_)
       get(`ui/repos/${user_}/${repo_}/All-Targets.json`);
-      // const new_got = get(`ui/repos/${user_}/${repo_}/All-Targets.json`);
-      // got.value = new_got;
-      tmp.value = `${user_}/${repo_}`;
-      // got.fileTree = new_got.fileTree;
-      // got.tabs = new_got.tabs;
-      // got.selectedTab = new_got.selectedTab;
-
-      // fileTree.value = new_got.fileTree;
-      fileTree.value = got.value.fileTree;
-      console.log(user_, repo_, got.value);
-    }
   }
 );
 
 function get(path: string) {
-  // basic.init_with_and_subscribe_to_current((target: string) => {
   githubFetch<FileTree>({ path })
     .then((file_tree) => {
-      // const file_tree: FileTree = JSON.parse(data as string);
-
       // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
       let kinds = {};
       for (const datum of file_tree.data) {
@@ -146,8 +121,6 @@ function get(path: string) {
       // selectedTab.value = "Not Exists!";
       // fileTree.value = { kinds_order: [], data: [] };
     });
-
-  console.log("utils got", got);
 }
 </script>
 
