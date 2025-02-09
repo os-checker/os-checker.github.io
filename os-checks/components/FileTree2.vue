@@ -7,9 +7,8 @@ const { get } = defineProps<Props>();
 const got = ref(get);
 
 watch(() => get, (val) => {
-  const { fileTree } = val;
   got.value = val;
-  console.log("get", val, fileTree)
+  console.log("get", val, val.fileTree)
 });
 
 watch(() => got.value.fileTree.data, data => console.log("watch got fileTree", data.length));

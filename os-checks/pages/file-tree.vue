@@ -38,12 +38,13 @@
       </div>
     </div>
 
+    <Print :get="got"></Print>
     <FileTree2 :get="got" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { get, getEmpty } from '~/shared/file-tree/utils';
+import { get, getEmpty, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
 
 useHead({ title: 'Issue File Tree' });
@@ -65,8 +66,8 @@ const checkers = ref([]);
 const targets = ref([]);
 const features = ref([]);
 
-const path = ref(`ui/repos/Azure-stars/elf_parser_rs/All-Targets.json`);
-const got = ref(getEmpty());
+// const path = ref(`ui/repos/Azure-stars/elf_parser_rs/All-Targets.json`);
+const got = ref<Get>(getEmpty());
 // got.value = get(path);
 // const got = ref(get(path));
 
@@ -85,7 +86,10 @@ watchEffect(() => {
   if (user_ && repo_) {
     const new_got = get(`ui/repos/${user_}/${repo_}/All-Targets.json`);
     got.value = new_got;
-    console.log(user_, repo_, got);
+    // got.fileTree = new_got.fileTree;
+    // got.tabs = new_got.tabs;
+    // got.selectedTab = new_got.selectedTab;
+    console.log(user_, repo_, got.value, new_got);
   }
 });
 </script>

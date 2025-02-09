@@ -2,6 +2,7 @@
 import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
 import type { FileTree, Kinds } from '~/shared/file-tree';
+import { getEmpty } from '../shared/file-tree/utils';
 
 type Props = { fetch_path: (target: string) => string };
 const props = defineProps<Props>();
@@ -10,7 +11,7 @@ highlightRust();
 
 const tabs = ref<CheckerResult[]>([]);
 const selectedTab = ref("");
-const fileTree = ref<FileTree>({ kinds_order: [], data: [] });
+const fileTree = ref<FileTree>(getEmpty().fileTree);
 
 const basic = useBasicStore();
 
@@ -46,7 +47,7 @@ basic.init_with_and_subscribe_to_current((target: string) => {
         lang: "rust", severity: Severity.Info, disabled: false
       }];
       selectedTab.value = "All good! 🥳";
-      fileTree.value = { kinds_order: [], data: [] };
+      fileTree.value = getEmpty().fileTree;
 
       // tabs.value = [{
       //   kind: "Not Exists!", raw: ["该目标架构下，无原始报告数据。"],

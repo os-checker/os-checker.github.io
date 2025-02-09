@@ -85,7 +85,7 @@ export function get(path: string): Get {
         lang: "rust", severity: Severity.Info, disabled: false
       }];
       got.selectedTab = "All good! 🥳";
-      got.fileTree = { kinds_order: [], data: [] };
+      got.fileTree = getEmpty().fileTree;
 
       // tabs.value = [{
       //   kind: "Not Exists!", raw: ["该目标架构下，无原始报告数据。"],
