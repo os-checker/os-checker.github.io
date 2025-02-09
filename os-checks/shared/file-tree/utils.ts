@@ -49,7 +49,7 @@ export function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResul
 
 export type Get = { tabs: CheckerResult[], selectedTab: string, fileTree: FileTree };
 export function getEmpty(): Get {
-  return { tabs: [], selectedTab: "", fileTree: { kinds_order: [], data: [] } };
+  return { tabs: [], selectedTab: "", fileTree: { kinds_order: [], data: [], repo: { user: "", repo: "" } } };
 }
 export function get(path: string): Get {
   let got = getEmpty();
@@ -95,6 +95,7 @@ export function get(path: string): Get {
       // fileTree.value = { kinds_order: [], data: [] };
     });
 
+  // console.log("got")
   return got;
 }
 

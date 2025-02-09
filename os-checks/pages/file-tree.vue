@@ -44,8 +44,10 @@
 
 <script lang="ts" setup>
 import { get, getEmpty } from '~/shared/file-tree/utils';
+import type { UserRepo } from '~/shared/target';
 
 useHead({ title: 'Issue File Tree' });
+highlightRust();
 
 const label = (a: string) => a;
 
@@ -56,16 +58,36 @@ const selectedChecker = ref("");
 const selectedTarget = ref("");
 const selectedFeatures = ref("");
 
-const users = ref([]);
-const repos = ref([]);
+// const users = ref([]);
+// const repos = ref([]);
 const pkgs = ref([]);
 const checkers = ref([]);
 const targets = ref([]);
 const features = ref([]);
 
-const path = `ui/repos/Azure-stars/elf_parser_rs/All-Targets.json`;
+const path = ref(`ui/repos/Azure-stars/elf_parser_rs/All-Targets.json`);
 const got = ref(getEmpty());
-got.value = get(path);
+// got.value = get(path);
+// const got = ref(get(path));
+
+
+const user_repo = ref<UserRepo>({});
+githubFetch<UserRepo>({ path: "ui/user_repo.json" })
+  .then(data => user_repo.value = data);
+console.log(user_repo);
+const users = computed(() => Object.keys(user_repo.value).sort());
+watch(users, (val) => selectedUser.value = val[0] ?? "");
+const repos = computed(() => user_repo.value[selectedUser.value]);
+watch(repos, (val) => selectedRepo.value = val[0] ?? "");
+watchEffect(() => {
+  const user_ = selectedUser.value;
+  const repo_ = selectedRepo.value;
+  if (user_ && repo_) {
+    const new_got = get(`ui/repos/${user_}/${repo_}/All-Targets.json`);
+    got.value = new_got;
+    console.log(user_, repo_, got);
+  }
+});
 </script>
 
 <style scoped>

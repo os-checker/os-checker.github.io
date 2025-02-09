@@ -4,17 +4,24 @@ import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
 type Props = { get: Get };
 const { get } = defineProps<Props>();
-const { fileTree } = get;
-const selectedTab = ref(get.selectedTab);
-let tabs = ref(get.tabs);
+const got = ref(get);
 
-highlightRust();
+watch(() => get, (val) => {
+  const { fileTree } = val;
+  got.value = val;
+  console.log("get", val, fileTree)
+});
 
-const nodes = computed<TreeNode[]>(() => {
-  let nodes: TreeNode[] = [];
+watch(() => got.value.fileTree.data, data => console.log("watch got fileTree", data.length));
+
+console.log("FileTree2", get.tabs.length)
+const nodes = ref<TreeNode[]>([]);
+watch(() => get.fileTree.data, data => {
+  console.log("computed fileTree.data", data.length)
+  nodes.value = [];
 
   let key = 0;
-  for (const datum of fileTree.data) {
+  for (const datum of data) {
     let node: TreeNode = {
       key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.pkg}`, children: [],
     };
@@ -33,18 +40,17 @@ const nodes = computed<TreeNode[]>(() => {
       user: datum.user, repo: datum.repo, pkg: datum.pkg,
       total: datum.count, fmt: count_fmt, clippy_warn: count_clippy_warn, clippy_error: count_clippy_error
     };
-    nodes.push(node);
+    nodes.value.push(node);
   }
-  console.log("nodes")
-  return nodes;
+  console.log("nodes", nodes.value.length)
 });
 
 const selectedKey = ref({});
 watch(selectedKey, (key) => {
-  const val = updateSelectedKey(key, nodes.value, fileTree);
+  const val = updateSelectedKey(key, nodes.value, get.fileTree);
   if (val !== undefined) {
-    tabs.value = val.results;
-    selectedTab.value = val.selectedTab;
+    get.tabs = val.results;
+    get.selectedTab = val.selectedTab;
   };
 });
 </script>
@@ -60,9 +66,9 @@ watch(selectedKey, (key) => {
     </div>
 
     <div class="fileViewResult">
-      <Tabs :value="selectedTab" scrollable>
+      <Tabs :value="get.selectedTab" scrollable>
         <TabList>
-          <Tab v-for="tab in tabs" :value="tab.kind" :disabled="tab.disabled">
+          <Tab v-for="tab in get.tabs" :value="tab.kind" :disabled="tab.disabled">
             {{ tab.kind }}
             <span class="tabBadge">
               <Badge :value="tab.raw.length" :severity="tab.severity" />
@@ -70,7 +76,7 @@ watch(selectedKey, (key) => {
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel v-for="tab in tabs" :value="tab.kind">
+          <TabPanel v-for="tab in get.tabs" :value="tab.kind">
             <ScrollPanel class="fileViewScroll" :dt="{
               bar: { background: '{primary.color}' },
             }">

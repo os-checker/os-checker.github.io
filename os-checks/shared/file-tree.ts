@@ -11,7 +11,11 @@ export type Datum = {
 export type FileTree = {
   // 诊断类别数组，越往前的越优先展示
   kinds_order: string[],
-  data: Datum[]
+  data: Datum[],
+  repo: {
+    user: string,
+    repo: string,
+  }
 }
 
 export type CheckerResult = {
