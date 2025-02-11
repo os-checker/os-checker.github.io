@@ -78,7 +78,7 @@ watch(repos, (val) => selectedRepo.value = val[0] ?? "");
 watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selectedTarget.value }),
   ({ user, repo, target }) => {
     if (user && repo) {
-      const target_ = (target === "") ? "All-Targets" : target;
+      const target_ = target || "All-Targets";
       get(`ui/repos/${user}/${repo}/${target_}.json`);
       getBasic(`ui/repos/${user}/${repo}/basic.json`);
     }
