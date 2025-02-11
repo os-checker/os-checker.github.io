@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
 import type { FileTree } from '~/shared/file-tree';
+import { ALL_PKGS } from '~/shared/file-tree/types';
 import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
 type Props = { get: Get, pkg?: string };
@@ -8,14 +9,12 @@ const { get, pkg } = defineProps<Props>();
 
 const filtered_fileTree = computed<FileTree>(() => {
   const ft = get.fileTree;
-  if (!pkg || pkg === "All-Pkgs") return ft;
+  if (!pkg || pkg === ALL_PKGS) return ft;
   const data = ft.data.filter(node => node.pkg === pkg);
   return { ...ft, ...{ data } }
 });
 
-console.log("FileTree2", get.tabs.length)
 const nodes = computed<TreeNode[]>(() => {
-  console.log("computed fileTree.data", filtered_fileTree.value.data.length)
   let nodes = [];
 
   let key = 0;
@@ -40,7 +39,6 @@ const nodes = computed<TreeNode[]>(() => {
     };
     nodes.push(node);
   }
-  console.log("nodes", nodes.length);
   return nodes;
 });
 

@@ -14,7 +14,17 @@
 
         <span class="input">Pkg:</span>
         <span class="select">
-          <Select v-model="selectedPkg" filter showClear :options="pkgs" :optionLabel="label" placeholder="All" />
+          <Select v-model="selectedPkg" filter showClear :options="pkgs.names">
+            <template #option="{ option }">
+              <Tag severity="danger" class="drop-down-options">{{ pkgs.counts[option] }}</Tag>
+              {{ option }}
+            </template>
+
+            <template #value="{ value }">
+              {{ value || ALL_PKGS }}
+              <Tag severity="danger" style="margin-left: 5px">{{ pkgs.counts[value || ALL_PKGS] }}</Tag>
+            </template>
+          </Select>
         </span>
 
         <span class="input">Checker:</span>
@@ -44,6 +54,7 @@
 <script lang="ts" setup>
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree } from '~/shared/file-tree';
+import { ALL_PKGS, type PkgCount } from '~/shared/file-tree/types';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
 import type { Basic } from '~/shared/types';
@@ -85,13 +96,37 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
   }
 );
 
-watch(basic, val => {
-  console.log(val);
-});
-const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
+// const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
 const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
 const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
+const pkgs = computed<{ counts: PkgCount, names: string[] }>(() => {
+  let counts: { [key: string]: number } = {};
+  for (const data of got.value.fileTree.data) {
+    const pkg = data.pkg;
+    const len = data.raw_reports.reduce((acc, reports) => acc + reports.count, 0);
+    // usually if can't be true due to impossible duplicated pkg name
+    if (counts[pkg]) counts[pkg] += len;
+    else counts[pkg] = len;
+  }
+  counts[ALL_PKGS] = Object.values(counts).reduce((acc, c) => acc + c, 0);
+  // descending sort by count and then name
+  const names = Object.entries(counts)
+    .sort((a, b) => {
+      const cmp_count = b[1] - a[1];
+      if (cmp_count === 0) return a[0].localeCompare(b[0]);
+      return cmp_count
+    })
+    .map(ele => ele[0]);
+  return { counts, names };
+});
+
+watch(pkgs, val => {
+  console.log("pkgs:", val);
+});
+// const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
+// const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
+// const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
 
 // update filetree
 // watch(selectedPkg, pkg => {
@@ -172,5 +207,11 @@ function getBasic(path: string) {
 
 .sources-table {
   --p-datatable-header-cell-color: var(--p-orange-400);
+}
+
+.drop-down-options {
+  margin-right: 8px;
+  width: 40px;
+  justify-content: right;
 }
 </style>
