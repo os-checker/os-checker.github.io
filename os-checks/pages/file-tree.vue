@@ -13,12 +13,9 @@
         </span>
 
         <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
+        <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
+        <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
 
-        <span class="input">Checker:</span>
-        <span class="select">
-          <Select v-model="selectedChecker" filter showClear :options="checkers" :optionLabel="label"
-            placeholder="All" />
-        </span>
       </div>
 
       <div style="padding: 2px 8px 10px 8px">
@@ -41,7 +38,7 @@
 <script lang="ts" setup>
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree } from '~/shared/file-tree';
-import { ALL_PKGS, type DropDownOptions } from '~/shared/file-tree/types';
+import { ALL_PKGS, ALL_CHECKERS, type DropDownOptions, type Counts, counts_to_options, emptyOptions, ALL_KINDS } from '~/shared/file-tree/types';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
 import type { Basic } from '~/shared/types';
@@ -55,6 +52,7 @@ const selectedUser = ref("");
 const selectedRepo = ref("");
 const selectedPkg = ref("");
 const selectedChecker = ref("");
+const selectedKind = ref("");
 const selectedTarget = ref("");
 const selectedFeatures = ref("");
 
@@ -83,12 +81,22 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
   }
 );
 
+
+// watch(selectedPkg, pkg => {
+//   console.log(`pkg=\`${pkg}\``); 
+//   const data = got.value.fileTree.data;
+//   got2.value.fileTree.data = (pkg || pkg !== ALL_PKGS) ? data.filter(val => val.pkg === pkg) : data;
+// });
+// watch(selectedChecker, ck => {
+//   got2.value.fileTree.data = got2.value.fileTree.data.filter(data => data.pkg == pkg);
+// });
+
 // const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
-const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
+// const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
 const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
 const pkgs = computed<DropDownOptions>(() => {
-  let counts: { [key: string]: number } = {};
+  let counts: Counts = {};
   for (const data of got.value.fileTree.data) {
     const pkg = data.pkg;
     const len = data.raw_reports.reduce((acc, reports) => acc + reports.count, 0);
@@ -96,21 +104,48 @@ const pkgs = computed<DropDownOptions>(() => {
     if (counts[pkg]) counts[pkg] += len;
     else counts[pkg] = len;
   }
-  counts[ALL_PKGS] = Object.values(counts).reduce((acc, c) => acc + c, 0);
-  // descending sort by count and then name
-  const names = Object.entries(counts)
-    .sort((a, b) => {
-      const cmp_count = b[1] - a[1];
-      if (cmp_count === 0) return a[0].localeCompare(b[0]);
-      return cmp_count
-    })
-    .map(ele => ele[0]);
-  return { counts, names };
+  return counts_to_options(counts, ALL_PKGS);
 });
 
-watch(pkgs, val => {
-  console.log("pkgs:", val);
+const kinds = computed<DropDownOptions>(() => {
+  let counts: Counts = {};
+  for (const ft of got.value.fileTree.data) {
+    for (const report of ft.raw_reports) {
+      for (const [kind, arr] of Object.entries(report.kinds)) {
+        let len = arr.length;
+        if (counts[kind]) counts[kind] += len;
+        else counts[kind] = len;
+      }
+    }
+  }
+  return counts_to_options(counts, ALL_KINDS);
 });
+
+const kind_checker_map = computed(() => {
+  const data = basic.value;
+  if (!data) return {};
+
+  // {"checker": ["kind1", "kind2"]} => {"kind1": "checker", "kind2": "checker"}
+  let kind_checker_map: { [key: string]: string } = {};
+  for (const [ck, kinds] of Object.entries(data.kinds.mapping)) {
+    for (const kind of kinds) {
+      kind_checker_map[kind] = ck;
+    }
+  }
+  return kind_checker_map;
+})
+
+const checkers = computed<DropDownOptions>(() => {
+  let counts: Counts = {};
+  for (const [kind, count] of Object.entries(kinds.value.counts)) {
+    const ck = kind_checker_map.value[kind];
+    if (!ck) continue;
+    if (counts[ck]) counts[ck] += count;
+    else counts[ck] = count;
+  }
+  return counts_to_options(counts, ALL_CHECKERS);
+});
+
 // const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
 // const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 // const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
