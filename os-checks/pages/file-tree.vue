@@ -12,20 +12,7 @@
           <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
         </span>
 
-        <span class="input">Pkg:</span>
-        <span class="select">
-          <Select v-model="selectedPkg" filter showClear :options="pkgs.names">
-            <template #option="{ option }">
-              <Tag severity="danger" class="drop-down-options">{{ pkgs.counts[option] }}</Tag>
-              {{ option }}
-            </template>
-
-            <template #value="{ value }">
-              {{ value || ALL_PKGS }}
-              <Tag severity="danger" style="margin-left: 5px">{{ pkgs.counts[value || ALL_PKGS] }}</Tag>
-            </template>
-          </Select>
-        </span>
+        <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
 
         <span class="input">Checker:</span>
         <span class="select">
@@ -44,8 +31,6 @@
         <span class="select">
           <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label" placeholder="" />
         </span>
-
-        <DropDownWithCount v-model="selectedPkg" :all="ALL_PKGS" :counts="pkgs"></DropDownWithCount>
       </div>
     </div>
 
@@ -187,6 +172,7 @@ function getBasic(path: string) {
 }
 </script>
 
+<!-- FIXME: remove these -->
 <style scoped>
 .input {
   font-size: 14.5px;

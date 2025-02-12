@@ -1,25 +1,27 @@
 <script lang="ts" setup>
 import type { DropDownOptions } from '~/shared/file-tree/types';
 
-type Props = { counts: DropDownOptions, all: string };
-const { counts, all } = defineProps<Props>();
+type Props = { tag: string, counts: DropDownOptions, all: string };
+const { tag, counts, all } = defineProps<Props>();
 const selected = defineModel({ default: "" });
-
 </script>
 
 <template>
 
-  <Select v-model="selected" filter showClear :options="counts.names">
-    <template #option="{ option }">
-      <Tag severity="danger" class="drop-down-options">{{ counts.counts[option] }}</Tag>
-      {{ option }}
-    </template>
+  <span class="input">{{ tag }}:</span>
+  <span class="select">
+    <Select v-model="selected" filter showClear :options="counts.names">
+      <template #option="{ option }">
+        <Tag severity="danger" class="drop-down-options">{{ counts.counts[option] }}</Tag>
+        {{ option }}
+      </template>
 
-    <template #value="{ value }">
-      {{ value || all }}
-      <Tag severity="danger" style="margin-left: 5px">{{ counts.counts[value || all] }}</Tag>
-    </template>
-  </Select>
+      <template #value="{ value }">
+        {{ value || all }}
+        <Tag severity="danger" style="margin-left: 5px">{{ counts.counts[value || all] }}</Tag>
+      </template>
+    </Select>
+  </span>
 
 </template>
 
