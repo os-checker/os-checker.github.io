@@ -44,6 +44,8 @@
         <span class="select">
           <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label" placeholder="" />
         </span>
+
+        <DropDownWithCount v-model="selectedPkg" :all="ALL_PKGS" :counts="pkgs"></DropDownWithCount>
       </div>
     </div>
 
@@ -54,7 +56,7 @@
 <script lang="ts" setup>
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree } from '~/shared/file-tree';
-import { ALL_PKGS, type PkgCount } from '~/shared/file-tree/types';
+import { ALL_PKGS, type DropDownOptions } from '~/shared/file-tree/types';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
 import type { Basic } from '~/shared/types';
@@ -100,7 +102,7 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
 const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
 const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
-const pkgs = computed<{ counts: PkgCount, names: string[] }>(() => {
+const pkgs = computed<DropDownOptions>(() => {
   let counts: { [key: string]: number } = {};
   for (const data of got.value.fileTree.data) {
     const pkg = data.pkg;
