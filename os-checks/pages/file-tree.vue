@@ -13,8 +13,7 @@
         </span>
 
         <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-        <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers"
-          @change="val => isClear.checker = val" />
+        <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
         <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
 
       </div>
@@ -37,6 +36,7 @@
 </template>
 
 <script lang="ts" setup>
+import { cloneDeep } from 'es-toolkit/compat';
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree, type Kinds } from '~/shared/file-tree';
 import { ALL_PKGS, ALL_CHECKERS, type DropDownOptions, type Counts, counts_to_options, emptyOptions, ALL_KINDS } from '~/shared/file-tree/types';
@@ -83,7 +83,7 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
   }
 );
 
-watch(got, val => got2.value = val)
+watch(got, val => got2.value = cloneDeep(val));
 
 // const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
 // const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
@@ -104,7 +104,7 @@ function compute_pkgs(g: Get): DropDownOptions {
 const pkgs = ref(emptyOptions());
 watch(selectedPkg, pkg => {
   const data = got.value.fileTree.data;
-  got2.value.fileTree.data = (pkg || pkg !== ALL_PKGS) ? data.filter(val => val.pkg === pkg) : data;
+  got2.value.fileTree.data = (pkg || pkg !== ALL_PKGS) ? data.filter(val => val.pkg === pkg) : cloneDeep(data);
 });
 
 const kinds = computed<DropDownOptions>(() => {
@@ -150,7 +150,8 @@ watch(selectedChecker, ck => {
   if (!ck_kinds || ck === ALL_CHECKERS) return;
   const kinds_set = new Set(ck_kinds);
 
-  const g = got.value;
+  // deep copy due to got shouldn't be mutated
+  const g = cloneDeep(got.value);
   for (const data of g.fileTree.data) {
     const reports = data.raw_reports;
     for (const r of reports) {
@@ -175,17 +176,17 @@ watch(selectedChecker, ck => {
   pkgs.value = compute_pkgs(g);
   console.log(pkgs.value, g.fileTree.data);
 });
-const isClear = reactive({
-  pkg: false,
-  checker: false,
-  kind: false
-});
-watch(isClear, val => console.log("file-tree: ", val));
 
 watch(
   () => ({ pkg: selectedPkg.value, ck: selectedChecker.value, kind: selectedKind.value }),
-  ({ pkg, ck, kind }) => { 
-console.log("watch selectedChecker: ", ck);
+  ({ pkg, ck, kind }) => {
+    console.log("watch selectedChecker: ", ck);
+    if (ck === null || ck === ALL_CHECKERS) {
+      // reset
+      const g = cloneDeep(got.value);
+      got2.value = g;
+      pkgs.value = compute_pkgs(g);
+    }
   }
 );
 
@@ -220,7 +221,7 @@ function get(path: string) {
       got.value.tabs = checkerResult(kinds, file_tree.kinds_order).results;
       got.value.selectedTab = got.value.tabs[0]?.kind ?? "";
       got.value.fileTree = file_tree;
-      got2.value = got.value;
+      got2.value = cloneDeep(got.value);
       pkgs.value = compute_pkgs(got2.value);
     }).catch((_: FetchError) => {
       // 不存在该文件：意味着该目标架构下的所有仓库没有检查出错误
@@ -235,7 +236,7 @@ function get(path: string) {
       }];
       got.value.selectedTab = "All good! 🥳";
       got.value.fileTree = getEmpty().fileTree;
-      got2.value = got.value;
+      got2.value = cloneDeep(got.value);
 
       // tabs.value = [{
       //   kind: "Not Exists!", raw: ["该目标架构下，无原始报告数据。"],
