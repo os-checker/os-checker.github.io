@@ -13,7 +13,8 @@
         </span>
 
         <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-        <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
+        <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers"
+          @change="val => isClear.checker = val" />
         <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
 
       </div>
@@ -57,7 +58,7 @@ const selectedTarget = ref("");
 const selectedFeatures = ref("");
 
 const got = ref<Get>(getEmpty());
-const got2 = shallowRef<Get>(getEmpty());
+const got2 = ref<Get>(getEmpty());
 const basic = ref<Basic | null>(null);
 
 // Get user/repo list for filters.
@@ -149,8 +150,8 @@ watch(selectedChecker, ck => {
   if (!ck_kinds || ck === ALL_CHECKERS) return;
   const kinds_set = new Set(ck_kinds);
 
-  const ft = got.value;
-  for (const data of ft.fileTree.data) {
+  const g = got.value;
+  for (const data of g.fileTree.data) {
     const reports = data.raw_reports;
     for (const r of reports) {
       let kinds_new: Kinds = {};
@@ -169,11 +170,24 @@ watch(selectedChecker, ck => {
     data.raw_reports = reports.filter(r => r.count !== 0).sort((a, b) => (b.count - a.count));
     data.count = data.raw_reports.reduce((acc, r) => acc + r.count, 0);
   }
-  ft.fileTree.data = ft.fileTree.data.filter(d => d.count !== 0);
-  got2.value = ft;
-  pkgs.value = compute_pkgs(ft);
-  console.log(pkgs.value, ft.fileTree.data);
+  g.fileTree.data = g.fileTree.data.filter(d => d.count !== 0);
+  got2.value = g;
+  pkgs.value = compute_pkgs(g);
+  console.log(pkgs.value, g.fileTree.data);
 });
+const isClear = reactive({
+  pkg: false,
+  checker: false,
+  kind: false
+});
+watch(isClear, val => console.log("file-tree: ", val));
+
+watch(
+  () => ({ pkg: selectedPkg.value, ck: selectedChecker.value, kind: selectedKind.value }),
+  ({ pkg, ck, kind }) => { 
+console.log("watch selectedChecker: ", ck);
+  }
+);
 
 // const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
 // const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
