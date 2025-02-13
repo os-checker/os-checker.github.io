@@ -31,13 +31,13 @@
       </div>
     </div>
 
-    <FileTree2 :get="got" :pkg="selectedPkg" />
+    <FileTree2 :get="got2" :pkg="selectedPkg" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import type { FetchError } from 'ofetch';
-import { Severity, type FileTree } from '~/shared/file-tree';
+import { Severity, type FileTree, type Kinds } from '~/shared/file-tree';
 import { ALL_PKGS, ALL_CHECKERS, type DropDownOptions, type Counts, counts_to_options, emptyOptions, ALL_KINDS } from '~/shared/file-tree/types';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
@@ -57,6 +57,7 @@ const selectedTarget = ref("");
 const selectedFeatures = ref("");
 
 const got = ref<Get>(getEmpty());
+const got2 = shallowRef<Get>(getEmpty());
 const basic = ref<Basic | null>(null);
 
 // Get user/repo list for filters.
@@ -81,23 +82,16 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
   }
 );
 
-
-// watch(selectedPkg, pkg => {
-//   console.log(`pkg=\`${pkg}\``); 
-//   const data = got.value.fileTree.data;
-//   got2.value.fileTree.data = (pkg || pkg !== ALL_PKGS) ? data.filter(val => val.pkg === pkg) : data;
-// });
-// watch(selectedChecker, ck => {
-//   got2.value.fileTree.data = got2.value.fileTree.data.filter(data => data.pkg == pkg);
-// });
+watch(got, val => got2.value = val)
 
 // const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
 // const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
 const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
-const pkgs = computed<DropDownOptions>(() => {
+
+function compute_pkgs(g: Get): DropDownOptions {
   let counts: Counts = {};
-  for (const data of got.value.fileTree.data) {
+  for (const data of g.fileTree.data) {
     const pkg = data.pkg;
     const len = data.raw_reports.reduce((acc, reports) => acc + reports.count, 0);
     // usually if can't be true due to impossible duplicated pkg name
@@ -105,11 +99,16 @@ const pkgs = computed<DropDownOptions>(() => {
     else counts[pkg] = len;
   }
   return counts_to_options(counts, ALL_PKGS);
+}
+const pkgs = ref(emptyOptions());
+watch(selectedPkg, pkg => {
+  const data = got.value.fileTree.data;
+  got2.value.fileTree.data = (pkg || pkg !== ALL_PKGS) ? data.filter(val => val.pkg === pkg) : data;
 });
 
 const kinds = computed<DropDownOptions>(() => {
   let counts: Counts = {};
-  for (const ft of got.value.fileTree.data) {
+  for (const ft of got2.value.fileTree.data) {
     for (const report of ft.raw_reports) {
       for (const [kind, arr] of Object.entries(report.kinds)) {
         let len = arr.length;
@@ -145,6 +144,36 @@ const checkers = computed<DropDownOptions>(() => {
   }
   return counts_to_options(counts, ALL_CHECKERS);
 });
+watch(selectedChecker, ck => {
+  const ck_kinds = basic.value?.kinds.mapping[ck];
+  if (!ck_kinds || ck === ALL_CHECKERS) return;
+  const kinds_set = new Set(ck_kinds);
+
+  const ft = got.value;
+  for (const data of ft.fileTree.data) {
+    const reports = data.raw_reports;
+    for (const r of reports) {
+      let kinds_new: Kinds = {};
+      let len = 0;
+      for (const [kind, arr] of Object.entries(r.kinds)) {
+        if (kinds_set.has(kind)) {
+          kinds_new[kind] = arr;
+          len += arr.length;
+        }
+      }
+      // filter ck kinds only
+      r.kinds = kinds_new;
+      r.count = len;
+    }
+    // remove count==0 items and sort
+    data.raw_reports = reports.filter(r => r.count !== 0).sort((a, b) => (b.count - a.count));
+    data.count = data.raw_reports.reduce((acc, r) => acc + r.count, 0);
+  }
+  ft.fileTree.data = ft.fileTree.data.filter(d => d.count !== 0);
+  got2.value = ft;
+  pkgs.value = compute_pkgs(ft);
+  console.log(pkgs.value, ft.fileTree.data);
+});
 
 // const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
 // const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
@@ -177,6 +206,8 @@ function get(path: string) {
       got.value.tabs = checkerResult(kinds, file_tree.kinds_order).results;
       got.value.selectedTab = got.value.tabs[0]?.kind ?? "";
       got.value.fileTree = file_tree;
+      got2.value = got.value;
+      pkgs.value = compute_pkgs(got2.value);
     }).catch((_: FetchError) => {
       // 不存在该文件：意味着该目标架构下的所有仓库没有检查出错误
       // 注意，由于使用 parseResponse，这个错误码并不为 404，而是 undefined，
@@ -190,6 +221,7 @@ function get(path: string) {
       }];
       got.value.selectedTab = "All good! 🥳";
       got.value.fileTree = getEmpty().fileTree;
+      got2.value = got.value;
 
       // tabs.value = [{
       //   kind: "Not Exists!", raw: ["该目标架构下，无原始报告数据。"],
