@@ -61,7 +61,6 @@ const selectedFeatures = ref("");
 const got = ref<Get>(getEmpty());
 const got2 = ref<Get>(getEmpty());
 const basic = ref<Basic | null>(null);
-const dropdown = ref<Dropdown>(Dropdown.empty());
 
 // Get user/repo list for filters.
 const user_repo = ref<UserRepo>({});
@@ -88,18 +87,12 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
 const pkgs = ref(emptyOptions());
 const kinds = ref(emptyOptions());
 const checkers = ref(emptyOptions());
-watch(() => ({ g: got.value, b: basic.value }), ({ g, b }) => {
-  if (!b) return console.log("basic is not ready");
+watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) => {
+  if (!b) return;
 
-  dropdown.value = new Dropdown(g, gen_map(b));
-  // console.log("got & basic: ", g, b, dropdown.value);
-  pkgs.value = cloneDeep(dropdown.value.pkgs);
-  kinds.value = cloneDeep(dropdown.value.kinds);
-  checkers.value = cloneDeep(dropdown.value.checkers);
-});
-watch(() => ({ g: got2.value, d: dropdown.value }), ({ g, d }) => {
-  const dropdown_new = d.filter(g);
-  // console.log("got & basic: ", g, dropdown_new);
+  const dropdown = new Dropdown(g, gen_map(b));
+  const dropdown_new = dropdown.filter(g2);
+
   pkgs.value = cloneDeep(dropdown_new.pkgs);
   kinds.value = cloneDeep(dropdown_new.kinds);
   checkers.value = cloneDeep(dropdown_new.checkers);

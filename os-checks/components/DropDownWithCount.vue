@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import type { SelectChangeEvent } from 'primevue/select';
 import type { DropDownOptions } from '~/shared/file-tree/types';
 
 type Props = { tag: string, counts: DropDownOptions, all: string };
-const { tag, counts, all } = defineProps<Props>();
+const { tag, counts } = defineProps<Props>();
 const selected = defineModel({ default: "" });
 </script>
 
@@ -17,10 +16,10 @@ const selected = defineModel({ default: "" });
         {{ option }}
       </template>
 
-      <template #value="{ value }">
-        {{ value || all }}
-        <Tag severity="danger" style="margin-left: 5px">{{ counts.counts[value || all] }}</Tag>
-      </template>
+      <!-- <template #value="{ value }"> -->
+      <!--   {{ value || all }} -->
+      <!--   <Tag severity="danger" style="margin-left: 5px">{{ counts.counts[value || all] }}</Tag> -->
+      <!-- </template> -->
     </Select>
   </span>
 
