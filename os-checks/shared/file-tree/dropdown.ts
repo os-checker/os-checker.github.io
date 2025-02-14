@@ -34,6 +34,18 @@ export class Dropdown {
     obj.pkgs = options; obj.kinds = options; obj.checkers = options; obj.map = {};
     return obj;
   }
+
+  static update_by_pkg(pkg: string, got: Get, got2: Get) {
+    update_by_pkg(pkg, got, got2);
+  }
+
+  static update_by_kind(kind: string, got: Get, got2: Get) {
+    update_by_kind(kind, got, got2);
+  }
+
+  static update_by_checker(kinds: string[], got: Get, got2: Get) {
+    update_by_checker(kinds, got, got2);
+  }
 }
 
 // generate filter options

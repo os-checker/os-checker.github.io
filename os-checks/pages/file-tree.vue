@@ -85,9 +85,17 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
   }
 );
 
-watch(() => [got.value, basic.value], ([g, b]) => {
-  if (basic.value) dropdown.value = new Dropdown(got.value, gen_map(basic.value));
-  console.log("got & basic: ", g, b, dropdown.value);
+const pkgs = ref(emptyOptions());
+const kinds = ref(emptyOptions());
+const checkers = ref(emptyOptions());
+watch(() => ({ g: got.value, b: basic.value }), ({ g, b }) => {
+  if (!b) return console.log("basic is not ready");
+
+  dropdown.value = new Dropdown(g, gen_map(b));
+  // console.log("got & basic: ", g, b, dropdown.value);
+  pkgs.value = cloneDeep(dropdown.value.pkgs);
+  kinds.value = cloneDeep(dropdown.value.kinds);
+  checkers.value = cloneDeep(dropdown.value.checkers);
 });
 
 // const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
@@ -95,123 +103,123 @@ watch(() => [got.value, basic.value], ([g, b]) => {
 const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
 
-function compute_pkgs(g: Get): DropDownOptions {
-  let counts: Counts = {};
-  for (const data of g.fileTree.data) {
-    const pkg = data.pkg;
-    const len = data.raw_reports.reduce((acc, reports) => acc + reports.count, 0);
-    // usually if can't be true due to impossible duplicated pkg name
-    if (counts[pkg]) counts[pkg] += len;
-    else counts[pkg] = len;
-  }
-  return counts_to_options(counts, ALL_PKGS);
-}
-const pkgs = ref(emptyOptions());
 watch(selectedPkg, pkg => {
-  const data = got.value.fileTree.data;
-  got2.value.fileTree.data = (pkg || pkg !== ALL_PKGS) ? data.filter(val => val.pkg === pkg) : cloneDeep(data);
+  if (pkg === null || pkg === ALL_PKGS) got2.value = cloneDeep(got.value);
+  else Dropdown.update_by_pkg(pkg, got.value, got2.value);
+});
+watch(selectedKind, kind => {
+  if (kind === null || kind === ALL_KINDS) got2.value = cloneDeep(got.value);
+  else Dropdown.update_by_kind(kind, got.value, got2.value);
+});
+watch(selectedChecker, checker => {
+  if (checker === null || checker === ALL_CHECKERS) got2.value = cloneDeep(got.value);
+  else {
+    const ck_kinds = basic.value?.kinds.mapping[checker];
+    if (!ck_kinds) return;
+    Dropdown.update_by_checker(ck_kinds, got.value, got2.value);
+  }
 });
 
-const kinds = computed<DropDownOptions>(() => {
-  let counts: Counts = {};
-  for (const ft of got2.value.fileTree.data) {
-    for (const report of ft.raw_reports) {
-      for (const [kind, arr] of Object.entries(report.kinds)) {
-        let len = arr.length;
-        if (counts[kind]) counts[kind] += len;
-        else counts[kind] = len;
-      }
-    }
-  }
-  return counts_to_options(counts, ALL_KINDS);
-});
+// const kinds = computed<DropDownOptions>(() => {
+//   let counts: Counts = {};
+//   for (const ft of got2.value.fileTree.data) {
+//     for (const report of ft.raw_reports) {
+//       for (const [kind, arr] of Object.entries(report.kinds)) {
+//         let len = arr.length;
+//         if (counts[kind]) counts[kind] += len;
+//         else counts[kind] = len;
+//       }
+//     }
+//   }
+//   return counts_to_options(counts, ALL_KINDS);
+// });
 
-const kind_checker_map = computed(() => {
-  const data = basic.value;
-  if (!data) return {};
+// const kind_checker_map = computed(() => {
+//   const data = basic.value;
+//   if (!data) return {};
+//
+//   // {"checker": ["kind1", "kind2"]} => {"kind1": "checker", "kind2": "checker"}
+//   let kind_checker_map: { [key: string]: string } = {};
+//   for (const [ck, kinds] of Object.entries(data.kinds.mapping)) {
+//     for (const kind of kinds) {
+//       kind_checker_map[kind] = ck;
+//     }
+//   }
+//   return kind_checker_map;
+// })
 
-  // {"checker": ["kind1", "kind2"]} => {"kind1": "checker", "kind2": "checker"}
-  let kind_checker_map: { [key: string]: string } = {};
-  for (const [ck, kinds] of Object.entries(data.kinds.mapping)) {
-    for (const kind of kinds) {
-      kind_checker_map[kind] = ck;
-    }
-  }
-  return kind_checker_map;
-})
+// const checkers = computed<DropDownOptions>(() => {
+//   let counts: Counts = {};
+//   for (const [kind, count] of Object.entries(kinds.value.counts)) {
+//     const ck = kind_checker_map.value[kind];
+//     if (!ck) continue;
+//     if (counts[ck]) counts[ck] += count;
+//     else counts[ck] = count;
+//   }
+//   return counts_to_options(counts, ALL_CHECKERS);
+// });
+//
+// function filter_kinds(kinds: string[]): Get {
+//   const kinds_set = new Set(kinds);
+//   // deep copy due to got shouldn't be mutated
+//   const g = cloneDeep(got.value);
+//   for (const data of g.fileTree.data) {
+//     const reports = data.raw_reports;
+//     for (const r of reports) {
+//       let kinds_new: Kinds = {};
+//       let len = 0;
+//       for (const [kind, arr] of Object.entries(r.kinds)) {
+//         if (kinds_set.has(kind)) {
+//           kinds_new[kind] = arr;
+//           len += arr.length;
+//         }
+//       }
+//       // filter ck kinds only
+//       r.kinds = kinds_new;
+//       r.count = len;
+//     }
+//     // remove count==0 items and sort
+//     data.raw_reports = reports.filter(r => r.count !== 0).sort((a, b) => (b.count - a.count));
+//     data.count = data.raw_reports.reduce((acc, r) => acc + r.count, 0);
+//   }
+//   g.fileTree.data = g.fileTree.data.filter(d => d.count !== 0);
+//   return g;
+// }
 
-const checkers = computed<DropDownOptions>(() => {
-  let counts: Counts = {};
-  for (const [kind, count] of Object.entries(kinds.value.counts)) {
-    const ck = kind_checker_map.value[kind];
-    if (!ck) continue;
-    if (counts[ck]) counts[ck] += count;
-    else counts[ck] = count;
-  }
-  return counts_to_options(counts, ALL_CHECKERS);
-});
-
-function filter_kinds(kinds: string[]): Get {
-  const kinds_set = new Set(kinds);
-  // deep copy due to got shouldn't be mutated
-  const g = cloneDeep(got.value);
-  for (const data of g.fileTree.data) {
-    const reports = data.raw_reports;
-    for (const r of reports) {
-      let kinds_new: Kinds = {};
-      let len = 0;
-      for (const [kind, arr] of Object.entries(r.kinds)) {
-        if (kinds_set.has(kind)) {
-          kinds_new[kind] = arr;
-          len += arr.length;
-        }
-      }
-      // filter ck kinds only
-      r.kinds = kinds_new;
-      r.count = len;
-    }
-    // remove count==0 items and sort
-    data.raw_reports = reports.filter(r => r.count !== 0).sort((a, b) => (b.count - a.count));
-    data.count = data.raw_reports.reduce((acc, r) => acc + r.count, 0);
-  }
-  g.fileTree.data = g.fileTree.data.filter(d => d.count !== 0);
-  return g;
-}
-
-watch(
-  () => ({ pkg: selectedPkg.value, ck: selectedChecker.value, kind: selectedKind.value }),
-  ({ pkg, ck, kind }) => {
-    let got2_new = null;
-    let pkgs_new = null;
-    if (ck === null || ck === ALL_CHECKERS) {
-      // reset
-      const g = cloneDeep(got.value);
-      got2_new = g;
-      pkgs_new = compute_pkgs(g);
-    } else {
-      const ck_kinds = basic.value?.kinds.mapping[ck];
-      if (ck_kinds) {
-        const g = filter_kinds(ck_kinds);
-        got2_new = g;
-        pkgs_new = compute_pkgs(g);
-      }
-    }
-
-    if (kind === null || kind === ALL_KINDS) {
-      // reset
-      const g = cloneDeep(got.value);
-      got2_new = g;
-      pkgs_new = compute_pkgs(g);
-    } else {
-      const g = filter_kinds([kind]);
-      got2_new = g;
-      pkgs_new = compute_pkgs(g);
-    }
-
-    if (got2_new) got2.value = got2_new;
-    if (pkgs_new) pkgs.value = pkgs_new;
-  }
-);
+// watch(
+//   () => ({ pkg: selectedPkg.value, ck: selectedChecker.value, kind: selectedKind.value }),
+//   ({ pkg, ck, kind }) => {
+//     let got2_new = null;
+//     let pkgs_new = null;
+//     if (ck === null || ck === ALL_CHECKERS) {
+//       // reset
+//       const g = cloneDeep(got.value);
+//       got2_new = g;
+//       pkgs_new = compute_pkgs(g);
+//     } else {
+//       const ck_kinds = basic.value?.kinds.mapping[ck];
+//       if (ck_kinds) {
+//         const g = filter_kinds(ck_kinds);
+//         got2_new = g;
+//         pkgs_new = compute_pkgs(g);
+//       }
+//     }
+//
+//     if (kind === null || kind === ALL_KINDS) {
+//       // reset
+//       const g = cloneDeep(got.value);
+//       got2_new = g;
+//       pkgs_new = compute_pkgs(g);
+//     } else {
+//       const g = filter_kinds([kind]);
+//       got2_new = g;
+//       pkgs_new = compute_pkgs(g);
+//     }
+//
+//     if (got2_new) got2.value = got2_new;
+//     if (pkgs_new) pkgs.value = pkgs_new;
+//   }
+// );
 
 // const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
 // const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
@@ -245,7 +253,7 @@ function get(path: string) {
       got.value.selectedTab = got.value.tabs[0]?.kind ?? "";
       got.value.fileTree = file_tree;
       got2.value = cloneDeep(got.value);
-      pkgs.value = compute_pkgs(got2.value);
+      // pkgs.value = compute_pkgs(got2.value);
     }).catch((_: FetchError) => {
       // 不存在该文件：意味着该目标架构下的所有仓库没有检查出错误
       // 注意，由于使用 parseResponse，这个错误码并不为 404，而是 undefined，
