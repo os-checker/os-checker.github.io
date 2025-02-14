@@ -3,7 +3,7 @@ import type { DropDownOptions } from '~/shared/file-tree/types';
 
 type Props = { tag: string, counts: DropDownOptions, all: string };
 const { tag, counts } = defineProps<Props>();
-const selected = defineModel({ default: "" });
+const selected = defineModel<string | null>({ default: null });
 </script>
 
 <template>

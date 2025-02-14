@@ -35,12 +35,14 @@ export class Dropdown {
     return obj;
   }
 
-  static update_by_pkg(pkg: string, got: Get, got2: Get) {
-    update_by_pkg(pkg, got, got2);
+  static update_by_pkg(pkg: string | null, got: Get, got2: Get) {
+    if (pkg === null || pkg === ALL_PKGS) return;
+    else update_by_pkg(pkg, got, got2);
   }
 
-  static update_by_kind(kind: string, got: Get, got2: Get) {
-    update_by_kind(kind, got, got2);
+  static update_by_kind(kind: string | null, got: Get, got2: Get) {
+    if (kind === null || kind === ALL_KINDS) return;
+    else update_by_kind(kind, got, got2);
   }
 
   static update_by_checker(kinds: string[], got: Get, got2: Get) {

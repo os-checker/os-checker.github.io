@@ -38,9 +38,9 @@
 <script lang="ts" setup>
 import { cloneDeep } from 'es-toolkit/compat';
 import type { FetchError } from 'ofetch';
-import { Severity, type FileTree, type Kinds } from '~/shared/file-tree';
+import { Severity, type FileTree } from '~/shared/file-tree';
 import { Dropdown, gen_map } from '~/shared/file-tree/dropdown';
-import { ALL_PKGS, ALL_CHECKERS, type DropDownOptions, type Counts, counts_to_options, emptyOptions, ALL_KINDS } from '~/shared/file-tree/types';
+import { ALL_PKGS, ALL_CHECKERS, emptyOptions, ALL_KINDS } from '~/shared/file-tree/types';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
 import type { Basic } from '~/shared/types';
@@ -52,9 +52,9 @@ const label = (a: string) => a;
 
 const selectedUser = ref("");
 const selectedRepo = ref("");
-const selectedPkg = ref("");
-const selectedChecker = ref("");
-const selectedKind = ref("");
+const selectedPkg = ref<string | null>(null);
+const selectedChecker = ref<string | null>(null);
+const selectedKind = ref<string | null>(null);
 const selectedTarget = ref("");
 const selectedFeatures = ref("");
 
@@ -103,133 +103,22 @@ watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) =
 const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
 
-watch(selectedPkg, pkg => {
-  if (pkg === null || pkg === ALL_PKGS) got2.value = cloneDeep(got.value);
-  else Dropdown.update_by_pkg(pkg, got.value, got2.value);
-});
-watch(selectedKind, kind => {
-  if (kind === null || kind === ALL_KINDS) got2.value = cloneDeep(got.value);
-  else Dropdown.update_by_kind(kind, got.value, got2.value);
-});
-watch(selectedChecker, checker => {
-  if (checker === null || checker === ALL_CHECKERS) got2.value = cloneDeep(got.value);
-  else {
-    const ck_kinds = basic.value?.kinds.mapping[checker];
-    if (!ck_kinds) return;
-    Dropdown.update_by_checker(ck_kinds, got.value, got2.value);
+watch(
+  () => ({ pkg: selectedPkg.value, kind: selectedKind.value, ck: selectedChecker.value }),
+  ({ pkg, kind, ck }) => {
+    got2.value = cloneDeep(got.value);
+
+    Dropdown.update_by_pkg(pkg, got.value, got2.value);
+
+    if (!(ck === null || ck === ALL_CHECKERS)) {
+      const ck_kinds = basic.value?.kinds.mapping[ck];
+      if (ck_kinds) Dropdown.update_by_checker(ck_kinds, got.value, got2.value);
+    }
+
+    Dropdown.update_by_kind(kind, got.value, got2.value);
   }
-});
+);
 
-// const kinds = computed<DropDownOptions>(() => {
-//   let counts: Counts = {};
-//   for (const ft of got2.value.fileTree.data) {
-//     for (const report of ft.raw_reports) {
-//       for (const [kind, arr] of Object.entries(report.kinds)) {
-//         let len = arr.length;
-//         if (counts[kind]) counts[kind] += len;
-//         else counts[kind] = len;
-//       }
-//     }
-//   }
-//   return counts_to_options(counts, ALL_KINDS);
-// });
-
-// const kind_checker_map = computed(() => {
-//   const data = basic.value;
-//   if (!data) return {};
-//
-//   // {"checker": ["kind1", "kind2"]} => {"kind1": "checker", "kind2": "checker"}
-//   let kind_checker_map: { [key: string]: string } = {};
-//   for (const [ck, kinds] of Object.entries(data.kinds.mapping)) {
-//     for (const kind of kinds) {
-//       kind_checker_map[kind] = ck;
-//     }
-//   }
-//   return kind_checker_map;
-// })
-
-// const checkers = computed<DropDownOptions>(() => {
-//   let counts: Counts = {};
-//   for (const [kind, count] of Object.entries(kinds.value.counts)) {
-//     const ck = kind_checker_map.value[kind];
-//     if (!ck) continue;
-//     if (counts[ck]) counts[ck] += count;
-//     else counts[ck] = count;
-//   }
-//   return counts_to_options(counts, ALL_CHECKERS);
-// });
-//
-// function filter_kinds(kinds: string[]): Get {
-//   const kinds_set = new Set(kinds);
-//   // deep copy due to got shouldn't be mutated
-//   const g = cloneDeep(got.value);
-//   for (const data of g.fileTree.data) {
-//     const reports = data.raw_reports;
-//     for (const r of reports) {
-//       let kinds_new: Kinds = {};
-//       let len = 0;
-//       for (const [kind, arr] of Object.entries(r.kinds)) {
-//         if (kinds_set.has(kind)) {
-//           kinds_new[kind] = arr;
-//           len += arr.length;
-//         }
-//       }
-//       // filter ck kinds only
-//       r.kinds = kinds_new;
-//       r.count = len;
-//     }
-//     // remove count==0 items and sort
-//     data.raw_reports = reports.filter(r => r.count !== 0).sort((a, b) => (b.count - a.count));
-//     data.count = data.raw_reports.reduce((acc, r) => acc + r.count, 0);
-//   }
-//   g.fileTree.data = g.fileTree.data.filter(d => d.count !== 0);
-//   return g;
-// }
-
-// watch(
-//   () => ({ pkg: selectedPkg.value, ck: selectedChecker.value, kind: selectedKind.value }),
-//   ({ pkg, ck, kind }) => {
-//     let got2_new = null;
-//     let pkgs_new = null;
-//     if (ck === null || ck === ALL_CHECKERS) {
-//       // reset
-//       const g = cloneDeep(got.value);
-//       got2_new = g;
-//       pkgs_new = compute_pkgs(g);
-//     } else {
-//       const ck_kinds = basic.value?.kinds.mapping[ck];
-//       if (ck_kinds) {
-//         const g = filter_kinds(ck_kinds);
-//         got2_new = g;
-//         pkgs_new = compute_pkgs(g);
-//       }
-//     }
-//
-//     if (kind === null || kind === ALL_KINDS) {
-//       // reset
-//       const g = cloneDeep(got.value);
-//       got2_new = g;
-//       pkgs_new = compute_pkgs(g);
-//     } else {
-//       const g = filter_kinds([kind]);
-//       got2_new = g;
-//       pkgs_new = compute_pkgs(g);
-//     }
-//
-//     if (got2_new) got2.value = got2_new;
-//     if (pkgs_new) pkgs.value = pkgs_new;
-//   }
-// );
-
-// const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
-// const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
-// const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
-
-// update filetree
-// watch(selectedPkg, pkg => {
-//   const data = got.value.fileTree.data.filter(node => pkg === "" || pkg === "All-Pkgs" || node.pkg == pkg);
-//   got_filtered.value.fileTree.data = data;
-// });
 
 // Download raw report JSON. 
 // NOTE: this function should mutate got state in the template.

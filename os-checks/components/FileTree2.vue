@@ -4,7 +4,7 @@ import type { FileTree } from '~/shared/file-tree';
 import { ALL_PKGS } from '~/shared/file-tree/types';
 import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
-type Props = { get: Get, pkg?: string };
+type Props = { get: Get, pkg: string | null };
 const { get, pkg } = defineProps<Props>();
 
 const filtered_fileTree = computed<FileTree>(() => {
