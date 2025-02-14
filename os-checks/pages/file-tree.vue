@@ -1,34 +1,47 @@
 <template>
   <div>
-    <div>
-      <div style="padding: 6px 8px 6px 8px">
-        <span class="input">User:</span>
-        <span class="select">
-          <Select v-model="selectedUser" filter :options="users" :optionLabel="label" />
-        </span>
-
-        <span class="input">Repo:</span>
-        <span class="select">
-          <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
-        </span>
-
-        <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-        <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
-        <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
-
+    <div style="display: flex">
+      <div style="max-width: 10%; display: grid; place-items: center; padding: 0px 20px;">
+        <div>
+          <b>Count</b><br>
+          <Button style="margin-top: 5px;" severity="contrast" v-if="count">{{ count }}</Button>
+        </div>
       </div>
 
-      <div style="padding: 2px 8px 10px 8px">
-        <span class="input">Target:</span>
-        <span class="select">
-          <Select v-model="selectedTarget" filter showClear :options="targets" :optionLabel="label" placeholder="All" />
-        </span>
+      <div style="flex:1">
+        <div style="padding: 6px 8px 6px 8px">
+          <span class="input">User:</span>
+          <span class="select">
+            <Select v-model="selectedUser" filter :options="users" :optionLabel="label" />
+          </span>
 
-        <span class="input">Features:</span>
-        <span class="select">
-          <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label" placeholder="" />
-        </span>
+          <span class="input">Repo:</span>
+          <span class="select">
+            <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
+          </span>
+
+          <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
+          <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
+          <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
+
+        </div>
+
+        <div style="padding: 2px 8px 10px 8px">
+          <span class="input">Target:</span>
+          <span class="select">
+            <Select v-model="selectedTarget" filter showClear :options="targets" :optionLabel="label"
+              placeholder="All" />
+          </span>
+
+          <span class="input">Features:</span>
+          <span class="select">
+            <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label"
+              placeholder="" />
+          </span>
+
+        </div>
       </div>
+
     </div>
 
     <FileTree2 :get="got2" :pkg="selectedPkg" />
@@ -87,6 +100,7 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
 const pkgs = ref(emptyOptions());
 const kinds = ref(emptyOptions());
 const checkers = ref(emptyOptions());
+const count = ref<number | null>(null);
 watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) => {
   if (!b) return;
 
@@ -96,6 +110,7 @@ watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) =
   pkgs.value = cloneDeep(dropdown_new.pkgs);
   kinds.value = cloneDeep(dropdown_new.kinds);
   checkers.value = cloneDeep(dropdown_new.checkers);
+  count.value = g2.fileTree.data.map(d => d.count).reduce((acc, c) => acc + c, 0);
 }, { deep: true });
 
 // const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
