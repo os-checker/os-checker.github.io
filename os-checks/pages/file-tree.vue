@@ -172,39 +172,39 @@ function filter_kinds(kinds: string[]): Get {
   g.fileTree.data = g.fileTree.data.filter(d => d.count !== 0);
   return g;
 }
-watch(selectedKind, kind => {
-  if (!kind || kind === ALL_KINDS) return;
-  const g = filter_kinds([kind]);
-  got2.value = g;
-  pkgs.value = compute_pkgs(g);
-});
-watch(selectedChecker, ck => {
-  const ck_kinds = basic.value?.kinds.mapping[ck];
-  if (!ck_kinds || ck === ALL_CHECKERS) return;
-
-  const g = filter_kinds(ck_kinds);
-  got2.value = g;
-  pkgs.value = compute_pkgs(g);
-});
 
 watch(
   () => ({ pkg: selectedPkg.value, ck: selectedChecker.value, kind: selectedKind.value }),
   ({ pkg, ck, kind }) => {
-    console.log("watch selectedChecker: ", ck);
+    let got2_new = null;
+    let pkgs_new = null;
     if (ck === null || ck === ALL_CHECKERS) {
       // reset
       const g = cloneDeep(got.value);
-      got2.value = g;
-      pkgs.value = compute_pkgs(g);
-      return;
+      got2_new = g;
+      pkgs_new = compute_pkgs(g);
+    } else {
+      const ck_kinds = basic.value?.kinds.mapping[ck];
+      if (ck_kinds) {
+        const g = filter_kinds(ck_kinds);
+        got2_new = g;
+        pkgs_new = compute_pkgs(g);
+      }
     }
+
     if (kind === null || kind === ALL_KINDS) {
       // reset
       const g = cloneDeep(got.value);
-      got2.value = g;
-      pkgs.value = compute_pkgs(g);
-      return;
+      got2_new = g;
+      pkgs_new = compute_pkgs(g);
+    } else {
+      const g = filter_kinds([kind]);
+      got2_new = g;
+      pkgs_new = compute_pkgs(g);
     }
+
+    if (got2_new) got2.value = got2_new;
+    if (pkgs_new) pkgs.value = pkgs_new;
   }
 );
 
