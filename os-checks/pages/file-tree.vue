@@ -39,6 +39,7 @@
 import { cloneDeep } from 'es-toolkit/compat';
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree, type Kinds } from '~/shared/file-tree';
+import { Dropdown, gen_map } from '~/shared/file-tree/dropdown';
 import { ALL_PKGS, ALL_CHECKERS, type DropDownOptions, type Counts, counts_to_options, emptyOptions, ALL_KINDS } from '~/shared/file-tree/types';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
@@ -60,6 +61,7 @@ const selectedFeatures = ref("");
 const got = ref<Get>(getEmpty());
 const got2 = ref<Get>(getEmpty());
 const basic = ref<Basic | null>(null);
+const dropdown = ref<Dropdown>(Dropdown.empty());
 
 // Get user/repo list for filters.
 const user_repo = ref<UserRepo>({});
@@ -83,7 +85,10 @@ watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selec
   }
 );
 
-watch(got, val => got2.value = cloneDeep(val));
+watch(() => [got.value, basic.value], ([g, b]) => {
+  if (basic.value) dropdown.value = new Dropdown(got.value, gen_map(basic.value));
+  console.log("got & basic: ", g, b, dropdown.value);
+});
 
 // const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
 // const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
