@@ -97,6 +97,13 @@ watch(() => ({ g: got.value, b: basic.value }), ({ g, b }) => {
   kinds.value = cloneDeep(dropdown.value.kinds);
   checkers.value = cloneDeep(dropdown.value.checkers);
 });
+watch(() => ({ g: got2.value, d: dropdown.value }), ({ g, d }) => {
+  const dropdown_new = d.filter(g);
+  // console.log("got & basic: ", g, dropdown_new);
+  pkgs.value = cloneDeep(dropdown_new.pkgs);
+  kinds.value = cloneDeep(dropdown_new.kinds);
+  checkers.value = cloneDeep(dropdown_new.checkers);
+}, { deep: true });
 
 // const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
 // const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
