@@ -59,7 +59,7 @@ const displayFileTreeIcon = computed<string>(() => displayFileTree.value ? "pi p
 
 // true means keeping filter panel open (thus shows up arrow icon to indicate close)
 const displayFilters = defineModel<boolean>("filters", { default: true });
-const displayFiltersIcon = computed<string>(() => displayFilters.value ? "pi pi-angle-double-down" : "pi pi-angle-double-up");
+const displayFiltersIcon = computed<string>(() => displayFilters.value ? "pi pi-angle-double-up" : "pi pi-angle-double-down");
 
 onMounted(() => {
   document.addEventListener("keydown", (event: KeyboardEvent) => {
@@ -78,11 +78,13 @@ onMounted(() => {
 
     <div class="fileViewNavi" v-if="displayFileTree">
       <div style="height: 3.2rem; display: flex; gap: 8px; justify-content: left; align-items: center;">
-        <div>
-          <Button style="height: 2.4rem;" :icon="displayFileTreeIcon" severity="secondary" variant="text" />
+        <div style="margin-left: 10px;">
+          <Button style="height: 2.4rem;" :icon="displayFileTreeIcon" severity="secondary" variant="text"
+            @click="() => displayFileTree = !displayFileTree" />
         </div>
         <div>
-          <Button style="height: 2.4rem;" :icon="displayFiltersIcon" severity="secondary" variant="text" />
+          <Button style="height: 2.4rem;" :icon="displayFiltersIcon" severity="secondary" variant="text"
+            @click="() => displayFilters = !displayFilters" />
         </div>
       </div>
 
