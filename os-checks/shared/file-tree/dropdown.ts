@@ -1,4 +1,3 @@
-import { cloneDeep } from "es-toolkit/compat";
 import { ALL_CHECKERS, ALL_KINDS, ALL_PKGS, counts_to_options, emptyOptions, type Counts, type DropDownOptions } from "./types";
 import type { Get } from "./utils";
 import type { Kinds } from "../file-tree";
@@ -35,17 +34,16 @@ export class Dropdown {
     return obj;
   }
 
-  static update_by_pkg(pkg: string | null, got: Get, got2: Get) {
-    console.log("pkg:", pkg);
-    if (pkg && pkg !== ALL_PKGS) update_by_pkg(pkg, got, got2);
+  static update_by_pkg(pkg: string | null, g: Get) {
+    if (pkg && pkg !== ALL_PKGS) update_by_pkg(pkg, g);
   }
 
-  static update_by_kind(kind: string | null, got: Get, got2: Get) {
-    if (kind && kind !== ALL_KINDS) update_by_kind(kind, got, got2);
+  static update_by_kind(kind: string | null, g: Get) {
+    if (kind && kind !== ALL_KINDS) update_by_kind(kind, g);
   }
 
-  static update_by_checker(kinds: string[], got: Get, got2: Get) {
-    update_by_checker(kinds, got, got2);
+  static update_by_checker(kinds: string[], g: Get) {
+    update_by_checker(kinds, g);
   }
 }
 
@@ -102,23 +100,20 @@ function gen_checkers(kinds: DropDownOptions, map: KindCheckerMap): DropDownOpti
 
 // filters update Get: got2 is updated in place; got is deep cloned
 
-export function update_by_pkg(pkg: string, got: Get, got2: Get) {
-  const data = got.fileTree.data;
-  got2.fileTree.data = data.filter(val => val.pkg === pkg);
-  console.log("update_by_pkg:", got2.fileTree.data);
+export function update_by_pkg(pkg: string, g: Get) {
+  g.fileTree.data = g.fileTree.data.filter(val => val.pkg === pkg);
 }
 
-export function update_by_kind(kind: string, got: Get, got2: Get) {
-  update_by_checker([kind], got, got2);
+export function update_by_kind(kind: string, g: Get) {
+  update_by_checker([kind], g);
 }
 
 /** for update_by_kind, pass [kind]; for update_by_checker, pass kinds */
-export function update_by_checker(kinds: string[], got: Get, got2: Get) {
+export function update_by_checker(kinds: string[], g: Get) {
   const kinds_set = new Set(kinds);
 
   // deep copy due to got shouldn't be mutated
-  const d = cloneDeep(got.fileTree.data);
-  for (const data of d) {
+  for (const data of g.fileTree.data) {
     const reports = data.raw_reports;
     for (const r of reports) {
       let kinds_new: Kinds = {};
@@ -137,6 +132,6 @@ export function update_by_checker(kinds: string[], got: Get, got2: Get) {
     data.raw_reports = reports.filter(r => r.count !== 0).sort((a, b) => (b.count - a.count));
     data.count = data.raw_reports.reduce((acc, r) => acc + r.count, 0);
   }
-  got2.fileTree.data = d.filter(d => d.count !== 0);
+  g.fileTree.data = g.fileTree.data.filter(d => d.count !== 0);
 }
 
