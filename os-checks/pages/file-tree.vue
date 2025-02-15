@@ -1,12 +1,12 @@
 <template>
   <div>
     <div style="display: flex" v-if="displayFilters">
-      <div style="max-width: 10%; display: grid; place-items: center; padding: 0px 20px;">
-        <div>
-          <b>Count</b><br>
-          <Button style="margin-top: 5px;" severity="danger" v-if="count">{{ count }}</Button>
-        </div>
-      </div>
+      <!-- <div style="max-width: 10%; display: grid; place-items: center; padding: 0px 20px;"> -->
+      <!--   <div> -->
+      <!--     <b>Count</b><br> -->
+      <!--     <Button style="margin-top: 5px;" severity="danger" v-if="count">{{ count }}</Button> -->
+      <!--   </div> -->
+      <!-- </div> -->
 
       <div style="flex:1">
         <div style="padding: 6px 8px 6px 8px">
@@ -42,7 +42,7 @@
 
     </div>
 
-    <FileTree2 :get="got2" v-model:filters="displayFilters" />
+    <FileTree2 :get="got2" :count="count" v-model:filters="displayFilters" />
   </div>
 </template>
 

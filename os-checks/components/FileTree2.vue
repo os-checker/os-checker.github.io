@@ -3,8 +3,8 @@ import type { TreeNode } from 'primevue/treenode';
 import type { FileTree } from '~/shared/file-tree';
 import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
-type Props = { get: Get };
-const { get } = defineProps<Props>();
+type Props = { get: Get, count: number | null };
+const { get, count } = defineProps<Props>();
 
 const filtered_fileTree = computed<FileTree>(() => get.fileTree);
 
@@ -78,14 +78,21 @@ const heightCodePanel = computed(() => {
   <div class="fileViewPanel">
 
     <div class="fileViewNavi" v-if="displayFileTree">
-      <div style="height: 3.2rem; display: flex; gap: 8px; justify-content: left; align-items: center;">
-        <div style="margin-left: 10px;">
-          <Button style="height: 2.4rem;" :icon="displayFileTreeIcon" severity="secondary" variant="text"
-            @click="() => displayFileTree = !displayFileTree" />
+      <div style="height: 3.2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: left; gap: 8px;">
+          <div style="margin-left: 10px;">
+            <Button style="height: 2.4rem;" :icon="displayFileTreeIcon" severity="secondary" variant="text"
+              @click="() => displayFileTree = !displayFileTree" />
+          </div>
+          <div>
+            <Button style="height: 2.4rem;" :icon="displayFiltersIcon" severity="secondary" variant="text"
+              @click="() => displayFilters = !displayFilters" />
+          </div>
         </div>
-        <div>
-          <Button style="height: 2.4rem;" :icon="displayFiltersIcon" severity="secondary" variant="text"
-            @click="() => displayFilters = !displayFilters" />
+        <div v-if="count">
+          <b style="margin-right: 10px;">Total Count:</b><Button style="height: 2.4rem;" severity="danger">
+            {{ count }}
+          </Button>
         </div>
       </div>
 
