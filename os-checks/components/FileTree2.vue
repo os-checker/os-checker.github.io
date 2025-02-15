@@ -64,6 +64,14 @@ onMounted(() => {
     else if (event.code === "ArrowDown") displayFilters.value = true;
   });
 });
+
+const { viewportHeight } = storeToRefs(useStyleStore());
+const heightCodePanel = computed(() => {
+  const height = viewportHeight.value;
+  // add more space to scroll codeblock panel to the bottom if filters exist
+  const adjust = displayFilters.value ? 100 : 0;
+  return `${height * 0.85 - adjust}px`;
+});
 </script>
 
 <template>
@@ -82,8 +90,7 @@ onMounted(() => {
       </div>
 
       <ScrollPanel class="fileViewMenu">
-        <PackageFileMenu style="padding-right: 0.8rem;" :nodes="nodes" :selectedKey="selectedKey"
-          @update:selectedKey="selectedKey = $event" />
+        <PackageFileMenu :nodes="nodes" :selectedKey="selectedKey" @update:selectedKey="selectedKey = $event" />
       </ScrollPanel>
     </div>
 
@@ -99,9 +106,7 @@ onMounted(() => {
         </TabList>
         <TabPanels>
           <TabPanel v-for="tab in get.tabs" :value="tab.kind">
-            <ScrollPanel class="fileViewScroll" :dt="{
-              bar: { background: '{primary.color}' },
-            }">
+            <ScrollPanel :dt="{ bar: { background: '{primary.color}' } }" :style="{ height: heightCodePanel }">
               <CodeBlock :snippets="tab.raw" :lang="tab.lang" />
             </ScrollPanel>
           </TabPanel>
@@ -129,7 +134,7 @@ onMounted(() => {
 .fileViewNavi {
   flex: 0 0 25%;
   padding-left: 0.25rem;
-  padding-right: 0.5rem;
+  /* padding-right: 0.5rem; */
   /* flex-grow, flex-shrink, flex-basis */
   /* 左边div不扩展也不收缩，基础宽度为10% */
 }
@@ -145,18 +150,14 @@ onMounted(() => {
 .fileViewResult {
   flex: 1;
   overflow-x: auto;
-  overflow-y: hidden;
-  /* 控制代码块容器的 padding: 上、左、下、右 */
-  --p-tabs-tabpanel-padding: 0.35rem 0.3rem 0 0;
+  overflow-y: auto;
+  padding: 0rem 0.5rem 0rem 1rem;
+  /* 控制代码块容器的 padding: 上、右、下、左 */
+  --p-tabs-tabpanel-padding: 0.35rem 0rem 0 0;
   /* 右边div占据剩余空间 */
   /* 可以省略flex-grow为1，因为默认值就是1 */
 
   /* 选中标签页的底部块的高度 */
   --p-tabs-active-bar-height: 3.2px;
-}
-
-.fileViewScroll {
-  width: 100%;
-  height: 86vh;
 }
 </style>
