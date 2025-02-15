@@ -111,6 +111,7 @@ watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) =
   kinds.value = cloneDeep(dropdown_new.kinds);
   checkers.value = cloneDeep(dropdown_new.checkers);
   count.value = g2.fileTree.data.map(d => d.count).reduce((acc, c) => acc + c, 0);
+  console.log("g2:", g2.fileTree.data);
 }, { deep: true });
 
 // const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
@@ -121,16 +122,18 @@ const features = computed(() => basic.value?.features_sets.map(p => p.features) 
 watch(
   () => ({ pkg: selectedPkg.value, kind: selectedKind.value, ck: selectedChecker.value }),
   ({ pkg, kind, ck }) => {
-    got2.value = cloneDeep(got.value);
+    const base = cloneDeep(got.value);
+    const target = cloneDeep(got.value);
 
-    Dropdown.update_by_pkg(pkg, got.value, got2.value);
+    Dropdown.update_by_pkg(pkg, base, target);
 
-    if (!(ck === null || ck === ALL_CHECKERS)) {
+    if (ck && ck !== ALL_CHECKERS) {
       const ck_kinds = basic.value?.kinds.mapping[ck];
-      if (ck_kinds) Dropdown.update_by_checker(ck_kinds, got.value, got2.value);
+      if (ck_kinds) Dropdown.update_by_checker(ck_kinds, base, target);
     }
 
-    Dropdown.update_by_kind(kind, got.value, got2.value);
+    Dropdown.update_by_kind(kind, base, target);
+    got2.value = target;
   }
 );
 

@@ -36,13 +36,12 @@ export class Dropdown {
   }
 
   static update_by_pkg(pkg: string | null, got: Get, got2: Get) {
-    if (pkg === null || pkg === ALL_PKGS) return;
-    else update_by_pkg(pkg, got, got2);
+    console.log("pkg:", pkg);
+    if (pkg && pkg !== ALL_PKGS) update_by_pkg(pkg, got, got2);
   }
 
   static update_by_kind(kind: string | null, got: Get, got2: Get) {
-    if (kind === null || kind === ALL_KINDS) return;
-    else update_by_kind(kind, got, got2);
+    if (kind && kind !== ALL_KINDS) update_by_kind(kind, got, got2);
   }
 
   static update_by_checker(kinds: string[], got: Get, got2: Get) {
@@ -105,7 +104,8 @@ function gen_checkers(kinds: DropDownOptions, map: KindCheckerMap): DropDownOpti
 
 export function update_by_pkg(pkg: string, got: Get, got2: Get) {
   const data = got.fileTree.data;
-  got2.fileTree.data = (pkg || pkg !== ALL_PKGS) ? data.filter(val => val.pkg === pkg) : cloneDeep(data);
+  got2.fileTree.data = data.filter(val => val.pkg === pkg);
+  console.log("update_by_pkg:", got2.fileTree.data);
 }
 
 export function update_by_kind(kind: string, got: Get, got2: Get) {
