@@ -118,13 +118,32 @@ watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) =
 const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
 
+function get_ck_kinds(ck: string | null): string[] | null {
+  if (ck && ck !== ALL_CHECKERS) {
+    const ck_kinds = basic.value?.kinds.mapping[ck];
+    if (ck_kinds) return ck_kinds;
+  }
+  return null;
+}
 watch(got, g => {
   // reset pkg since it's less likely to see the same selected pkg in another repo
   selectedPkg.value = null;
-  const kind = Dropdown.find_kind(selectedKind.value, g);
-  console.log("kind:", kind);
-  selectedKind.value = kind;
-  // selectedChecker.value = null;
+
+  // reset kind if the diagnositc is empty
+  selectedKind.value = Dropdown.find_kind(selectedKind.value, g);
+
+  // reset checker if the diagnositc is empty
+  const ck_kinds = get_ck_kinds(selectedChecker.value);
+  let reset_checker = true;
+  if (ck_kinds) {
+    for (const kind of ck_kinds) {
+      if (Dropdown.find_kind(kind, g)) {
+        reset_checker = false;
+        break
+      }
+    }
+  }
+  if (reset_checker) selectedChecker.value = null;
 });
 watch(
   () => ({ pkg: selectedPkg.value, kind: selectedKind.value, ck: selectedChecker.value, g: got.value }),
@@ -133,14 +152,11 @@ watch(
 
     Dropdown.update_by_pkg(pkg, target);
 
-    if (ck && ck !== ALL_CHECKERS) {
-      const ck_kinds = basic.value?.kinds.mapping[ck];
-      if (ck_kinds) Dropdown.update_by_checker(ck_kinds, target);
-    }
+    const ck_kinds = get_ck_kinds(ck);
+    if (ck_kinds) Dropdown.update_by_checker(ck_kinds, target);
 
     Dropdown.update_by_kind(kind, target);
 
-    console.log("react to select:", pkg, kind, ck, g);
     got2.value = target;
   }
 );
