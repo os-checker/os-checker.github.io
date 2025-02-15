@@ -101,13 +101,13 @@ const heightCodePanel = computed(() => {
               @click="() => displayFilters = !displayFilters" />
           </div>
         </div>
-        <div v-if="count">
+        <div v-if="count" style="padding-right: 0.6rem;">
           <b style="margin-right: 10px;">Total Count:</b>
           <Button class="btn" severity="danger" @click="resetSelectKey"> {{ count }} </Button>
         </div>
       </div>
 
-      <ScrollPanel class="fileViewMenu">
+      <ScrollPanel class="fileViewMenu" :style="{ height: heightCodePanel }">
         <PackageFileMenu :nodes="nodes" :selectedKey="selectedKey" @update:selectedKey="selectedKey = $event" />
       </ScrollPanel>
     </div>
@@ -152,7 +152,7 @@ const heightCodePanel = computed(() => {
 .fileViewNavi {
   flex: 0 0 25%;
   padding-left: 0.25rem;
-  /* padding-right: 0.5rem; */
+  padding-right: 0.5rem;
   /* flex-grow, flex-shrink, flex-basis */
   /* 左边div不扩展也不收缩，基础宽度为10% */
 }
