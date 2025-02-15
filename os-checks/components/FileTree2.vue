@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { cloneDeep } from 'es-toolkit/compat';
 import type { TreeNode } from 'primevue/treenode';
 import type { FileTree } from '~/shared/file-tree';
 import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
 type Props = { get: Get, count: number | null };
 const { get, count } = defineProps<Props>();
+
+const fullTabs = ref(cloneDeep(get.tabs));
+watch(() => get, g => fullTabs.value = cloneDeep(g.tabs));
 
 const filtered_fileTree = computed<FileTree>(() => get.fileTree);
 
@@ -43,8 +47,16 @@ watch(() => ({ key: selectedKey.value, n: nodes.value, ft: filtered_fileTree.val
     if (val !== undefined) {
       get.tabs = val.results;
       get.selectedTab = val.selectedTab;
+    } else {
+      // display full diagnostics if none is selected or something is not found
+      get.tabs = cloneDeep(fullTabs.value);
     }
   });
+
+function resetSelectKey() {
+  selectedKey.value = {};
+  get.tabs = cloneDeep(fullTabs.value);
+}
 
 // true means keeping file tree panel open (thus shows left arrow icon to indicate close)
 const displayFileTree = ref(true);
@@ -55,13 +67,13 @@ const displayFilters = defineModel<boolean>("filters", { default: true });
 const displayFiltersIcon = computed<string>(() => displayFilters.value ? "pi pi-angle-double-up" : "pi pi-angle-double-down");
 
 onMounted(() => {
-  document.addEventListener("keydown", (event: KeyboardEvent) => {
-    if (event.code === "Space") displayFileTree.value = !displayFileTree.value;
-    else if (event.code === "Escape") displayFilters.value = !displayFilters.value;
-    else if (event.code === "ArrowLeft") displayFileTree.value = false;
-    else if (event.code === "ArrowRight") displayFileTree.value = true;
-    else if (event.code === "ArrowUp") displayFilters.value = false;
-    else if (event.code === "ArrowDown") displayFilters.value = true;
+  document.addEventListener("keydown", ({ code }: KeyboardEvent) => {
+    if (code === "Space") displayFileTree.value = !displayFileTree.value;
+    else if (code === "Escape") displayFilters.value = !displayFilters.value;
+    else if (code === "ArrowLeft") displayFileTree.value = false;
+    else if (code === "ArrowRight") displayFileTree.value = true;
+    else if (code === "ArrowUp") displayFilters.value = false;
+    else if (code === "ArrowDown") displayFilters.value = true;
   });
 });
 
@@ -81,18 +93,17 @@ const heightCodePanel = computed(() => {
       <div style="height: 3.2rem; display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; justify-content: left; gap: 8px;">
           <div style="margin-left: 10px;">
-            <Button style="height: 2.4rem;" :icon="displayFileTreeIcon" severity="secondary" variant="text"
+            <Button class="btn" :icon="displayFileTreeIcon" severity="secondary" variant="text"
               @click="() => displayFileTree = !displayFileTree" />
           </div>
           <div>
-            <Button style="height: 2.4rem;" :icon="displayFiltersIcon" severity="secondary" variant="text"
+            <Button class="btn" :icon="displayFiltersIcon" severity="secondary" variant="text"
               @click="() => displayFilters = !displayFilters" />
           </div>
         </div>
         <div v-if="count">
-          <b style="margin-right: 10px;">Total Count:</b><Button style="height: 2.4rem;" severity="danger">
-            {{ count }}
-          </Button>
+          <b style="margin-right: 10px;">Total Count:</b>
+          <Button class="btn" severity="danger" @click="resetSelectKey"> {{ count }} </Button>
         </div>
       </div>
 
@@ -166,5 +177,9 @@ const heightCodePanel = computed(() => {
 
   /* 选中标签页的底部块的高度 */
   --p-tabs-active-bar-height: 3.2px;
+}
+
+.btn {
+  height: 2.4rem;
 }
 </style>
