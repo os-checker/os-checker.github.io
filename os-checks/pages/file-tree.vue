@@ -118,10 +118,18 @@ watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) =
 const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
 
+watch(got, g => {
+  // reset pkg since it's less likely to see the same selected pkg in another repo
+  selectedPkg.value = null;
+  const kind = Dropdown.find_kind(selectedKind.value, g);
+  console.log("kind:", kind);
+  selectedKind.value = kind;
+  // selectedChecker.value = null;
+});
 watch(
-  () => ({ pkg: selectedPkg.value, kind: selectedKind.value, ck: selectedChecker.value }),
-  ({ pkg, kind, ck }) => {
-    const target = cloneDeep(got.value);
+  () => ({ pkg: selectedPkg.value, kind: selectedKind.value, ck: selectedChecker.value, g: got.value }),
+  ({ pkg, kind, ck, g }) => {
+    const target = cloneDeep(g);
 
     Dropdown.update_by_pkg(pkg, target);
 
@@ -132,6 +140,7 @@ watch(
 
     Dropdown.update_by_kind(kind, target);
 
+    console.log("react to select:", pkg, kind, ck, g);
     got2.value = target;
   }
 );
@@ -143,10 +152,10 @@ watch(
 // broken. See https://github.com/os-checker/os-checker.github.io/issues/138
 function get(path: string) {
   githubFetch<FileTree>({ path })
-    .then((file_tree) => {
+    .then((fileTree) => {
       // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
       let kinds = {};
-      for (const datum of file_tree.data) {
+      for (const datum of fileTree.data) {
         for (const report of datum.raw_reports) {
           // for (const kind of Object.keys(report.kinds)) {
           // 对原始输出中的所有特殊符号转义，以后就不需要转义了
@@ -155,9 +164,12 @@ function get(path: string) {
           mergeObjectsWithArrayConcat(kinds, report.kinds);
         }
       }
-      got.value.tabs = checkerResult(kinds, file_tree.kinds_order).results;
-      got.value.selectedTab = got.value.tabs[0]?.kind ?? "";
-      got.value.fileTree = file_tree;
+      const tabs = checkerResult(kinds, fileTree.kinds_order).results;
+      got.value = {
+        tabs,
+        selectedTab: tabs[0]?.kind ?? "",
+        fileTree: fileTree,
+      };
       got2.value = cloneDeep(got.value);
       // pkgs.value = compute_pkgs(got2.value);
     }).catch((_: FetchError) => {
@@ -167,12 +179,14 @@ function get(path: string) {
       // 这里 ofetch 没有正确处理错误（貌似也没人报告？），所以暂且认为出现任何网络或解析错误都视为无错误。
       // console.log(err, err.data, err.statusCode);
 
-      got.value.tabs = [{
-        kind: "All good! 🥳", raw: ["该目标架构下的所有仓库没有检查出错误 🥳🥳🥳"],
-        lang: "rust", severity: Severity.Info, disabled: false
-      }];
-      got.value.selectedTab = "All good! 🥳";
-      got.value.fileTree = getEmpty().fileTree;
+      got.value = {
+        tabs: [{
+          kind: "All good! 🥳", raw: ["该目标架构下的所有仓库没有检查出错误 🥳🥳🥳"],
+          lang: "rust", severity: Severity.Info, disabled: false
+        }],
+        selectedTab: "All good! 🥳",
+        fileTree: getEmpty().fileTree
+      };
       got2.value = cloneDeep(got.value);
 
       // tabs.value = [{

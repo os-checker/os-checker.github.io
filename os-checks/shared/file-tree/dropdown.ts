@@ -45,6 +45,17 @@ export class Dropdown {
   static update_by_checker(kinds: string[], g: Get) {
     update_by_checker(kinds, g);
   }
+
+  static find_kind(kind: string | null, g: Get): string | null {
+    if (!kind) return null;
+    for (const data of g.fileTree.data) {
+      for (const reports of data.raw_reports) {
+        const ele = reports.kinds[kind];
+        if (ele && ele.length) return kind;
+      }
+    }
+    return null;
+  }
 }
 
 // generate filter options
