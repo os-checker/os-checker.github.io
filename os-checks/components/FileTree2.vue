@@ -1,19 +1,12 @@
 <script setup lang="ts">
 import type { TreeNode } from 'primevue/treenode';
 import type { FileTree } from '~/shared/file-tree';
-import { ALL_PKGS } from '~/shared/file-tree/types';
 import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
-// FIXME: remove pkg
-type Props = { get: Get, pkg: string | null };
-const { get, pkg } = defineProps<Props>();
+type Props = { get: Get };
+const { get } = defineProps<Props>();
 
-const filtered_fileTree = computed<FileTree>(() => {
-  const ft = get.fileTree;
-  if (!pkg || pkg === ALL_PKGS) return ft;
-  const data = ft.data.filter(node => node.pkg === pkg);
-  return { ...ft, ...{ data } }
-});
+const filtered_fileTree = computed<FileTree>(() => get.fileTree);
 
 const nodes = computed<TreeNode[]>(() => {
   let nodes = [];

@@ -42,7 +42,7 @@
 
     </div>
 
-    <FileTree2 :get="got2" :pkg="selectedPkg" v-model:filters="displayFilters" />
+    <FileTree2 :get="got2" v-model:filters="displayFilters" />
   </div>
 </template>
 
