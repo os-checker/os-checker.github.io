@@ -4,6 +4,7 @@ import type { FileTree } from '~/shared/file-tree';
 import { ALL_PKGS } from '~/shared/file-tree/types';
 import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
+// FIXME: remove pkg
 type Props = { get: Get, pkg: string | null };
 const { get, pkg } = defineProps<Props>();
 
@@ -51,12 +52,40 @@ watch(() => ({ key: selectedKey.value, n: nodes.value, ft: filtered_fileTree.val
       get.selectedTab = val.selectedTab;
     }
   });
+
+// true means keeping file tree panel open (thus shows left arrow icon to indicate close)
+const displayFileTree = ref(true);
+const displayFileTreeIcon = computed<string>(() => displayFileTree.value ? "pi pi-angle-double-left" : "pi pi-angle-double-right");
+
+// true means keeping filter panel open (thus shows up arrow icon to indicate close)
+const displayFilters = defineModel<boolean>("filters", { default: true });
+const displayFiltersIcon = computed<string>(() => displayFilters.value ? "pi pi-angle-double-down" : "pi pi-angle-double-up");
+
+onMounted(() => {
+  document.addEventListener("keydown", (event: KeyboardEvent) => {
+    if (event.code === "Space") displayFileTree.value = !displayFileTree.value;
+    else if (event.code === "Escape") displayFilters.value = !displayFilters.value;
+    else if (event.code === "ArrowLeft") displayFileTree.value = false;
+    else if (event.code === "ArrowRight") displayFileTree.value = true;
+    else if (event.code === "ArrowUp") displayFilters.value = false;
+    else if (event.code === "ArrowDown") displayFilters.value = true;
+  });
+});
 </script>
 
 <template>
   <div class="fileViewPanel">
 
-    <div class="fileViewNavi">
+    <div class="fileViewNavi" v-if="displayFileTree">
+      <div style="height: 3.2rem; display: flex; gap: 8px; justify-content: left; align-items: center;">
+        <div>
+          <Button style="height: 2.4rem;" :icon="displayFileTreeIcon" severity="secondary" variant="text" />
+        </div>
+        <div>
+          <Button style="height: 2.4rem;" :icon="displayFiltersIcon" severity="secondary" variant="text" />
+        </div>
+      </div>
+
       <ScrollPanel class="fileViewMenu">
         <PackageFileMenu style="padding-right: 0.8rem;" :nodes="nodes" :selectedKey="selectedKey"
           @update:selectedKey="selectedKey = $event" />
@@ -126,6 +155,9 @@ watch(() => ({ key: selectedKey.value, n: nodes.value, ft: filtered_fileTree.val
   --p-tabs-tabpanel-padding: 0.35rem 0.3rem 0 0;
   /* 右边div占据剩余空间 */
   /* 可以省略flex-grow为1，因为默认值就是1 */
+
+  /* 选中标签页的底部块的高度 */
+  --p-tabs-active-bar-height: 3.2px;
 }
 
 .fileViewScroll {

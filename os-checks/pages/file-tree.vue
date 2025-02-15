@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div style="display: flex">
+    <div style="display: flex" v-if="displayFilters">
       <div style="max-width: 10%; display: grid; place-items: center; padding: 0px 20px;">
         <div>
           <b>Count</b><br>
-          <Button style="margin-top: 5px;" severity="warn" v-if="count">{{ count }}</Button>
+          <Button style="margin-top: 5px;" severity="danger" v-if="count">{{ count }}</Button>
         </div>
       </div>
 
@@ -42,7 +42,7 @@
 
     </div>
 
-    <FileTree2 :get="got2" :pkg="selectedPkg" />
+    <FileTree2 :get="got2" :pkg="selectedPkg" v-model:filters="displayFilters" />
   </div>
 </template>
 
@@ -68,6 +68,7 @@ const selectedChecker = ref<string | null>(null);
 const selectedKind = ref<string | null>(null);
 const selectedTarget = ref(ALL_TARGETS);
 const selectedFeatures = ref("");
+const displayFilters = ref(true);
 
 const got = ref<Get>(getEmpty());
 const got2 = ref<Get>(getEmpty());
