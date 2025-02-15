@@ -4,7 +4,7 @@
       <div style="max-width: 10%; display: grid; place-items: center; padding: 0px 20px;">
         <div>
           <b>Count</b><br>
-          <Button style="margin-top: 5px;" severity="contrast" v-if="count">{{ count }}</Button>
+          <Button style="margin-top: 5px;" severity="warn" v-if="count">{{ count }}</Button>
         </div>
       </div>
 
@@ -20,18 +20,16 @@
             <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
           </span>
 
-          <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-          <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
-          <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
+          <DropDownWithCount v-model="selectedTarget" tag="Target" :all="ALL_TARGETS" :counts="targets" />
 
         </div>
 
         <div style="padding: 2px 8px 10px 8px">
-          <span class="input">Target:</span>
-          <span class="select">
-            <Select v-model="selectedTarget" filter showClear :options="targets" :optionLabel="label"
-              placeholder="All" />
-          </span>
+
+          <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
+          <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
+
+          <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
 
           <span class="input">Features:</span>
           <span class="select">
@@ -52,8 +50,8 @@
 import { cloneDeep } from 'es-toolkit/compat';
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree } from '~/shared/file-tree';
-import { Dropdown, gen_map } from '~/shared/file-tree/dropdown';
-import { ALL_PKGS, ALL_CHECKERS, emptyOptions, ALL_KINDS } from '~/shared/file-tree/types';
+import { Dropdown, gen_map, gen_targets } from '~/shared/file-tree/dropdown';
+import { ALL_PKGS, ALL_CHECKERS, ALL_TARGETS, ALL_KINDS, emptyOptions, type DropDownOptions } from '~/shared/file-tree/types';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
 import type { Basic } from '~/shared/types';
@@ -68,7 +66,7 @@ const selectedRepo = ref("");
 const selectedPkg = ref<string | null>(null);
 const selectedChecker = ref<string | null>(null);
 const selectedKind = ref<string | null>(null);
-const selectedTarget = ref("");
+const selectedTarget = ref(ALL_TARGETS);
 const selectedFeatures = ref("");
 
 const got = ref<Get>(getEmpty());
@@ -90,12 +88,17 @@ watch(repos, (val) => selectedRepo.value = val[0] ?? "");
 watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selectedTarget.value }),
   ({ user, repo, target }) => {
     if (user && repo) {
-      const target_ = target || "All-Targets";
+      const target_ = target || ALL_TARGETS;
       get(`ui/repos/${user}/${repo}/${target_}.json`);
       getBasic(`ui/repos/${user}/${repo}/basic.json`);
     }
   }
 );
+
+const targets = computed<DropDownOptions>(() => {
+  const t = basic.value?.targets;
+  return t ? gen_targets(t) : emptyOptions();
+});
 
 const pkgs = ref(emptyOptions());
 const kinds = ref(emptyOptions());
@@ -113,9 +116,6 @@ watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) =
   count.value = g2.fileTree.data.map(d => d.count).reduce((acc, c) => acc + c, 0);
 }, { deep: true });
 
-// const pkgs = computed(() => basic.value?.pkgs.map(p => p.pkg) ?? []);
-// const checkers = computed(() => basic.value?.checkers.map(p => p.checker) ?? []);
-const targets = computed(() => basic.value?.targets.map(p => p.triple) ?? []);
 const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
 
 function get_ck_kinds(ck: string | null): string[] | null {

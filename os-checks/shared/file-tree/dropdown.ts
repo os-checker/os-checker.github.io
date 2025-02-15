@@ -1,7 +1,7 @@
 import { ALL_CHECKERS, ALL_KINDS, ALL_PKGS, counts_to_options, emptyOptions, type Counts, type DropDownOptions } from "./types";
 import type { Get } from "./utils";
 import type { Kinds } from "../file-tree";
-import type { Basic } from "../types";
+import type { Basic, Targets } from "../types";
 
 export class Dropdown {
   pkgs: DropDownOptions;
@@ -107,6 +107,14 @@ function gen_checkers(kinds: DropDownOptions, map: KindCheckerMap): DropDownOpti
     else counts[ck] = count;
   }
   return counts_to_options(counts, ALL_CHECKERS);
+}
+
+export function gen_targets(targets: Targets): DropDownOptions {
+  let counts: Counts = {};
+  for (const { triple, count } of targets) {
+    counts[triple] = count;
+  }
+  return counts_to_options(counts);
 }
 
 // filters update Get: got2 is updated in place; got is deep cloned
