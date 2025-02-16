@@ -73,6 +73,8 @@ const selected = reactive<{
   checker: null,
   kind: null,
 });
+watch(selected, val => console.log(val));
+
 const displayFilters = ref(true);
 
 const got = ref<Get>(getEmpty());
@@ -83,12 +85,17 @@ const basic = ref<Basic | null>(null);
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
   .then(data => user_repo.value = data);
+watch(user_repo, val => {
+  if (!selected.user && !selected.repo) {
+    const user = Object.keys(user_repo.value).sort()[0] ?? "";
+    selected.user = user;
+    selected.repo = val[user][0] ?? "";
+  }
+});
 
 // Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
-watch(users, (val) => selected.user = val[0] ?? "");
 const repos = computed(() => user_repo.value[selected.user]);
-watch(repos, (val) => selected.repo = val[0] ?? "");
 
 // Update got state.
 watch(() => ({ user: selected.user, repo: selected.repo, target: selected.target }),
