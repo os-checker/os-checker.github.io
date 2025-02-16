@@ -9,7 +9,6 @@ export type Basic = {
   pkgs: { pkg: string, count: number }[],
   checkers: { checker: string, count: number }[],
   targets: Targets,
-  features_sets: { features: string, count: number }[],
   kinds: {
     order: string[],
     mapping: { [key: string]: string[] },
