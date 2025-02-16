@@ -12,25 +12,25 @@
         <div style="padding: 6px 8px 6px 8px">
           <span class="input">User:</span>
           <span class="select">
-            <Select v-model="selectedUser" filter :options="users" :optionLabel="label" />
+            <Select v-model="selected.user" filter :options="users" :optionLabel="label" />
           </span>
 
           <span class="input">Repo:</span>
           <span class="select">
-            <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
+            <Select v-model="selected.repo" filter :options="repos" :optionLabel="label" />
           </span>
 
-          <DropDownWithCount v-model="selectedTarget" tag="Target" :all="ALL_TARGETS" :counts="targets" />
+          <DropDownWithCount v-model="selected.target" tag="Target" :all="ALL_TARGETS" :counts="targets" />
 
         </div>
 
         <div style="padding: 2px 8px 10px 8px">
 
-          <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-          <DropDownWithCount v-model="selectedFeatures" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
+          <DropDownWithCount v-model="selected.pkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
+          <DropDownWithCount v-model="selected.features" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
 
-          <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
-          <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
+          <DropDownWithCount v-model="selected.checker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
+          <DropDownWithCount v-model="selected.kind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
 
         </div>
       </div>
@@ -56,13 +56,23 @@ highlightRust();
 
 const label = (a: string) => a;
 
-const selectedUser = ref("");
-const selectedRepo = ref("");
-const selectedPkg = ref<string | null>(null);
-const selectedChecker = ref<string | null>(null);
-const selectedKind = ref<string | null>(null);
-const selectedTarget = ref(ALL_TARGETS);
-const selectedFeatures = ref<string | null>(null);
+const selected = reactive<{
+  user: string,
+  repo: string,
+  target: string,
+  pkg: string | null,
+  features: string | null,
+  checker: string | null,
+  kind: string | null,
+}>({
+  user: "",
+  repo: "",
+  target: ALL_TARGETS,
+  pkg: null,
+  features: null,
+  checker: null,
+  kind: null,
+});
 const displayFilters = ref(true);
 
 const got = ref<Get>(getEmpty());
@@ -76,12 +86,12 @@ githubFetch<UserRepo>({ path: "ui/user_repo.json" })
 
 // Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
-watch(users, (val) => selectedUser.value = val[0] ?? "");
-const repos = computed(() => user_repo.value[selectedUser.value]);
-watch(repos, (val) => selectedRepo.value = val[0] ?? "");
+watch(users, (val) => selected.user = val[0] ?? "");
+const repos = computed(() => user_repo.value[selected.user]);
+watch(repos, (val) => selected.repo = val[0] ?? "");
 
 // Update got state.
-watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selectedTarget.value }),
+watch(() => ({ user: selected.user, repo: selected.repo, target: selected.target }),
   ({ user, repo, target }) => {
     if (user && repo) {
       const target_ = target || ALL_TARGETS;
@@ -125,14 +135,14 @@ function get_ck_kinds(ck: string | null): string[] | null {
 // switch to another Get
 watch(got, g => {
   // reset pkg and features since it's less likely to see the same selected pkg in another repo
-  selectedPkg.value = null;
-  selectedFeatures.value = null;
+  selected.pkg = null;
+  selected.features = null;
 
   // reset kind if the diagnositc is empty
-  selectedKind.value = Dropdown.find_kind(selectedKind.value, g);
+  selected.kind = Dropdown.find_kind(selected.kind, g);
 
   // reset checker if the diagnositc is empty
-  const ck_kinds = get_ck_kinds(selectedChecker.value);
+  const ck_kinds = get_ck_kinds(selected.checker);
   let reset_checker = true;
   if (ck_kinds) {
     for (const kind of ck_kinds) {
@@ -142,14 +152,14 @@ watch(got, g => {
       }
     }
   }
-  if (reset_checker) selectedChecker.value = null;
+  if (reset_checker) selected.checker = null;
 });
 
 // watch selection changes
 watch(
   () => ({
-    pkg: selectedPkg.value, feat: selectedFeatures.value,
-    kind: selectedKind.value, ck: selectedChecker.value, g: got.value
+    pkg: selected.pkg, feat: selected.features,
+    kind: selected.kind, ck: selected.checker, g: got.value
   }),
   ({ pkg, feat, kind, ck, g }) => {
     const target = cloneDeep(g);
@@ -214,7 +224,7 @@ function get(path: string) {
       //   kind: "Not Exists!", raw: ["该目标架构下，无原始报告数据。"],
       //   lang: "rust", severity: Severity.Danger, disabled: false
       // }];
-      // selectedTab.value = "Not Exists!";
+      // selected.tab.value = "Not Exists!";
       // fileTree.value = { kinds_order: [], data: [] };
     });
 }
@@ -224,6 +234,47 @@ function getBasic(path: string) {
     .then(val => basic.value = val)
     .catch(err => console.log(err))
 }
+
+// route query
+const route = useRoute();
+function updateFilter(query: {
+  user?: string,
+  repo?: string,
+  target?: string,
+  pkg?: string,
+  features?: string,
+  checker?: string,
+  kind?: string,
+}) {
+  const { user, repo, target, pkg, features, checker, kind } = query;
+
+  if (user) { selected.user = decodeURIComponent(user); }
+  if (repo) { selected.repo = decodeURIComponent(repo); }
+  if (target) { selected.target = decodeURIComponent(target); }
+  if (pkg) { selected.pkg = decodeURIComponent(pkg); }
+  if (features) { selected.features = decodeURIComponent(features); }
+  if (checker) { selected.checker = decodeURIComponent(checker); }
+  if (kind) { selected.kind = decodeURIComponent(kind); }
+}
+updateFilter(route.query);
+
+
+const router = useRouter();
+watchEffect(() => {
+  const { user, repo, target, pkg, features, checker, kind } = selected;
+
+  let query: any = {};
+
+  if (user) query.user = encodeURIComponent(user);
+  if (repo) query.repo = encodeURIComponent(repo);
+  if (target) query.target = encodeURIComponent(target);
+  if (pkg) query.pkg = encodeURIComponent(pkg);
+  if (features) query.features = encodeURIComponent(features);
+  if (checker) query.checker = encodeURIComponent(checker);
+  if (kind) query.kind = encodeURIComponent(kind);
+
+  router.push({ path: route.path, query });
+});
 </script>
 
 <!-- FIXME: remove these -->
