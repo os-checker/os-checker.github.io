@@ -37,7 +37,7 @@
 
     </div>
 
-    <FileTree2 :get="got2" :count="count" v-model:filters="displayFilters" />
+    <FileTree2 :get="got2" :count="count" v-model:filters="displayFilters" v-model:lockURL="lockURL" />
   </div>
 </template>
 
@@ -96,6 +96,19 @@ watch(user_repo, val => {
 // Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
 const repos = computed(() => user_repo.value[selected.user]);
+
+const lockURL = ref(false);
+type Params = {
+  user?: string,
+  repo?: string,
+  target?: string,
+  pkg?: string,
+  features?: string,
+  checker?: string,
+  kind?: string,
+  lock?: string,
+};
+const query_params = reactive<Params>({});
 
 // Update got state.
 watch(() => ({ user: selected.user, repo: selected.repo, target: selected.target }),
@@ -169,6 +182,13 @@ watch(
     kind: selected.kind, ck: selected.checker, g: got.value
   }),
   ({ pkg, feat, kind, ck, g }) => {
+    if (query_params.lock === "true") {
+      if (query_params.pkg) selected.pkg = query_params.pkg;
+      if (query_params.features) selected.features = query_params.features;
+      if (query_params.checker) selected.checker = query_params.checker;
+      if (query_params.kind) selected.kind = query_params.kind;
+    }
+
     const target = cloneDeep(g);
 
     Dropdown.update_by_features(feat, target);
@@ -244,24 +264,20 @@ function getBasic(path: string) {
 
 // route query
 const route = useRoute();
-function updateFilter(query: {
-  user?: string,
-  repo?: string,
-  target?: string,
-  pkg?: string,
-  features?: string,
-  checker?: string,
-  kind?: string,
-}) {
-  const { user, repo, target, pkg, features, checker, kind } = query;
+function updateFilter(query: Params) {
+  const { user, repo, target, pkg, features, checker, kind, lock } = query;
 
-  if (user) { selected.user = decodeURIComponent(user); }
-  if (repo) { selected.repo = decodeURIComponent(repo); }
-  if (target) { selected.target = decodeURIComponent(target); }
-  if (pkg) { selected.pkg = decodeURIComponent(pkg); }
-  if (features) { selected.features = decodeURIComponent(features); }
-  if (checker) { selected.checker = decodeURIComponent(checker); }
-  if (kind) { selected.kind = decodeURIComponent(kind); }
+  if (user) { query_params.user = decodeURIComponent(user); }
+  if (repo) { query_params.repo = decodeURIComponent(repo); }
+  if (target) { query_params.target = decodeURIComponent(target); }
+  if (pkg) { query_params.pkg = decodeURIComponent(pkg); }
+  if (features) { query_params.features = decodeURIComponent(features); }
+  if (checker) { query_params.checker = decodeURIComponent(checker); }
+  if (kind) { query_params.kind = decodeURIComponent(kind); }
+  if (lock === "true") {
+    query_params.lock = decodeURIComponent(lock);
+    lockURL.value = true;
+  }
 }
 updateFilter(route.query);
 
@@ -274,11 +290,12 @@ watchEffect(() => {
 
   if (user) query.user = encodeURIComponent(user);
   if (repo) query.repo = encodeURIComponent(repo);
-  if (target) query.target = encodeURIComponent(target);
+  if (target && target !== ALL_TARGETS) query.target = encodeURIComponent(target);
   if (pkg) query.pkg = encodeURIComponent(pkg);
   if (features) query.features = encodeURIComponent(features);
   if (checker) query.checker = encodeURIComponent(checker);
   if (kind) query.kind = encodeURIComponent(kind);
+  if (lockURL.value) query.lock = encodeURIComponent(lockURL.value);
 
   router.push({ path: route.path, query });
 });
