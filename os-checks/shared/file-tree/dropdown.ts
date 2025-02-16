@@ -147,7 +147,7 @@ export function update_by_features(feat: string, g: Get) {
   for (const data of g.fileTree.data) {
     // only keep feat
     data.raw_reports = data.raw_reports.filter(r => r.features === feat);
-    data.count = data.raw_reports.length;
+    data.count = data.raw_reports.reduce((acc, r) => acc + r.count, 0);
   }
   // only keep non-zero nodes
   g.fileTree.data = g.fileTree.data.filter(d => d.count !== 0);
