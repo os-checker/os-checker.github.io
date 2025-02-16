@@ -238,22 +238,4 @@ function getBasic(path: string) {
 .select {
   padding-right: 10px;
 }
-
-.resolved-table {
-  --p-datatable-header-cell-color: var(--p-button-primary-background);
-}
-
-.sources {
-  color: var(--p-orange-400);
-}
-
-.sources-table {
-  --p-datatable-header-cell-color: var(--p-orange-400);
-}
-
-.drop-down-options {
-  margin-right: 8px;
-  width: 40px;
-  justify-content: right;
-}
 </style>
