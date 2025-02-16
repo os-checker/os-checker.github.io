@@ -68,7 +68,7 @@ const selectedPkg = ref<string | null>(null);
 const selectedChecker = ref<string | null>(null);
 const selectedKind = ref<string | null>(null);
 const selectedTarget = ref(ALL_TARGETS);
-const selectedFeatures = ref("");
+const selectedFeatures = ref<string | null>(null);
 const displayFilters = ref(true);
 
 const got = ref<Get>(getEmpty());
@@ -128,9 +128,11 @@ function get_ck_kinds(ck: string | null): string[] | null {
   }
   return null;
 }
+// switch to another Get
 watch(got, g => {
-  // reset pkg since it's less likely to see the same selected pkg in another repo
+  // reset pkg and features since it's less likely to see the same selected pkg in another repo
   selectedPkg.value = null;
+  selectedFeatures.value = null;
 
   // reset kind if the diagnositc is empty
   selectedKind.value = Dropdown.find_kind(selectedKind.value, g);
@@ -148,11 +150,17 @@ watch(got, g => {
   }
   if (reset_checker) selectedChecker.value = null;
 });
+
+// watch selection changes
 watch(
-  () => ({ pkg: selectedPkg.value, kind: selectedKind.value, ck: selectedChecker.value, g: got.value }),
-  ({ pkg, kind, ck, g }) => {
+  () => ({
+    pkg: selectedPkg.value, feat: selectedFeatures.value,
+    kind: selectedKind.value, ck: selectedChecker.value, g: got.value
+  }),
+  ({ pkg, feat, kind, ck, g }) => {
     const target = cloneDeep(g);
 
+    Dropdown.update_by_features(feat, target);
     Dropdown.update_by_pkg(pkg, target);
 
     const ck_kinds = get_ck_kinds(ck);

@@ -9,8 +9,6 @@ export class Dropdown {
   map: KindCheckerMap;
   checkers: DropDownOptions;
   features: DropDownOptions;
-  // has non-empty features
-  has_features: boolean;
 
   /** called when a new fileTree is created */
   constructor(g: Get, map: KindCheckerMap) {
@@ -18,10 +16,7 @@ export class Dropdown {
     this.kinds = gen_kinds(g);
     this.map = map; // map is supposed to never change
     this.checkers = gen_checkers(this.kinds, map);
-    const { has, opt } = gen_features(g);
-    console.log(has, opt);
-    this.has_features = has;
-    this.features = opt;
+    this.features = gen_features(g);
   }
 
   /** called when a fitler is changed */
@@ -31,10 +26,7 @@ export class Dropdown {
     options.pkgs.counts[ALL_PKGS] = this.pkgs.counts[ALL_PKGS];
     options.kinds.counts[ALL_KINDS] = this.kinds.counts[ALL_KINDS];
     options.checkers.counts[ALL_CHECKERS] = this.checkers.counts[ALL_CHECKERS];
-
-    if (this.has_features)
-      options.features.counts[ALL_FEATURES_SETS] = this.features.counts[ALL_FEATURES_SETS];
-
+    options.features.counts[ALL_FEATURES_SETS] = this.features.counts[ALL_FEATURES_SETS];
     return options;
   }
 
@@ -47,6 +39,10 @@ export class Dropdown {
 
   static update_by_pkg(pkg: string | null, g: Get) {
     if (pkg && pkg !== ALL_PKGS) update_by_pkg(pkg, g);
+  }
+
+  static update_by_features(feat: string | null, g: Get) {
+    if (feat !== null && feat !== ALL_FEATURES_SETS) update_by_features(feat, g);
   }
 
   static update_by_kind(kind: string | null, g: Get) {
@@ -128,7 +124,7 @@ export function gen_targets(targets: Targets): DropDownOptions {
   return counts_to_options(counts);
 }
 
-function gen_features(g: Get): { opt: DropDownOptions, has: boolean } {
+function gen_features(g: Get): DropDownOptions {
   let counts: Counts = {};
   for (const data of g.fileTree.data) {
     for (const reports of data.raw_reports) {
@@ -138,20 +134,23 @@ function gen_features(g: Get): { opt: DropDownOptions, has: boolean } {
       else counts[feat] = len;
     }
   }
-  // if no feat or only empty feat, treat it as no option
-  const len = Object.entries(counts).length;
-  const has_features = !(len === 0 || (len === 1 && counts[""]));
-  // ALL_FEATURES_SETS must only apply to has non-empty features
-  return {
-    opt: has_features ? counts_to_options(counts, ALL_FEATURES_SETS) : emptyOptions(),
-    has: has_features
-  };
+  return counts_to_options(counts, ALL_FEATURES_SETS);
 }
 
 // filters update Get: got2 is updated in place; got is deep cloned
 
 export function update_by_pkg(pkg: string, g: Get) {
   g.fileTree.data = g.fileTree.data.filter(val => val.pkg === pkg);
+}
+
+export function update_by_features(feat: string, g: Get) {
+  for (const data of g.fileTree.data) {
+    // only keep feat
+    data.raw_reports = data.raw_reports.filter(r => r.features === feat);
+    data.count = data.raw_reports.length;
+  }
+  // only keep non-zero nodes
+  g.fileTree.data = g.fileTree.data.filter(d => d.count !== 0);
 }
 
 export function update_by_kind(kind: string, g: Get) {
