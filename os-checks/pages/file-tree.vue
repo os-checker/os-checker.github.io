@@ -26,17 +26,11 @@
 
         <div style="padding: 2px 8px 10px 8px">
 
+          <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
+          <DropDownWithCount v-model="selectedFeatures" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
+
           <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
           <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
-
-          <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-
-          <DropDownWithCount v-model="selectedFeatures" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
-          <!-- <span class="input">Features:</span> -->
-          <!-- <span class="select"> -->
-          <!--   <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label" -->
-          <!--     placeholder="" /> -->
-          <!-- </span> -->
 
         </div>
       </div>
