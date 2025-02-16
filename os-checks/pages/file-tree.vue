@@ -117,7 +117,8 @@ watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) =
   count.value = g2.fileTree.data.map(d => d.count).reduce((acc, c) => acc + c, 0);
 }, { deep: true });
 
-const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
+// const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
+const features: string[] = [];
 
 function get_ck_kinds(ck: string | null): string[] | null {
   if (ck && ck !== ALL_CHECKERS) {
