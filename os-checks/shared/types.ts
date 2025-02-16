@@ -6,11 +6,13 @@ export type Targets = Target[];
 export type Column = { field: string, header: string };
 export type Columns = Column[];
 export type Basic = {
+  pkgs: { pkg: string, count: number }[],
+  checkers: { checker: string, count: number }[],
   targets: Targets,
   kinds: {
-    // order: string[],
-    // mapping: { [key: string]: string[] },
-    columns: Columns
+    order: string[],
+    mapping: { [key: string]: string[] },
+    // columns: Columns
   }
 };
 export type TargetOption = { target: string };

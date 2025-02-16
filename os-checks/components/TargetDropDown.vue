@@ -43,17 +43,14 @@ function fetch() {
   });
 }
 
-function change(path: string, params: any) {
-  // console.log("path =", path);
-  const excludes = ["/", "/repos", "/charts", "/target", "/workflows", "/testcases"];
-  if (excludes.findIndex(p => p === path) !== -1) {
-    visible.value = false;
-    return;
-  } else if (params) {
-    // console.log("path =", path);
+function change(path: string, _params: any) {
+  const includes = ["/diagnostics"];
+  if (includes.findIndex(p => p === path) !== -1) {
+    visible.value = true;
     fetch();
+  } else {
+    visible.value = false;
   }
-  visible.value = true;
 }
 </script>
 

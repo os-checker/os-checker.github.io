@@ -12,7 +12,21 @@ export const useBasicStore = defineStore('targets', {
     },
 
     columns(): Columns {
-      return this.basic?.kinds.columns ?? [];
+      const order = this.basic?.kinds.order;
+      if (!order) return [];
+      return order.map(kind => {
+        let val = kind;
+        if (kind === "Clippy(Warn)") {
+          val = "Clippy (Warn)";
+        } else if (kind === "Clippy(Error)") {
+          val = "Clippy (Error)"
+        } else if (kind === "Lockbud(Possibly)") {
+          val = "Lockbud (Possibly)"
+        } else if (kind === "Lockbud(Probably)") {
+          val = "Lockbud (Probably)"
+        }
+        return { field: kind, header: val };
+      });
     }
   },
 
