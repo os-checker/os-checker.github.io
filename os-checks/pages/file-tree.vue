@@ -73,7 +73,7 @@ const selected = reactive<{
   checker: null,
   kind: null,
 });
-watch(selected, val => console.log(val));
+// watch(selected, val => console.log(val));
 
 const displayFilters = ref(true);
 
@@ -86,7 +86,7 @@ const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
   .then(data => user_repo.value = data);
 watch(user_repo, val => {
-  if (!selected.user && !selected.repo) {
+  if (!selected.user || !selected.repo) {
     const user = Object.keys(user_repo.value).sort()[0] ?? "";
     selected.user = user;
     selected.repo = val[user][0] ?? "";
@@ -154,6 +154,8 @@ function get_ck_kinds(ck: string | null): string[] | null {
 }
 // switch to another Get
 watch(got, g => {
+  if (lock_filters()) return;
+
   // reset pkg and features since it's less likely to see the same selected pkg in another repo
   selected.pkg = null;
   selected.features = null;
@@ -175,6 +177,26 @@ watch(got, g => {
   if (reset_checker) selected.checker = null;
 });
 
+// should be called only once in start-up
+function lock_filters(): boolean {
+  if (query_params.lock === "true") {
+    lockURL.value = true;
+    const { user, repo, target, pkg, features, checker, kind } = query_params;
+    if (user) selected.user = user;
+    if (repo) selected.repo = repo;
+    if (target && target !== ALL_TARGETS) selected.target = target;
+    if (pkg) selected.pkg = pkg;
+    if (features) selected.features = features;
+    if (checker) selected.checker = checker;
+    if (kind) selected.kind = kind;
+    query_params.lock = undefined;
+    return true;
+  } else {
+    lockURL.value = false;
+    return false
+  }
+}
+
 // watch selection changes
 watch(
   () => ({
@@ -182,24 +204,18 @@ watch(
     kind: selected.kind, ck: selected.checker, g: got.value
   }),
   ({ pkg, feat, kind, ck, g }) => {
-    if (query_params.lock === "true") {
-      if (query_params.pkg) selected.pkg = query_params.pkg;
-      if (query_params.features) selected.features = query_params.features;
-      if (query_params.checker) selected.checker = query_params.checker;
-      if (query_params.kind) selected.kind = query_params.kind;
-    }
 
-    const target = cloneDeep(g);
+    const val = cloneDeep(g);
 
-    Dropdown.update_by_features(feat, target);
-    Dropdown.update_by_pkg(pkg, target);
+    Dropdown.update_by_features(feat, val);
+    Dropdown.update_by_pkg(pkg, val);
 
     const ck_kinds = get_ck_kinds(ck);
-    if (ck_kinds) Dropdown.update_by_checker(ck_kinds, target);
+    if (ck_kinds) Dropdown.update_by_checker(ck_kinds, val);
 
-    Dropdown.update_by_kind(kind, target);
+    Dropdown.update_by_kind(kind, val);
 
-    got2.value = target;
+    got2.value = val;
   }
 );
 
@@ -271,19 +287,25 @@ function updateFilter(query: Params) {
   if (repo) { query_params.repo = decodeURIComponent(repo); }
   if (target) { query_params.target = decodeURIComponent(target); }
   if (pkg) { query_params.pkg = decodeURIComponent(pkg); }
-  if (features) { query_params.features = decodeURIComponent(features); }
+  if (features !== undefined) { query_params.features = decodeURIComponent(features); }
   if (checker) { query_params.checker = decodeURIComponent(checker); }
   if (kind) { query_params.kind = decodeURIComponent(kind); }
   if (lock === "true") {
     query_params.lock = decodeURIComponent(lock);
-    lockURL.value = true;
+    lockURL.value = false;
   }
 }
 updateFilter(route.query);
 
-
 const router = useRouter();
-watchEffect(() => {
+const router_params = ref<Params | null>({});
+watch(router_params, query => router.push({ path: route.path, query: query || {} }));
+
+watch(lockURL, lock => {
+  if (!lock) {
+    router_params.value = {};
+    return;
+  }
   const { user, repo, target, pkg, features, checker, kind } = selected;
 
   let query: any = {};
@@ -292,12 +314,13 @@ watchEffect(() => {
   if (repo) query.repo = encodeURIComponent(repo);
   if (target && target !== ALL_TARGETS) query.target = encodeURIComponent(target);
   if (pkg) query.pkg = encodeURIComponent(pkg);
-  if (features) query.features = encodeURIComponent(features);
+  if (features !== null) query.features = encodeURIComponent(features);
   if (checker) query.checker = encodeURIComponent(checker);
   if (kind) query.kind = encodeURIComponent(kind);
-  if (lockURL.value) query.lock = encodeURIComponent(lockURL.value);
 
-  router.push({ path: route.path, query });
+  query.lock = encodeURIComponent("true");
+
+  router_params.value = query;
 });
 </script>
 
