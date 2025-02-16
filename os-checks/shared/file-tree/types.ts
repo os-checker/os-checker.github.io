@@ -5,6 +5,7 @@ export const ALL_TARGETS = "All-Targets";
 export const ALL_PKGS = "All-Pkgs";
 export const ALL_CHECKERS = "All-Checkers";
 export const ALL_KINDS = "All-Kinds";
+export const ALL_FEATURES_SETS = "All-Features-Sets";
 
 export function emptyOptions(): DropDownOptions {
   return { counts: {}, names: [] };

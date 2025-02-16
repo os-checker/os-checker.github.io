@@ -31,11 +31,12 @@
 
           <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
 
-          <span class="input">Features:</span>
-          <span class="select">
-            <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label"
-              placeholder="" />
-          </span>
+          <DropDownWithCount v-model="selectedFeatures" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
+          <!-- <span class="input">Features:</span> -->
+          <!-- <span class="select"> -->
+          <!--   <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label" -->
+          <!--     placeholder="" /> -->
+          <!-- </span> -->
 
         </div>
       </div>
@@ -51,7 +52,7 @@ import { cloneDeep } from 'es-toolkit/compat';
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree } from '~/shared/file-tree';
 import { Dropdown, gen_map, gen_targets } from '~/shared/file-tree/dropdown';
-import { ALL_PKGS, ALL_CHECKERS, ALL_TARGETS, ALL_KINDS, emptyOptions, type DropDownOptions } from '~/shared/file-tree/types';
+import { ALL_PKGS, ALL_CHECKERS, ALL_TARGETS, ALL_KINDS, emptyOptions, type DropDownOptions, ALL_FEATURES_SETS } from '~/shared/file-tree/types';
 import { checkerResult, getEmpty, mergeObjectsWithArrayConcat, type Get } from '~/shared/file-tree/utils';
 import type { UserRepo } from '~/shared/target';
 import type { Basic } from '~/shared/types';
@@ -104,6 +105,7 @@ const targets = computed<DropDownOptions>(() => {
 const pkgs = ref(emptyOptions());
 const kinds = ref(emptyOptions());
 const checkers = ref(emptyOptions());
+const features = ref(emptyOptions());
 const count = ref<number | null>(null);
 watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) => {
   if (!b) return;
@@ -114,11 +116,10 @@ watch(() => ({ g: got.value, g2: got2.value, b: basic.value }), ({ g, g2, b }) =
   pkgs.value = cloneDeep(dropdown_new.pkgs);
   kinds.value = cloneDeep(dropdown_new.kinds);
   checkers.value = cloneDeep(dropdown_new.checkers);
+  features.value = cloneDeep(dropdown_new.features);
   count.value = g2.fileTree.data.map(d => d.count).reduce((acc, c) => acc + c, 0);
 }, { deep: true });
 
-// const features = computed(() => basic.value?.features_sets.map(p => p.features) ?? []);
-const features: string[] = [];
 
 function get_ck_kinds(ck: string | null): string[] | null {
   if (ck && ck !== ALL_CHECKERS) {

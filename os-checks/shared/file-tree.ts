@@ -1,5 +1,5 @@
 export type Kinds = { [key: string]: string[] };
-export type RawReport = { file: string, count: number, kinds: Kinds };
+export type RawReport = { file: string, features: string, count: number, kinds: Kinds };
 export type Datum = {
   user: string,
   repo: string,

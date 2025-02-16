@@ -1,4 +1,4 @@
-import { ALL_CHECKERS, ALL_KINDS, ALL_PKGS, counts_to_options, emptyOptions, type Counts, type DropDownOptions } from "./types";
+import { ALL_CHECKERS, ALL_FEATURES_SETS, ALL_KINDS, ALL_PKGS, counts_to_options, emptyOptions, type Counts, type DropDownOptions } from "./types";
 import type { Get } from "./utils";
 import type { Kinds } from "../file-tree";
 import type { Basic, Targets } from "../types";
@@ -8,6 +8,9 @@ export class Dropdown {
   kinds: DropDownOptions;
   map: KindCheckerMap;
   checkers: DropDownOptions;
+  features: DropDownOptions;
+  // has non-empty features
+  has_features: boolean;
 
   /** called when a new fileTree is created */
   constructor(g: Get, map: KindCheckerMap) {
@@ -15,6 +18,10 @@ export class Dropdown {
     this.kinds = gen_kinds(g);
     this.map = map; // map is supposed to never change
     this.checkers = gen_checkers(this.kinds, map);
+    const { has, opt } = gen_features(g);
+    console.log(has, opt);
+    this.has_features = has;
+    this.features = opt;
   }
 
   /** called when a fitler is changed */
@@ -24,6 +31,10 @@ export class Dropdown {
     options.pkgs.counts[ALL_PKGS] = this.pkgs.counts[ALL_PKGS];
     options.kinds.counts[ALL_KINDS] = this.kinds.counts[ALL_KINDS];
     options.checkers.counts[ALL_CHECKERS] = this.checkers.counts[ALL_CHECKERS];
+
+    if (this.has_features)
+      options.features.counts[ALL_FEATURES_SETS] = this.features.counts[ALL_FEATURES_SETS];
+
     return options;
   }
 
@@ -115,6 +126,26 @@ export function gen_targets(targets: Targets): DropDownOptions {
     counts[triple] = count;
   }
   return counts_to_options(counts);
+}
+
+function gen_features(g: Get): { opt: DropDownOptions, has: boolean } {
+  let counts: Counts = {};
+  for (const data of g.fileTree.data) {
+    for (const reports of data.raw_reports) {
+      const feat = reports.features;
+      const len = reports.count;
+      if (counts[feat]) counts[feat] += len;
+      else counts[feat] = len;
+    }
+  }
+  // if no feat or only empty feat, treat it as no option
+  const len = Object.entries(counts).length;
+  const has_features = !(len === 0 || (len === 1 && counts[""]));
+  // ALL_FEATURES_SETS must only apply to has non-empty features
+  return {
+    opt: has_features ? counts_to_options(counts, ALL_FEATURES_SETS) : emptyOptions(),
+    has: has_features
+  };
 }
 
 // filters update Get: got2 is updated in place; got is deep cloned
