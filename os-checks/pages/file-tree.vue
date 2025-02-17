@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts" setup>
-import { cloneDeep } from 'es-toolkit/compat';
+import { cloneDeep, includes } from 'es-toolkit/compat';
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree } from '~/shared/file-tree';
 import { Dropdown, gen_map, gen_targets } from '~/shared/file-tree/dropdown';
@@ -59,7 +59,7 @@ const label = (a: string) => a;
 const selected = reactive<{
   user: string,
   repo: string,
-  target: string,
+  target: string | null,
   pkg: string | null,
   features: string | null,
   checker: string | null,
@@ -89,6 +89,10 @@ githubFetch<UserRepo>({ path: "ui/user_repo.json" })
 // Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
 const repos = computed(() => user_repo.value[selected.user]);
+const targets = computed<DropDownOptions>(() => {
+  const t = basic.value?.targets;
+  return t ? gen_targets(t) : emptyOptions();
+});
 
 const lockURL = ref(false);
 type Params = {
@@ -121,21 +125,16 @@ watch(user_repo, val => {
 // Update got state.
 watch(() => ({ user: selected.user, repo: selected.repo, target: selected.target }),
   ({ user, repo, target }) => {
-    if (user && repos.value.findIndex(r => r === repo) !== -1) {
-      const target_ = target || ALL_TARGETS;
-      get(`ui/repos/${user}/${repo}/${target_}.json`);
+    if (user && includes(repos.value, repo)) {
+      get(`ui/repos/${user}/${repo}/${target || ALL_TARGETS}.json`);
       getBasic(`ui/repos/${user}/${repo}/basic.json`);
     } else if (user && repos.value[0]) {
       // repo is not present, maybe user is selected, but not for repo
       selected.repo = repos.value[0];
+      selected.target = ALL_TARGETS;
     }
   }
 );
-
-const targets = computed<DropDownOptions>(() => {
-  const t = basic.value?.targets;
-  return t ? gen_targets(t) : emptyOptions();
-});
 
 const pkgs = ref(emptyOptions());
 const kinds = ref(emptyOptions());
