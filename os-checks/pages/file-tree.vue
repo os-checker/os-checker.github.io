@@ -101,6 +101,7 @@ type Params = {
   kind?: string,
   lock?: string,
 };
+// given query
 const query_params = reactive<Params>({});
 
 watch(user_repo, val => {
@@ -157,30 +158,6 @@ function get_ck_kinds(ck: string | null): string[] | null {
   }
   return null;
 }
-// switch to another Get
-// watch(got, g => {
-//   if (lock_filters()) return;
-//
-//   // reset pkg and features since it's less likely to see the same selected pkg in another repo
-//   selected.pkg = null;
-//   selected.features = null;
-//
-//   // reset kind if the diagnositc is empty
-//   selected.kind = Dropdown.find_kind(selected.kind, g);
-//
-//   // reset checker if the diagnositc is empty
-//   const ck_kinds = get_ck_kinds(selected.checker);
-//   let reset_checker = true;
-//   if (ck_kinds) {
-//     for (const kind of ck_kinds) {
-//       if (Dropdown.find_kind(kind, g)) {
-//         reset_checker = false;
-//         break
-//       }
-//     }
-//   }
-//   if (reset_checker) selected.checker = null;
-// });
 
 function switch_got(g: Get) {
   if (lock_filters()) return;
@@ -206,25 +183,20 @@ function switch_got(g: Get) {
   if (reset_checker) selected.checker = null;
 }
 
-// should be called only once in start-up
 function lock_filters(): boolean {
-  console.log("[lock_filters] query_params.lock", query_params.lock);
-  if (query_params.lock === "true") {
+  const init = query_params.lock === "true";
+  // should be called only once in startup
+  if (init) {
     lockURL.value = true;
-    const { user, repo, target, pkg, features, checker, kind } = query_params;
-    if (user) selected.user = user;
-    if (repo) selected.repo = repo;
+    const { target, pkg, features, checker, kind } = query_params;
     if (target && target !== ALL_TARGETS) selected.target = target;
     if (pkg) selected.pkg = pkg;
     if (features) selected.features = features;
     if (checker) selected.checker = checker;
     if (kind) selected.kind = kind;
     query_params.lock = undefined;
-    return true;
-  } else {
-    lockURL.value = false;
-    return false
   }
+  return init;
 }
 
 // watch selection changes
@@ -234,11 +206,8 @@ watch(
     kind: selected.kind, ck: selected.checker, g: got.value
   }),
   ({ pkg, feat, kind, ck, g }, old) => {
-    if (old.g !== g) {
-      console.log("switch_got", old.g, g);
-      switch_got(g);
-      return;
-    }
+    if (old.g !== g) return switch_got(g);
+    lockURL.value = false;
 
     const val = cloneDeep(g);
 
@@ -333,7 +302,8 @@ function updateFilter(query: Params) {
 updateFilter(route.query);
 
 const router = useRouter();
-const router_params = ref<Params | null>({});
+// emit query
+const router_params = ref<Params | null>(null);
 watch(router_params, query => router.push({ path: route.path, query: query || {} }));
 
 watch(lockURL, lock => {
@@ -341,6 +311,7 @@ watch(lockURL, lock => {
     router_params.value = {};
     return;
   }
+
   const { user, repo, target, pkg, features, checker, kind } = selected;
 
   let query: any = {};
