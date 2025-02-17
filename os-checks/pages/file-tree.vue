@@ -104,6 +104,7 @@ type Params = {
 // given query
 const query_params = reactive<Params>({});
 
+// init user & repo, considering route query if any
 watch(user_repo, val => {
   const { user, repo, target } = query_params;
   if (user && repo) {
@@ -120,10 +121,13 @@ watch(user_repo, val => {
 // Update got state.
 watch(() => ({ user: selected.user, repo: selected.repo, target: selected.target }),
   ({ user, repo, target }) => {
-    if (user && repo) {
+    if (user && repos.value.findIndex(r => r === repo) !== -1) {
       const target_ = target || ALL_TARGETS;
       get(`ui/repos/${user}/${repo}/${target_}.json`);
       getBasic(`ui/repos/${user}/${repo}/basic.json`);
+    } else if (user && repos.value[0]) {
+      // repo is not present, maybe user is selected, but not for repo
+      selected.repo = repos.value[0];
     }
   }
 );
