@@ -105,10 +105,11 @@ type Params = {
 const query_params = reactive<Params>({});
 
 watch(user_repo, val => {
-  const { user, repo } = query_params;
+  const { user, repo, target } = query_params;
   if (user && repo) {
     selected.user = user;
     selected.repo = repo;
+    if (target && target !== ALL_TARGETS) selected.target = target;
   } else {
     const user = Object.keys(val).sort()[0] ?? "";
     selected.user = user;
@@ -188,8 +189,7 @@ function lock_filters(): boolean {
   // should be called only once in startup
   if (init) {
     lockURL.value = true;
-    const { target, pkg, features, checker, kind } = query_params;
-    if (target && target !== ALL_TARGETS) selected.target = target;
+    const { pkg, features, checker, kind } = query_params;
     if (pkg) selected.pkg = pkg;
     if (features) selected.features = features;
     if (checker) selected.checker = checker;
