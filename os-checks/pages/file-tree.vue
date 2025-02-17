@@ -85,13 +85,6 @@ const basic = ref<Basic | null>(null);
 const user_repo = ref<UserRepo>({});
 githubFetch<UserRepo>({ path: "ui/user_repo.json" })
   .then(data => user_repo.value = data);
-watch(user_repo, val => {
-  if (!selected.user || !selected.repo) {
-    const user = Object.keys(user_repo.value).sort()[0] ?? "";
-    selected.user = user;
-    selected.repo = val[user][0] ?? "";
-  }
-});
 
 // Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
@@ -109,6 +102,18 @@ type Params = {
   lock?: string,
 };
 const query_params = reactive<Params>({});
+
+watch(user_repo, val => {
+  const { user, repo } = query_params;
+  if (user && repo) {
+    selected.user = user;
+    selected.repo = repo;
+  } else {
+    const user = Object.keys(val).sort()[0] ?? "";
+    selected.user = user;
+    selected.repo = val[user][0] ?? "";
+  }
+});
 
 // Update got state.
 watch(() => ({ user: selected.user, repo: selected.repo, target: selected.target }),
@@ -153,7 +158,31 @@ function get_ck_kinds(ck: string | null): string[] | null {
   return null;
 }
 // switch to another Get
-watch(got, g => {
+// watch(got, g => {
+//   if (lock_filters()) return;
+//
+//   // reset pkg and features since it's less likely to see the same selected pkg in another repo
+//   selected.pkg = null;
+//   selected.features = null;
+//
+//   // reset kind if the diagnositc is empty
+//   selected.kind = Dropdown.find_kind(selected.kind, g);
+//
+//   // reset checker if the diagnositc is empty
+//   const ck_kinds = get_ck_kinds(selected.checker);
+//   let reset_checker = true;
+//   if (ck_kinds) {
+//     for (const kind of ck_kinds) {
+//       if (Dropdown.find_kind(kind, g)) {
+//         reset_checker = false;
+//         break
+//       }
+//     }
+//   }
+//   if (reset_checker) selected.checker = null;
+// });
+
+function switch_got(g: Get) {
   if (lock_filters()) return;
 
   // reset pkg and features since it's less likely to see the same selected pkg in another repo
@@ -175,10 +204,11 @@ watch(got, g => {
     }
   }
   if (reset_checker) selected.checker = null;
-});
+}
 
 // should be called only once in start-up
 function lock_filters(): boolean {
+  console.log("[lock_filters] query_params.lock", query_params.lock);
   if (query_params.lock === "true") {
     lockURL.value = true;
     const { user, repo, target, pkg, features, checker, kind } = query_params;
@@ -203,7 +233,12 @@ watch(
     pkg: selected.pkg, feat: selected.features,
     kind: selected.kind, ck: selected.checker, g: got.value
   }),
-  ({ pkg, feat, kind, ck, g }) => {
+  ({ pkg, feat, kind, ck, g }, old) => {
+    if (old.g !== g) {
+      console.log("switch_got", old.g, g);
+      switch_got(g);
+      return;
+    }
 
     const val = cloneDeep(g);
 
