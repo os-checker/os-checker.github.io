@@ -206,7 +206,8 @@ function lock_filters(): boolean {
 watch(
   () => ({
     pkg: selected.pkg, feat: selected.features,
-    kind: selected.kind, ck: selected.checker, g: got.value
+    kind: selected.kind, ck: selected.checker,
+    g: got.value, b: basic.value
   }),
   ({ pkg, feat, kind, ck, g }, old) => {
     if (old.g !== g) return switch_got(g);
@@ -217,6 +218,7 @@ watch(
     Dropdown.update_by_features(feat, val);
     Dropdown.update_by_pkg(pkg, val);
 
+    // get_ck_kinds relies on basic: if basic is not ready, spurious null is got
     const ck_kinds = get_ck_kinds(ck);
     if (ck_kinds) Dropdown.update_by_checker(ck_kinds, val);
 
