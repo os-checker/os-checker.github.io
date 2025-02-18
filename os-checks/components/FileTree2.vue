@@ -84,6 +84,9 @@ const heightCodePanel = computed(() => {
   const adjust = displayFilters.value ? 100 : 0;
   return `${height * 0.85 - adjust}px`;
 });
+
+const lockURL = defineModel("lockURL", { default: false });
+const lockURLIcon = computed(() => lockURL.value ? "pi pi-lock" : "pi pi-lock-open");
 </script>
 
 <template>
@@ -100,9 +103,13 @@ const heightCodePanel = computed(() => {
             <Button class="btn" :icon="displayFiltersIcon" severity="secondary" variant="text"
               @click="() => displayFilters = !displayFilters" />
           </div>
+          <div>
+            <Button class="btn" :icon="lockURLIcon" severity="secondary" variant="text"
+              @click="() => lockURL = !lockURL" />
+          </div>
         </div>
         <div v-if="count" style="padding-right: 0.6rem;">
-          <b style="margin-right: 10px;">Total Count:</b>
+          <b style="margin-right: 6px;">Total Count:</b>
           <Button class="btn" severity="danger" @click="resetSelectKey"> {{ count }} </Button>
         </div>
       </div>

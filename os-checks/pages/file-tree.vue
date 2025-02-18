@@ -12,43 +12,37 @@
         <div style="padding: 6px 8px 6px 8px">
           <span class="input">User:</span>
           <span class="select">
-            <Select v-model="selectedUser" filter :options="users" :optionLabel="label" />
+            <Select v-model="selected.user" filter :options="users" :optionLabel="label" />
           </span>
 
           <span class="input">Repo:</span>
           <span class="select">
-            <Select v-model="selectedRepo" filter :options="repos" :optionLabel="label" />
+            <Select v-model="selected.repo" filter :options="repos" :optionLabel="label" />
           </span>
 
-          <DropDownWithCount v-model="selectedTarget" tag="Target" :all="ALL_TARGETS" :counts="targets" />
+          <DropDownWithCount v-model="selected.target" tag="Target" :all="ALL_TARGETS" :counts="targets" />
 
         </div>
 
         <div style="padding: 2px 8px 10px 8px">
 
-          <DropDownWithCount v-model="selectedChecker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
-          <DropDownWithCount v-model="selectedKind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
+          <DropDownWithCount v-model="selected.pkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
+          <DropDownWithCount v-model="selected.features" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
 
-          <DropDownWithCount v-model="selectedPkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-
-          <DropDownWithCount v-model="selectedFeatures" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
-          <!-- <span class="input">Features:</span> -->
-          <!-- <span class="select"> -->
-          <!--   <Select v-model="selectedFeatures" filter showClear :options="features" :optionLabel="label" -->
-          <!--     placeholder="" /> -->
-          <!-- </span> -->
+          <DropDownWithCount v-model="selected.checker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
+          <DropDownWithCount v-model="selected.kind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
 
         </div>
       </div>
 
     </div>
 
-    <FileTree2 :get="got2" :count="count" v-model:filters="displayFilters" />
+    <FileTree2 :get="got2" :count="count" v-model:filters="displayFilters" v-model:lockURL="lockURL" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { cloneDeep } from 'es-toolkit/compat';
+import { cloneDeep, includes } from 'es-toolkit/compat';
 import type { FetchError } from 'ofetch';
 import { Severity, type FileTree } from '~/shared/file-tree';
 import { Dropdown, gen_map, gen_targets } from '~/shared/file-tree/dropdown';
@@ -62,13 +56,25 @@ highlightRust();
 
 const label = (a: string) => a;
 
-const selectedUser = ref("");
-const selectedRepo = ref("");
-const selectedPkg = ref<string | null>(null);
-const selectedChecker = ref<string | null>(null);
-const selectedKind = ref<string | null>(null);
-const selectedTarget = ref(ALL_TARGETS);
-const selectedFeatures = ref<string | null>(null);
+const selected = reactive<{
+  user: string,
+  repo: string,
+  target: string | null,
+  pkg: string | null,
+  features: string | null,
+  checker: string | null,
+  kind: string | null,
+}>({
+  user: "",
+  repo: "",
+  target: ALL_TARGETS,
+  pkg: null,
+  features: null,
+  checker: null,
+  kind: null,
+});
+// watch(selected, val => console.log(val));
+
 const displayFilters = ref(true);
 
 const got = ref<Get>(getEmpty());
@@ -82,25 +88,53 @@ githubFetch<UserRepo>({ path: "ui/user_repo.json" })
 
 // Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
-watch(users, (val) => selectedUser.value = val[0] ?? "");
-const repos = computed(() => user_repo.value[selectedUser.value]);
-watch(repos, (val) => selectedRepo.value = val[0] ?? "");
-
-// Update got state.
-watch(() => ({ user: selectedUser.value, repo: selectedRepo.value, target: selectedTarget.value }),
-  ({ user, repo, target }) => {
-    if (user && repo) {
-      const target_ = target || ALL_TARGETS;
-      get(`ui/repos/${user}/${repo}/${target_}.json`);
-      getBasic(`ui/repos/${user}/${repo}/basic.json`);
-    }
-  }
-);
-
+const repos = computed(() => user_repo.value[selected.user]);
 const targets = computed<DropDownOptions>(() => {
   const t = basic.value?.targets;
   return t ? gen_targets(t) : emptyOptions();
 });
+
+const lockURL = ref(false);
+type Params = {
+  user?: string,
+  repo?: string,
+  target?: string,
+  pkg?: string,
+  features?: string,
+  checker?: string,
+  kind?: string,
+  lock?: string,
+};
+// given query
+const query_params = reactive<Params>({});
+
+// init user & repo, considering route query if any
+watch(user_repo, val => {
+  const { user, repo, target } = query_params;
+  if (user && repo) {
+    selected.user = user;
+    selected.repo = repo;
+    if (target && target !== ALL_TARGETS) selected.target = target;
+  } else {
+    const user = Object.keys(val).sort()[0] ?? "";
+    selected.user = user;
+    selected.repo = val[user][0] ?? "";
+  }
+});
+
+// Update got state.
+watch(() => ({ user: selected.user, repo: selected.repo, target: selected.target }),
+  ({ user, repo, target }) => {
+    if (user && includes(repos.value, repo)) {
+      get(`ui/repos/${user}/${repo}/${target || ALL_TARGETS}.json`);
+      getBasic(`ui/repos/${user}/${repo}/basic.json`);
+    } else if (user && repos.value[0]) {
+      // repo is not present, maybe user is selected, but not for repo
+      selected.repo = repos.value[0];
+      selected.target = ALL_TARGETS;
+    }
+  }
+);
 
 const pkgs = ref(emptyOptions());
 const kinds = ref(emptyOptions());
@@ -128,17 +162,19 @@ function get_ck_kinds(ck: string | null): string[] | null {
   }
   return null;
 }
-// switch to another Get
-watch(got, g => {
+
+function switch_got(g: Get) {
+  if (lock_filters()) return;
+
   // reset pkg and features since it's less likely to see the same selected pkg in another repo
-  selectedPkg.value = null;
-  selectedFeatures.value = null;
+  selected.pkg = null;
+  selected.features = null;
 
   // reset kind if the diagnositc is empty
-  selectedKind.value = Dropdown.find_kind(selectedKind.value, g);
+  selected.kind = Dropdown.find_kind(selected.kind, g);
 
   // reset checker if the diagnositc is empty
-  const ck_kinds = get_ck_kinds(selectedChecker.value);
+  const ck_kinds = get_ck_kinds(selected.checker);
   let reset_checker = true;
   if (ck_kinds) {
     for (const kind of ck_kinds) {
@@ -148,27 +184,47 @@ watch(got, g => {
       }
     }
   }
-  if (reset_checker) selectedChecker.value = null;
-});
+  if (reset_checker) selected.checker = null;
+}
+
+function lock_filters(): boolean {
+  const init = query_params.lock === "true";
+  // should be called only once in startup
+  if (init) {
+    lockURL.value = true;
+    const { pkg, features, checker, kind } = query_params;
+    if (pkg) selected.pkg = pkg;
+    if (features) selected.features = features;
+    if (checker) selected.checker = checker;
+    if (kind) selected.kind = kind;
+    query_params.lock = undefined;
+  }
+  return init;
+}
 
 // watch selection changes
 watch(
   () => ({
-    pkg: selectedPkg.value, feat: selectedFeatures.value,
-    kind: selectedKind.value, ck: selectedChecker.value, g: got.value
+    pkg: selected.pkg, feat: selected.features,
+    kind: selected.kind, ck: selected.checker,
+    g: got.value, b: basic.value
   }),
-  ({ pkg, feat, kind, ck, g }) => {
-    const target = cloneDeep(g);
+  ({ pkg, feat, kind, ck, g }, old) => {
+    if (old.g !== g) return switch_got(g);
+    lockURL.value = false;
 
-    Dropdown.update_by_features(feat, target);
-    Dropdown.update_by_pkg(pkg, target);
+    const val = cloneDeep(g);
 
+    Dropdown.update_by_features(feat, val);
+    Dropdown.update_by_pkg(pkg, val);
+
+    // get_ck_kinds relies on basic: if basic is not ready, spurious null is got
     const ck_kinds = get_ck_kinds(ck);
-    if (ck_kinds) Dropdown.update_by_checker(ck_kinds, target);
+    if (ck_kinds) Dropdown.update_by_checker(ck_kinds, val);
 
-    Dropdown.update_by_kind(kind, target);
+    Dropdown.update_by_kind(kind, val);
 
-    got2.value = target;
+    got2.value = val;
   }
 );
 
@@ -220,7 +276,7 @@ function get(path: string) {
       //   kind: "Not Exists!", raw: ["该目标架构下，无原始报告数据。"],
       //   lang: "rust", severity: Severity.Danger, disabled: false
       // }];
-      // selectedTab.value = "Not Exists!";
+      // selected.tab.value = "Not Exists!";
       // fileTree.value = { kinds_order: [], data: [] };
     });
 }
@@ -230,6 +286,53 @@ function getBasic(path: string) {
     .then(val => basic.value = val)
     .catch(err => console.log(err))
 }
+
+// route query
+const route = useRoute();
+function updateFilter(query: Params) {
+  const { user, repo, target, pkg, features, checker, kind, lock } = query;
+
+  if (user) { query_params.user = decodeURIComponent(user); }
+  if (repo) { query_params.repo = decodeURIComponent(repo); }
+  if (target) { query_params.target = decodeURIComponent(target); }
+  if (pkg) { query_params.pkg = decodeURIComponent(pkg); }
+  if (features !== undefined) { query_params.features = decodeURIComponent(features); }
+  if (checker) { query_params.checker = decodeURIComponent(checker); }
+  if (kind) { query_params.kind = decodeURIComponent(kind); }
+  if (lock === "true") {
+    query_params.lock = decodeURIComponent(lock);
+    lockURL.value = false;
+  }
+}
+updateFilter(route.query);
+
+const router = useRouter();
+// emit query
+const router_params = ref<Params | null>(null);
+watch(router_params, query => router.push({ path: route.path, query: query || {} }));
+
+watch(lockURL, lock => {
+  if (!lock) {
+    router_params.value = {};
+    return;
+  }
+
+  const { user, repo, target, pkg, features, checker, kind } = selected;
+
+  let query: any = {};
+
+  if (user) query.user = encodeURIComponent(user);
+  if (repo) query.repo = encodeURIComponent(repo);
+  if (target && target !== ALL_TARGETS) query.target = encodeURIComponent(target);
+  if (pkg) query.pkg = encodeURIComponent(pkg);
+  if (features !== null) query.features = encodeURIComponent(features);
+  if (checker) query.checker = encodeURIComponent(checker);
+  if (kind) query.kind = encodeURIComponent(kind);
+
+  query.lock = encodeURIComponent("true");
+
+  router_params.value = query;
+});
 </script>
 
 <!-- FIXME: remove these -->
@@ -243,23 +346,5 @@ function getBasic(path: string) {
 
 .select {
   padding-right: 10px;
-}
-
-.resolved-table {
-  --p-datatable-header-cell-color: var(--p-button-primary-background);
-}
-
-.sources {
-  color: var(--p-orange-400);
-}
-
-.sources-table {
-  --p-datatable-header-cell-color: var(--p-orange-400);
-}
-
-.drop-down-options {
-  margin-right: 8px;
-  width: 40px;
-  justify-content: right;
 }
 </style>
