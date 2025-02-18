@@ -1,40 +1,31 @@
 <template>
   <div>
-    <div style="display: flex" v-if="displayFilters">
-      <!-- <div style="max-width: 10%; display: grid; place-items: center; padding: 0px 20px;"> -->
-      <!--   <div> -->
-      <!--     <b>Count</b><br> -->
-      <!--     <Button style="margin-top: 5px;" severity="danger" v-if="count">{{ count }}</Button> -->
-      <!--   </div> -->
-      <!-- </div> -->
 
-      <div style="flex:1">
-        <div style="padding: 6px 8px 6px 8px">
-          <span class="input">User:</span>
-          <span class="select">
-            <Select v-model="selected.user" filter :options="users" :optionLabel="label" />
-          </span>
+    <div v-if="displayFilters">
+      <div style="padding: 6px 8px 6px 8px">
+        <span class="input">User:</span>
+        <span class="select">
+          <Select v-model="selected.user" filter :options="users" :optionLabel="label" />
+        </span>
 
-          <span class="input">Repo:</span>
-          <span class="select">
-            <Select v-model="selected.repo" filter :options="repos" :optionLabel="label" />
-          </span>
+        <span class="input">Repo:</span>
+        <span class="select">
+          <Select v-model="selected.repo" filter :options="repos" :optionLabel="label" />
+        </span>
 
-          <DropDownWithCount v-model="selected.target" tag="Target" :all="ALL_TARGETS" :counts="targets" />
+        <DropDownWithCount v-model="selected.target" tag="Target" :all="ALL_TARGETS" :counts="targets" />
 
-        </div>
-
-        <div style="padding: 2px 8px 10px 8px">
-
-          <DropDownWithCount v-model="selected.pkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-          <DropDownWithCount v-model="selected.features" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
-
-          <DropDownWithCount v-model="selected.checker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
-          <DropDownWithCount v-model="selected.kind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
-
-        </div>
       </div>
 
+      <div style="padding: 2px 8px 10px 8px">
+
+        <DropDownWithCount v-model="selected.pkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
+        <DropDownWithCount v-model="selected.features" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
+
+        <DropDownWithCount v-model="selected.checker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
+        <DropDownWithCount v-model="selected.kind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
+
+      </div>
     </div>
 
     <FileTree2 :get="got2" :count="count" v-model:filters="displayFilters" v-model:lockURL="lockURL" />
