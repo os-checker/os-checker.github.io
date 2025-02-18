@@ -3,18 +3,9 @@
 
     <div v-if="displayFilters">
       <div style="padding: 6px 8px 6px 8px">
-        <span class="input">User:</span>
-        <span class="select">
-          <Select v-model="selected.user" filter :options="users" :optionLabel="label" />
-        </span>
-
-        <span class="input">Repo:</span>
-        <span class="select">
-          <Select v-model="selected.repo" filter :options="repos" :optionLabel="label" />
-        </span>
-
+        <DropDownSimple v-model="selected.user" tag="User" :options="users" />
+        <DropDownSimple v-model="selected.repo" tag="Repo" :options="repos" />
         <DropDownWithCount v-model="selected.target" tag="Target" :all="ALL_TARGETS" :counts="targets" />
-
       </div>
 
       <div style="padding: 2px 8px 10px 8px">
@@ -48,8 +39,8 @@ highlightRust();
 const label = (a: string) => a;
 
 const selected = reactive<{
-  user: string,
-  repo: string,
+  user: string | null,
+  repo: string | null,
   target: string | null,
   pkg: string | null,
   features: string | null,
@@ -79,7 +70,7 @@ githubFetch<UserRepo>({ path: "ui/user_repo.json" })
 
 // Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
-const repos = computed(() => user_repo.value[selected.user]);
+const repos = computed(() => selected.user ? user_repo.value[selected.user] : []);
 const targets = computed<DropDownOptions>(() => {
   const t = basic.value?.targets;
   return t ? gen_targets(t) : emptyOptions();
