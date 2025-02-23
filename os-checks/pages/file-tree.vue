@@ -1,40 +1,22 @@
 <template>
   <div>
-    <div style="display: flex" v-if="displayFilters">
-      <!-- <div style="max-width: 10%; display: grid; place-items: center; padding: 0px 20px;"> -->
-      <!--   <div> -->
-      <!--     <b>Count</b><br> -->
-      <!--     <Button style="margin-top: 5px;" severity="danger" v-if="count">{{ count }}</Button> -->
-      <!--   </div> -->
-      <!-- </div> -->
 
-      <div style="flex:1">
-        <div style="padding: 6px 8px 6px 8px">
-          <span class="input">User:</span>
-          <span class="select">
-            <Select v-model="selected.user" filter :options="users" :optionLabel="label" />
-          </span>
-
-          <span class="input">Repo:</span>
-          <span class="select">
-            <Select v-model="selected.repo" filter :options="repos" :optionLabel="label" />
-          </span>
-
-          <DropDownWithCount v-model="selected.target" tag="Target" :all="ALL_TARGETS" :counts="targets" />
-
-        </div>
-
-        <div style="padding: 2px 8px 10px 8px">
-
-          <DropDownWithCount v-model="selected.pkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
-          <DropDownWithCount v-model="selected.features" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
-
-          <DropDownWithCount v-model="selected.checker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
-          <DropDownWithCount v-model="selected.kind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
-
-        </div>
+    <div v-if="displayFilters">
+      <div style="padding: 6px 8px 6px 8px">
+        <DropDownSimple v-model="selected.user" tag="User" :options="users" />
+        <DropDownSimple v-model="selected.repo" tag="Repo" :options="repos" />
+        <DropDownWithCount v-model="selected.target" tag="Target" :all="ALL_TARGETS" :counts="targets" />
       </div>
 
+      <div style="padding: 2px 8px 10px 8px">
+
+        <DropDownWithCount v-model="selected.pkg" tag="Pkg" :all="ALL_PKGS" :counts="pkgs" />
+        <DropDownWithCount v-model="selected.features" tag="Features" :all="ALL_FEATURES_SETS" :counts="features" />
+
+        <DropDownWithCount v-model="selected.checker" tag="Checker" :all="ALL_CHECKERS" :counts="checkers" />
+        <DropDownWithCount v-model="selected.kind" tag="Kind" :all="ALL_KINDS" :counts="kinds" />
+
+      </div>
     </div>
 
     <FileTree2 :get="got2" :count="count" v-model:filters="displayFilters" v-model:lockURL="lockURL" />
@@ -54,11 +36,9 @@ import type { Basic } from '~/shared/types';
 useHead({ title: 'Issue File Tree' });
 highlightRust();
 
-const label = (a: string) => a;
-
 const selected = reactive<{
-  user: string,
-  repo: string,
+  user: string | null,
+  repo: string | null,
   target: string | null,
   pkg: string | null,
   features: string | null,
@@ -88,7 +68,7 @@ githubFetch<UserRepo>({ path: "ui/user_repo.json" })
 
 // Init filters.
 const users = computed(() => Object.keys(user_repo.value).sort());
-const repos = computed(() => user_repo.value[selected.user]);
+const repos = computed(() => selected.user ? user_repo.value[selected.user] : []);
 const targets = computed<DropDownOptions>(() => {
   const t = basic.value?.targets;
   return t ? gen_targets(t) : emptyOptions();
@@ -334,17 +314,3 @@ watch(lockURL, lock => {
   router_params.value = query;
 });
 </script>
-
-<!-- FIXME: remove these -->
-<style scoped>
-.input {
-  font-size: 14.5px;
-  font-weight: bold;
-  padding-right: 10px;
-  color: var(--p-button-primary-background);
-}
-
-.select {
-  padding-right: 10px;
-}
-</style>
