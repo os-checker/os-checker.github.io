@@ -36,8 +36,6 @@ import type { Basic } from '~/shared/types';
 useHead({ title: 'Issue File Tree' });
 highlightRust();
 
-const label = (a: string) => a;
-
 const selected = reactive<{
   user: string | null,
   repo: string | null,
@@ -316,17 +314,3 @@ watch(lockURL, lock => {
   router_params.value = query;
 });
 </script>
-
-<!-- FIXME: remove these -->
-<style scoped>
-.input {
-  font-size: 14.5px;
-  font-weight: bold;
-  padding-right: 10px;
-  color: var(--p-button-primary-background);
-}
-
-.select {
-  padding-right: 10px;
-}
-</style>

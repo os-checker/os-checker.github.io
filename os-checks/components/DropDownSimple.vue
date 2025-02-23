@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-const { tag, options } = defineProps<{
+const { tag, options, showClear } = defineProps<{
   tag: string,
   options: string[],
+  showClear?: boolean
 }>();
 
 const selected = defineModel<string | null>({ default: null });
@@ -10,7 +11,7 @@ const selected = defineModel<string | null>({ default: null });
 <template>
   <span class="input">{{ tag }}:</span>
   <span class="select">
-    <Select v-model="selected" filter :options="options" />
+    <Select v-model="selected" filter :showClear="showClear" :options="options" />
   </span>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
 
-  <DataTable :value="testcases" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
+  <DataTable :value="testcasesFiltered" scrollable :scrollHeight="tableHeight" showGridlines selectionMode="single"
     v-model:selection="selectedTest" v-model:filters="selected.text" :multiSortMeta="selected.sorts"
     @update:multiSortMeta="sortsChanged" sortMode="multiple" removableSort paginator :rows="10"
     :rowsPerPageOptions="[5, 10, 20, 50, 100, 200, 1000]"
@@ -9,15 +9,20 @@
     <template #empty><b> No testcases found. </b></template>
     <template #header>
       <div style="display: flex; justify-content: space-between;">
-        <div style="display: flex; gap: 10px;">
-          <!-- <MultiSelect v-model="selected.categories" display="chip" :options="categories" filter :maxSelectedLabels="4" -->
-          <!--   placeholder="Select Categories" /> -->
+        <div style="display: flex; align-items: center;">
+          <DropDownSimple tag="user" :options="options.val.user" v-model="selected.user" showClear />
+          <DropDownSimple tag="repo" :options="options.val.repo" v-model="selected.repo" showClear />
+          <DropDownSimple tag="pkg" :options="options.val.pkg" v-model="selected.pkg" showClear />
+          <DropDownSimple tag="test_pass" :options="options.val.test_pass" v-model="selected.test_pass" showClear />
+          <DropDownSimple tag="miri_pass" :options="options.val.miri_pass" v-model="selected.miri_pass" showClear />
+          <DropDownSimple tag="miri_timeout" :options="options.val.miri_timeout" v-model="selected.miri_timeout"
+            showClear />
         </div>
 
         <div>
           <IconField>
             <InputIcon> <i class="pi pi-search" /> </InputIcon>
-            <InputText style="width: 300px" v-model="selected.text['global'].value" placeholder="Search" />
+            <InputText style="width: 200px" v-model="selected.text['global'].value" placeholder="Search" />
           </IconField>
         </div>
 
@@ -93,6 +98,9 @@
 import type { DataTableSortMeta } from 'primevue/datatable';
 import { FilterMatchMode } from '@primevue/core/api';
 import type { PkgInfo } from '~/shared/info';
+import { cloneDeep, uniq } from 'es-toolkit/compat';
+
+useHead({ title: 'Test Cases' });
 
 // styling
 const { viewportHeight } = storeToRefs(useStyleStore());
@@ -108,6 +116,7 @@ const ptColumnRight = ref({
 highlightRust();
 
 const testcases = ref<TestResult[]>([]);
+const testcasesFiltered = ref<TestResult[]>([]);
 const selectedTest = ref<TestResult | null>(null);
 
 // pop up details
@@ -118,6 +127,7 @@ githubFetch<PkgInfo[]>({
   path: "plugin/cargo/info/summaries.json"
 }).then(val => {
   testcases.value = summariesToTestResult(val);
+  testcasesFiltered.value = cloneDeep(testcases.value);
 });
 
 type TestResult = {
@@ -174,12 +184,94 @@ function sortsChanged(meta?: DataTableSortMeta[] | null) {
 }
 
 const selected = reactive<{
+  user: string | null,
+  repo: string | null,
+  pkg: string | null,
+  kind: string | null,
+  test_pass: string | null,
+  miri_pass: string | null,
+  miri_timeout: string | null,
   text: any,
   sorts: DataTableSortMeta[],
 }>({
+  user: null,
+  repo: null,
+  pkg: null,
+  kind: null,
+  test_pass: null,
+  miri_pass: null,
+  miri_timeout: null,
   text: { global: { value: null, matchMode: FilterMatchMode.CONTAINS }, },
   sorts: [],
 });
 
-useHead({ title: 'Test Cases' });
+type Options = {
+  user: string[],
+  repo: string[],
+  pkg: string[],
+  kind: string[],
+  test_pass: string[],
+  miri_pass: string[],
+  miri_timeout: string[],
+};
+function defaultOptions(): Options {
+  return {
+    user: [],
+    repo: [],
+    pkg: [],
+    kind: [],
+    test_pass: [],
+    miri_pass: [],
+    miri_timeout: [],
+  };
+}
+const options = reactive<{ val: Options }>({ val: defaultOptions() });
+
+// init options
+watch(testcases, tc => options.val = testcasesToOptions(tc));
+
+// update table when filter selection changes
+watch(
+  selected,
+  ({ user, repo, pkg, kind, test_pass, miri_pass, miri_timeout }) => {
+    // for simplicity, the data of testcases are supposed to remain unchanged
+    const chosen_testcases = testcases.value.filter(test => {
+      let chosen = true;
+      if (user) chosen &&= test.user === user;
+      if (repo) chosen &&= test.repo === repo;
+      if (pkg) chosen &&= test.pkg === pkg;
+      if (kind) chosen &&= test.kind === repo;
+      if (test_pass) chosen &&= test.test_pass === test_pass;
+      if (miri_pass) chosen &&= test.miri_pass === miri_pass;
+      if (miri_timeout || miri_timeout === "") chosen &&= test.miri_timeout === miri_timeout;
+      return chosen;
+    });
+    testcasesFiltered.value = chosen_testcases.map((tc, idx) => {
+      tc.idx = idx;
+      return tc;
+    });
+    // options.val = testcasesToOptions(chosen_testcases);
+  });
+
+function testcasesToOptions(tc: TestResult[]): Options {
+  let opts = defaultOptions();
+  for (const test of tc) {
+    opts.user.push(test.user);
+    opts.repo.push(test.repo);
+    opts.pkg.push(test.pkg);
+    opts.kind.push(test.kind);
+    opts.test_pass.push(test.test_pass);
+    opts.miri_pass.push(test.miri_pass);
+    opts.miri_timeout.push(test.miri_timeout);
+  }
+
+  opts.user = uniq(opts.user).sort();
+  opts.repo = uniq(opts.repo).sort();
+  opts.pkg = uniq(opts.pkg).sort();
+  opts.kind = uniq(opts.kind).sort();
+  opts.test_pass = uniq(opts.test_pass).sort();
+  opts.miri_pass = uniq(opts.miri_pass).sort();
+  opts.miri_timeout = uniq(opts.miri_timeout).sort();
+  return opts;
+}
 </script>
