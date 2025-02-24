@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <FileTree2 :get="got2" :count="count" v-model:filters="displayFilters" v-model:lockURL="lockURL" />
+    <FileTree :get="got2" :count="count" v-model:filters="displayFilters" v-model:lockURL="lockURL" />
   </div>
 </template>
 

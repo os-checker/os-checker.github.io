@@ -1,69 +1,22 @@
 <script setup lang="ts">
-import type { FetchError } from 'ofetch';
+import { cloneDeep } from 'es-toolkit/compat';
 import type { TreeNode } from 'primevue/treenode';
-import type { FileTree, Kinds } from '~/shared/file-tree';
-import { getEmpty } from '../shared/file-tree/utils';
+import type { FileTree } from '~/shared/file-tree';
+import { updateSelectedKey, type Get } from '~/shared/file-tree/utils';
 
-type Props = { fetch_path: (target: string) => string };
-const props = defineProps<Props>();
+type Props = { get: Get, count: number | null };
+const { get, count } = defineProps<Props>();
 
-highlightRust();
+const fullTabs = ref(cloneDeep(get.tabs));
+watch(() => get, g => fullTabs.value = cloneDeep(g.tabs));
 
-const tabs = ref<CheckerResult[]>([]);
-const selectedTab = ref("");
-const fileTree = ref<FileTree>(getEmpty().fileTree);
+const filtered_fileTree = computed<FileTree>(() => get.fileTree);
 
-const basic = useBasicStore();
-
-basic.init_with_and_subscribe_to_current((target: string) => {
-  const path = props.fetch_path(target);
-  githubFetch<FileTree>({ path })
-    .then((file_tree) => {
-      // const file_tree: FileTree = JSON.parse(data as string);
-
-      // 首次打开页面加载数据后，从所有 packags 的原始输出填充到所有选项卡
-      let kinds = {};
-      for (const datum of file_tree.data) {
-        for (const report of datum.raw_reports) {
-          // for (const kind of Object.keys(report.kinds)) {
-          // 对原始输出中的所有特殊符号转义，以后就不需要转义了
-          //   report.kinds[kind] = report.kinds[kind].map(domSanitize);
-          // }
-          mergeObjectsWithArrayConcat(kinds, report.kinds);
-        }
-      }
-      tabs.value = checkerResult(kinds, file_tree.kinds_order);
-      selectedTab.value = tabs.value[0]?.kind ?? "";
-      fileTree.value = file_tree;
-    }).catch((_: FetchError) => {
-      // 不存在该文件：意味着该目标架构下的所有仓库没有检查出错误
-      // 注意，由于使用 parseResponse，这个错误码并不为 404，而是 undefined，
-      // 且错误原因为 SyntaxError: Unexpected non-whitespace character after JSON at position 3。
-      // 这里 ofetch 没有正确处理错误（貌似也没人报告？），所以暂且认为出现任何网络或解析错误都视为无错误。
-      // console.log(err, err.data, err.statusCode);
-
-      tabs.value = [{
-        kind: "All good! 🥳", raw: ["该目标架构下的所有仓库没有检查出错误 🥳🥳🥳"],
-        lang: "rust", severity: Severity.Info, disabled: false
-      }];
-      selectedTab.value = "All good! 🥳";
-      fileTree.value = getEmpty().fileTree;
-
-      // tabs.value = [{
-      //   kind: "Not Exists!", raw: ["该目标架构下，无原始报告数据。"],
-      //   lang: "rust", severity: Severity.Danger, disabled: false
-      // }];
-      // selectedTab.value = "Not Exists!";
-      // fileTree.value = { kinds_order: [], data: [] };
-    });
-});
-
-const nodes = ref<TreeNode[]>([]);
-watch(fileTree, (data) => {
-  nodes.value = [];
+const nodes = computed<TreeNode[]>(() => {
+  let nodes = [];
 
   let key = 0;
-  for (const datum of data.data) {
+  for (const datum of filtered_fileTree.value.data) {
     let node: TreeNode = {
       key: (key++).toString(), label: `[${datum.count}] ${datum.repo} #${datum.pkg}`, children: [],
     };
@@ -82,121 +35,94 @@ watch(fileTree, (data) => {
       user: datum.user, repo: datum.repo, pkg: datum.pkg,
       total: datum.count, fmt: count_fmt, clippy_warn: count_clippy_warn, clippy_error: count_clippy_error
     };
-    nodes.value.push(node);
+    nodes.push(node);
   }
+  return nodes;
 });
-
-function mergeObjectsWithArrayConcat(result: Kinds, obj: Kinds) {
-  for (const [key, value] of Object.entries(obj)) {
-    if (result.hasOwnProperty(key)) {
-      // 如果键已经存在，则合并数组
-      result[key] = result[key].concat(value);
-    } else {
-      // 否则，添加新的键值对
-      result[key] = value;
-    }
-  }
-}
 
 const selectedKey = ref({});
-watch(selectedKey, (val) => {
-  const key = Object.keys(val)[0];
-  if (!key) { return; }
-  const idx = parseInt(key);
-  for (const node of nodes.value.slice().reverse()) {
-    const nd = node.data;
-    if (!(nd && nd.user && nd.repo && nd.pkg)) { return; }
-
-    // 查找是否点击了 package
-    if (node.key === key) {
-      // 更新 tabs 展示的数据
-      const found_pkg = fileTree.value.data.find(datum => {
-        return datum.user === nd.user && datum.repo === nd.repo && datum.pkg === nd.pkg;
-      });
-      let kinds = {};
-      for (const report of found_pkg?.raw_reports ?? []) {
-        mergeObjectsWithArrayConcat(kinds, report.kinds);
-      }
-      tabs.value = checkerResult(kinds, fileTree.value.kinds_order);
-      return;
+watch(() => ({ key: selectedKey.value, n: nodes.value, ft: filtered_fileTree.value }),
+  ({ key, n, ft }) => {
+    const val = updateSelectedKey(key, n, ft);
+    if (val !== undefined) {
+      get.tabs = val.results;
+      get.selectedTab = val.selectedTab;
     } else {
-      // 由于 key 是升序的，现在只要找第一个小于目标 key 的 package，那么这个文件就在那里
-      if (idx > parseInt(node.key)) {
-        for (const file of node.children ?? []) {
-          if (file.key === key) {
-            const filename = file.data;
-            if (!filename) { return []; }
-            const package_ = fileTree.value.data.find(datum => {
-              return datum.user === nd.user && datum.repo === nd.repo && datum.pkg === nd.pkg;
-            });
-            const found_file = package_?.raw_reports.find(item => item.file === filename);
-            if (found_file) {
-              tabs.value = checkerResult(found_file.kinds, fileTree.value.kinds_order);
-              return;
-            }
-          }
-        }
-      }
+      // display full diagnostics if none is selected or something is not found
+      get.tabs = cloneDeep(fullTabs.value);
     }
-  }
+  });
+
+function resetSelectKey() {
+  selectedKey.value = {};
+  get.tabs = cloneDeep(fullTabs.value);
+}
+
+// true means keeping file tree panel open (thus shows left arrow icon to indicate close)
+const displayFileTree = ref(true);
+const displayFileTreeIcon = computed<string>(() => displayFileTree.value ? "pi pi-angle-double-left" : "pi pi-angle-double-right");
+
+// true means keeping filter panel open (thus shows up arrow icon to indicate close)
+const displayFilters = defineModel<boolean>("filters", { default: true });
+const displayFiltersIcon = computed<string>(() => displayFilters.value ? "pi pi-angle-double-up" : "pi pi-angle-double-down");
+
+onMounted(() => {
+  document.addEventListener("keydown", ({ code }: KeyboardEvent) => {
+    if (code === "Space") displayFileTree.value = !displayFileTree.value;
+    else if (code === "Escape") displayFilters.value = !displayFilters.value;
+    else if (code === "ArrowLeft") displayFileTree.value = false;
+    else if (code === "ArrowRight") displayFileTree.value = true;
+    else if (code === "ArrowUp") displayFilters.value = false;
+    else if (code === "ArrowDown") displayFilters.value = true;
+  });
 });
 
-type CheckerResult = {
-  kind: string,
-  raw: string[],
-  lang: string,
-  severity: Severity,
-  disabled: boolean, // 对于空数组，禁用选项卡
-};
+const { viewportHeight } = storeToRefs(useStyleStore());
+const heightCodePanel = computed(() => {
+  const height = viewportHeight.value;
+  // add more space to scroll codeblock panel to the bottom if filters exist
+  const adjust = displayFilters.value ? 100 : 0;
+  return `${height * 0.85 - adjust}px`;
+});
 
-enum Severity {
-  Danger = "danger",
-  Warn = "warn",
-  Info = "info",
-  Disabled = "secondary",
-}
-
-// Kinds 可能不包含全部诊断类别，因此这里填充空数组，并按照顺序排列
-function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
-  let results = kinds_order.map<CheckerResult>(kind => {
-    return { kind, raw: [], lang: "rust", severity: Severity.Disabled, disabled: true };
-  });
-  for (const [kind, raw] of Object.entries(kinds)) {
-    let lang = "rust";
-    let severity = Severity.Info;
-    switch (kind) {
-      case "Cargo": severity = Severity.Danger; break;
-      case "Clippy(Error)": severity = Severity.Danger; break;
-      case "Lockbud(Probably)": severity = Severity.Danger; break;
-      case "Clippy(Warn)": severity = Severity.Warn; break;
-      case "Unformatted": lang = "diff"; break;
-      default: ;
-    }
-    const pos = results.findIndex(r => r.kind === kind);
-    if (pos !== -1) {
-      // JSON 提供的诊断信息一定不是空数组
-      results[pos] = { kind, raw, lang, severity, disabled: false };
-    }
-  }
-  selectedTab.value = results.find(r => !r.disabled)?.kind ?? "";
-  return results;
-}
+const lockURL = defineModel("lockURL", { default: false });
+const lockURLIcon = computed(() => lockURL.value ? "pi pi-lock" : "pi pi-lock-open");
 </script>
 
 <template>
   <div class="fileViewPanel">
 
-    <div class="fileViewNavi">
-      <ScrollPanel class="fileViewMenu">
-        <PackageFileMenu style="padding-right: 0.8rem;" :nodes="nodes" :selectedKey="selectedKey"
-          @update:selectedKey="selectedKey = $event" />
+    <div class="fileViewNavi" v-if="displayFileTree">
+      <div style="height: 3.2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; justify-content: left; gap: 8px;">
+          <div style="margin-left: 10px;">
+            <Button class="btn" :icon="displayFileTreeIcon" severity="secondary" variant="text"
+              @click="() => displayFileTree = !displayFileTree" />
+          </div>
+          <div>
+            <Button class="btn" :icon="displayFiltersIcon" severity="secondary" variant="text"
+              @click="() => displayFilters = !displayFilters" />
+          </div>
+          <div>
+            <Button class="btn" :icon="lockURLIcon" severity="secondary" variant="text"
+              @click="() => lockURL = !lockURL" />
+          </div>
+        </div>
+        <div v-if="count" style="padding-right: 0.6rem;">
+          <b style="margin-right: 6px;">Total Count:</b>
+          <Button class="btn" severity="danger" @click="resetSelectKey"> {{ count }} </Button>
+        </div>
+      </div>
+
+      <ScrollPanel class="fileViewMenu" :style="{ height: heightCodePanel }">
+        <PackageFileMenu :nodes="nodes" :selectedKey="selectedKey" @update:selectedKey="selectedKey = $event" />
       </ScrollPanel>
     </div>
 
     <div class="fileViewResult">
-      <Tabs :value="selectedTab" scrollable>
+      <Tabs :value="get.selectedTab" scrollable>
         <TabList>
-          <Tab v-for="tab in tabs" :value="tab.kind" :disabled="tab.disabled">
+          <Tab v-for="tab in get.tabs" :value="tab.kind" :disabled="tab.disabled">
             {{ tab.kind }}
             <span class="tabBadge">
               <Badge :value="tab.raw.length" :severity="tab.severity" />
@@ -204,10 +130,8 @@ function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel v-for="tab in tabs" :value="tab.kind">
-            <ScrollPanel class="fileViewScroll" :dt="{
-              bar: { background: '{primary.color}' },
-            }">
+          <TabPanel v-for="tab in get.tabs" :value="tab.kind">
+            <ScrollPanel :dt="{ bar: { background: '{primary.color}' } }" :style="{ height: heightCodePanel }">
               <CodeBlock :snippets="tab.raw" :lang="tab.lang" />
             </ScrollPanel>
           </TabPanel>
@@ -251,15 +175,18 @@ function checkerResult(kinds: Kinds, kinds_order: string[]): CheckerResult[] {
 .fileViewResult {
   flex: 1;
   overflow-x: auto;
-  overflow-y: hidden;
-  /* 控制代码块容器的 padding: 上、左、下、右 */
-  --p-tabs-tabpanel-padding: 0.35rem 0.3rem 0 0;
+  overflow-y: auto;
+  padding: 0rem 0.5rem 0rem 1rem;
+  /* 控制代码块容器的 padding: 上、右、下、左 */
+  --p-tabs-tabpanel-padding: 0.35rem 0rem 0 0;
   /* 右边div占据剩余空间 */
   /* 可以省略flex-grow为1，因为默认值就是1 */
+
+  /* 选中标签页的底部块的高度 */
+  --p-tabs-active-bar-height: 3.2px;
 }
 
-.fileViewScroll {
-  width: 100%;
-  height: 86vh;
+.btn {
+  height: 2.4rem;
 }
 </style>
