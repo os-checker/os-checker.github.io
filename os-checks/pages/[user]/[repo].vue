@@ -1,11 +1,12 @@
 <script setup lang="ts">
-const route = useRoute();
-const user = route.params.user;
-const repo = route.params.repo;
+definePageMeta({
+  middleware: [
+    function (to, _from) {
+      const user = to.params.user;
+      const repo = to.params.repo;
+      const query = { user, repo, lock: "true" };
+      return navigateTo({ path: "/file-tree", query });
+    }
+  ]
+})
 </script>
-
-<template>
-  <div>
-    <FileTree :fetch_path="(target: string) => `ui/repos/${user}/${repo}/${target}.json`" />
-  </div>
-</template>
