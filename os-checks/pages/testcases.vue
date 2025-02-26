@@ -128,6 +128,7 @@ githubFetch<PkgInfo[]>({
 }).then(val => {
   testcases.value = summariesToTestResult(val);
   testcasesFiltered.value = cloneDeep(testcases.value);
+  applySelection(selected);
 });
 
 type TestResult = {
@@ -182,8 +183,7 @@ function sortsChanged(meta?: DataTableSortMeta[] | null) {
     selected.sorts = meta;
   }
 }
-
-const selected = reactive<{
+type Selection = {
   user: string | null,
   repo: string | null,
   pkg: string | null,
@@ -193,7 +193,8 @@ const selected = reactive<{
   miri_timeout: string | null,
   text: any,
   sorts: DataTableSortMeta[],
-}>({
+};
+const selected = reactive<Selection>({
   user: null,
   repo: null,
   pkg: null,
@@ -230,28 +231,28 @@ const options = reactive<{ val: Options }>({ val: defaultOptions() });
 // init options
 watch(testcases, tc => options.val = testcasesToOptions(tc));
 
-// update table when filter selection changes
-watch(
-  selected,
-  ({ user, repo, pkg, kind, test_pass, miri_pass, miri_timeout }) => {
-    // for simplicity, the data of testcases are supposed to remain unchanged
-    const chosen_testcases = testcases.value.filter(test => {
-      let chosen = true;
-      if (user) chosen &&= test.user === user;
-      if (repo) chosen &&= test.repo === repo;
-      if (pkg) chosen &&= test.pkg === pkg;
-      if (kind) chosen &&= test.kind === repo;
-      if (test_pass) chosen &&= test.test_pass === test_pass;
-      if (miri_pass) chosen &&= test.miri_pass === miri_pass;
-      if (miri_timeout || miri_timeout === "") chosen &&= test.miri_timeout === miri_timeout;
-      return chosen;
-    });
-    testcasesFiltered.value = chosen_testcases.map((tc, idx) => {
-      tc.idx = idx;
-      return tc;
-    });
-    // options.val = testcasesToOptions(chosen_testcases);
+/** Called when testcases are fetched or selection is updated */
+function applySelection({ user, repo, pkg, kind, test_pass, miri_pass, miri_timeout }: Selection) {
+  // for simplicity, the data of testcases are supposed to remain unchanged
+  const chosen_testcases = testcases.value.filter(test => {
+    let chosen = true;
+    if (user) chosen &&= test.user === user;
+    if (repo) chosen &&= test.repo === repo;
+    if (pkg) chosen &&= test.pkg === pkg;
+    if (kind) chosen &&= test.kind === repo;
+    if (test_pass) chosen &&= test.test_pass === test_pass;
+    if (miri_pass) chosen &&= test.miri_pass === miri_pass;
+    if (miri_timeout || miri_timeout === "") chosen &&= test.miri_timeout === miri_timeout;
+    return chosen;
   });
+  testcasesFiltered.value = chosen_testcases.map((tc, idx) => {
+    tc.idx = idx;
+    return tc;
+  });
+}
+
+// update table when filter selection changes
+watch(selected, applySelection);
 
 function testcasesToOptions(tc: TestResult[]): Options {
   let opts = defaultOptions();
@@ -274,4 +275,64 @@ function testcasesToOptions(tc: TestResult[]): Options {
   opts.miri_timeout = uniq(opts.miri_timeout).sort();
   return opts;
 }
+
+// ******************* route query *******************
+const route = useRoute();
+function updateFilter(query: {
+  user?: string,
+  repo?: string,
+  pkg?: string,
+  kind?: string,
+  test_pass?: string,
+  miri_pass?: string,
+  miri_timeout?: string,
+  text?: string,
+  sorts?: string,
+}) {
+  const { user, repo, pkg, kind, test_pass, miri_pass, miri_timeout, text, sorts } = query;
+
+  // only support single value for each param
+  // FIXME: empty string will not handled
+  if (user) selected.user = decodeURIComponent(user);
+  if (repo) selected.repo = decodeURIComponent(repo);
+  if (pkg) selected.pkg = decodeURIComponent(pkg);
+  if (kind) selected.kind = decodeURIComponent(kind);
+  if (test_pass) selected.test_pass = decodeURIComponent(test_pass);
+  if (miri_pass) selected.miri_pass = decodeURIComponent(miri_pass);
+  if (miri_timeout) selected.miri_timeout = decodeURIComponent(miri_timeout);
+  if (text) selected.text.global.value = decodeURIComponent(text);
+
+  if (sorts) {
+    const args = decodeURIComponent(sorts).split(",");
+    //@ts-ignore
+    selected.sorts = args.map(arg => {
+      let [field, order] = arg.split("=");
+      return { field, order: parseInt(order) };
+    });
+  }
+}
+updateFilter(route.query);
+
+const router = useRouter();
+watch(selected, sel => {
+  const { user, repo, pkg, kind, test_pass, miri_pass, miri_timeout, text, sorts } = sel;
+
+  let query: any = {};
+
+  if (user) query.user = encodeURIComponent(user);
+  if (repo) query.repo = encodeURIComponent(repo);
+  if (pkg) query.pkg = encodeURIComponent(pkg);
+  if (kind) query.kind = encodeURIComponent(kind);
+  if (test_pass) query.test_pass = encodeURIComponent(test_pass);
+  if (miri_pass) query.miri_pass = encodeURIComponent(miri_pass);
+  if (miri_timeout) query.miri_timeout = encodeURIComponent(miri_timeout);
+  if (text.global.value) query.text = encodeURIComponent(text.global.value);
+
+  if (sorts.length !== 0) {
+    const args = sorts.map(({ field, order }) => order ? `${field}=${order}` : null);
+    query.sorts = encodeURIComponent(args.filter(x => x).join(","));
+  }
+
+  router.push({ path: route.path, query });
+});
 </script>
