@@ -265,7 +265,7 @@ $fetch(docs_json_url).then(val => docs.value = val);
 
 const summaryTable = computed<SummaryTable[]>(() => {
   const value = summaries.value.map(val => {
-    return Object.entries(val.pkgs).map(([name, pkg]) => {
+    return Object.entries(val.pkgs ?? {}).map(([name, pkg]) => {
       let testcases_color = null;
       if (pkg.testcases?.pkg_tests_count) {
         if (pkg.testcases?.failed === 0) {
@@ -457,7 +457,7 @@ watch(selectedPkg, val => {
 
   const pkg = summaries.value
     .find(summary => summary.user === val.user && summary.repo === val.repo)
-    ?.pkgs[val.pkg];
+    ?.pkgs?.[val.pkg];
 
   if (!pkg) { return; }
 
