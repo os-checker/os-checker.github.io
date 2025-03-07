@@ -102,7 +102,7 @@ export function summariesToTestResult(pkg_info: PkgInfo[]): TestResult[] {
   let idx = 0;
 
   for (const info of pkg_info) {
-    for (const [pkg, value] of Object.entries(info.pkgs)) {
+    for (const [pkg, value] of Object.entries(info.pkgs ?? {})) {
       for (const test of value.testcases?.tests || []) {
         for (const testcase of test.testcases) {
           result.push({
