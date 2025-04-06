@@ -49,12 +49,12 @@
       <Column frozen sortable field="pkg" header="Package" style="min-width: 200px;" />
 
       <Column v-if="C.display('last_commit_time')" sortable field="last_commit_time"
-        :header="C.name('last_commit_time')" :pt="ptColumnCenter" />
+        :header="C.name('last_commit_time')" :pt="center" />
 
-      <Column v-if="C.display('version')" sortable field="version" :header="C.name('version')" :pt="ptColumnCenter" />
+      <Column v-if="C.display('version')" sortable field="version" :header="C.name('version')" :pt="center" />
 
       <Column v-if="C.display('release_count')" sortable field="release_count" :header="C.name('release_count')"
-        :pt="ptColumnCenter">
+        :pt="center">
         <template #body="{ data }">
           <NuxtLink :to="`https://crates.io/crates/${data.pkg}`" target="_blank" class="nav-link">
             {{ data.release_count }}
@@ -63,13 +63,13 @@
       </Column>
 
       <Column v-if="C.display('last_release_time')" sortable field="last_release_time"
-        :header="C.name('last_release_time')" style="min-width: 120px;" :pt="ptColumnCenter" />
+        :header="C.name('last_release_time')" style="min-width: 120px;" :pt="center" />
 
       <Column v-if="C.display('last_release_size')" sortable field="last_release_size"
-        :header="C.name('last_release_size')" :pt="ptColumnRight" />
+        :header="C.name('last_release_size')" :pt="right" />
 
       <Column v-if="C.display('diag_total_count')" sortable field="diag_total_count"
-        :header="C.name('diag_total_count')" :pt="ptColumnRight">
+        :header="C.name('diag_total_count')" :pt="right">
         <template #body="{ data }">
           <NuxtLink :to="`/${data.user}/${data.repo}`" target="_blank" class="nav-link">
             {{ data.diag_total_count }}
@@ -78,7 +78,7 @@
       </Column>
 
       <Column v-if="C.display('testcases')" sortable field="testcases" :header="C.name('testcases')"
-        style="font-weight: bold" :pt="ptColumnRight">
+        style="font-weight: bold" :pt="right">
         <template #body="{ data }">
           <span :style="{ color: data.testcases_color }">
             {{ data.testcases }}
@@ -86,17 +86,16 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('lib')" sortable field="lib" :header="C.name('lib')" :pt="ptColumnCenter" />
-      <Column v-if="C.display('bin')" sortable field="bin" :header="C.name('bin')" :pt="ptColumnCenter" />
+      <Column v-if="C.display('lib')" sortable field="lib" :header="C.name('lib')" :pt="center" />
+      <Column v-if="C.display('bin')" sortable field="bin" :header="C.name('bin')" :pt="center" />
       <Column v-if="C.display('dependencies')" sortable field="dependencies" :header="C.name('dependencies')"
-        :pt="ptColumnRight" />
+        :pt="right" />
 
-      <Column v-if="C.display('tests')" sortable field="tests" :header="C.name('tests')" :pt="ptColumnRight" />
-      <Column v-if="C.display('examples')" sortable field="examples" :header="C.name('examples')" :pt="ptColumnRight" />
-      <Column v-if="C.display('benches')" sortable field="benches" :header="C.name('benches')" :pt="ptColumnRight" />
+      <Column v-if="C.display('tests')" sortable field="tests" :header="C.name('tests')" :pt="right" />
+      <Column v-if="C.display('examples')" sortable field="examples" :header="C.name('examples')" :pt="right" />
+      <Column v-if="C.display('benches')" sortable field="benches" :header="C.name('benches')" :pt="right" />
 
-      <Column v-if="C.display('documentation')" field="documentation" :header="C.name('documentation')"
-        :pt="ptColumnCenter">
+      <Column v-if="C.display('documentation')" field="documentation" :header="C.name('documentation')" :pt="center">
         <template #body="{ data }">
           <NuxtLink v-if="data.documentation" :to="data.documentation" target="_blank" class="nav-link">
             link
@@ -105,7 +104,7 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('latest_doc')" field="latest_doc" :header="C.name('latest_doc')" :pt="ptColumnCenter">
+      <Column v-if="C.display('latest_doc')" field="latest_doc" :header="C.name('latest_doc')" :pt="center">
         <template #body="{ data }">
           <NuxtLink v-if="data.latest_doc" :to="data.latest_doc" target="_blank" class="nav-link">
             link
@@ -114,7 +113,7 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('homepage')" field="homepage" :header="C.name('homepage')" :pt="ptColumnCenter">
+      <Column v-if="C.display('homepage')" field="homepage" :header="C.name('homepage')" :pt="center">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
             link
@@ -145,7 +144,7 @@
         style="min-width: 280px;" />
 
       <Column v-if="C.display('authors')" sortable field="authors" :header="C.name('authors')" style="min-width: 300px;"
-        :pt="ptColumnCenter">
+        :pt="center">
         <template #body="{ data: { authors } }">
           <div v-for="tag of authors">
             <Tag severity="info" :value="tag" style="margin-bottom: 5px;"></Tag>
@@ -235,21 +234,12 @@
 import type { Pkg, PkgInfo, Test } from '~/shared/info';
 import { unique_field, unique_field_bool, InfoCols } from '~/shared/info';
 import { formatBytes } from '~/shared/columns-select';
+import { center, right } from '~/shared/styling';
 import { FilterMatchMode } from '@primevue/core/api';
 import type { DataTableSortMeta } from 'primevue/datatable';
 
 const { color, viewportHeight } = storeToRefs(useStyleStore());
 const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.8)}px`);
-
-// styling
-const ptColumnCenter = ref({
-  columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "center" } }
-});
-const ptColumnRight = ref({
-  columnHeaderContent: { style: { "justify-content": "right" } },
-  bodyCell: { style: { "text-align": "right" } }
-});
 
 const summaries = ref<PkgInfo[]>([]);
 

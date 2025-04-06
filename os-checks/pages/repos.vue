@@ -37,9 +37,9 @@
         </template>
       </Column>
 
-      <Column v-if="C.display('license')" sortable field="license" :header="C.name('license')" :pt="ptColumnCenter" />
+      <Column v-if="C.display('license')" sortable field="license" :header="C.name('license')" :pt="center" />
 
-      <Column v-if="C.display('homepage')" sortable field="homepage" :header="C.name('homepage')" :pt="ptColumnCenter">
+      <Column v-if="C.display('homepage')" sortable field="homepage" :header="C.name('homepage')" :pt="center">
         <template #body="{ data }">
           <NuxtLink v-if="data.homepage" :to="data.homepage" target="_blank" class="nav-link">
             <!-- <Button icon="pi pi-external-link" link /> a bug when scrolling -->
@@ -49,7 +49,7 @@
       </Column>
 
       <Column v-if="C.display('open_issues_count')" sortable field="open_issues_count"
-        :header="C.name('open_issues_count')" :pt="ptColumnCenter">
+        :header="C.name('open_issues_count')" :pt="center">
         <template #body="{ data }">
           <NuxtLink v-if="data.issues" target="_blank" class="nav-link"
             :to="`https://github.com/${data.user}/${data.repo}/issues`">
@@ -60,18 +60,16 @@
 
       <Column v-if="C.display('description')" sortable field="description" :header="C.name('description')"
         style="max-width: 500px; min-width: 280px" />
-      <Column v-if="C.display('created_at')" sortable field="created_at" :header="C.name('created_at')"
-        :pt="ptColumnCenter" />
-      <Column v-if="C.display('pushed_at')" sortable field="pushed_at" :header="C.name('pushed_at')"
-        :pt="ptColumnCenter" />
+      <Column v-if="C.display('created_at')" sortable field="created_at" :header="C.name('created_at')" :pt="center" />
+      <Column v-if="C.display('pushed_at')" sortable field="pushed_at" :header="C.name('pushed_at')" :pt="center" />
       <Column v-if="C.display('active_days')" sortable field="active_days" :header="C.name('active_days')"
-        :pt="ptColumnRight" />
+        :pt="right" />
       <Column v-if="C.display('contributions')" sortable field="contributions" :header="C.name('contributions')"
-        :pt="ptColumnRight" />
+        :pt="right" />
       <Column v-if="C.display('contributors')" sortable field="contributors" :header="C.name('contributors')"
-        :pt="ptColumnRight" />
+        :pt="right" />
 
-      <Column v-if="C.display('size')" sortable field="size" :header="C.name('size')" :pt="ptColumnRight">
+      <Column v-if="C.display('size')" sortable field="size" :header="C.name('size')" :pt="right">
         <template #body="{ data }">
           <span :style="{ color: (data.size < 1024) ? color.grey : '' }">
             {{ formatBytes(data.size) }}
@@ -80,20 +78,17 @@
       </Column>
 
       <Column v-if="C.display('default_branch')" sortable field="default_branch" :header="C.name('default_branch')"
-        :pt="ptColumnCenter" />
-      <Column v-if="C.display('fork')" sortable field="fork" :header="C.name('fork')" :pt="ptColumnCenter" />
-      <Column v-if="C.display('archived')" sortable field="archived" :header="C.name('archived')"
-        :pt="ptColumnCenter" />
+        :pt="center" />
+      <Column v-if="C.display('fork')" sortable field="fork" :header="C.name('fork')" :pt="center" />
+      <Column v-if="C.display('archived')" sortable field="archived" :header="C.name('archived')" :pt="center" />
 
-      <Column v-if="C.display('stargazers')" sortable field="stargazers" :header="C.name('stargazers')"
-        :pt="ptColumnRight" />
+      <Column v-if="C.display('stargazers')" sortable field="stargazers" :header="C.name('stargazers')" :pt="right" />
       <Column v-if="C.display('subscribers')" sortable field="subscribers" :header="C.name('subscribers')"
-        :pt="ptColumnRight" />
-      <Column v-if="C.display('forks')" sortable field="forks" :header="C.name('forks')" :pt="ptColumnRight" />
-      <Column v-if="C.display('network')" sortable field="network" :header="C.name('network')" :pt="ptColumnRight" />
+        :pt="right" />
+      <Column v-if="C.display('forks')" sortable field="forks" :header="C.name('forks')" :pt="right" />
+      <Column v-if="C.display('network')" sortable field="network" :header="C.name('network')" :pt="right" />
 
-      <Column v-if="C.display('discussions')" sortable field="discussions" :header="C.name('discussions')"
-        :pt="ptColumnCenter">
+      <Column v-if="C.display('discussions')" sortable field="discussions" :header="C.name('discussions')" :pt="center">
         <template #body="{ data }">
           <NuxtLink v-if="data.discussions" target="_blank" class="nav-link"
             :to="`https://github.com/${data.user}/${data.repo}/discussions`">
@@ -120,21 +115,12 @@ import type { DataTableSortMeta } from 'primevue/datatable';
 import { RepoCols } from '~/shared/repos';
 import { formatBytes } from '~/shared/columns-select';
 import type { Output, Repo } from '~/shared/repos';
+import { center, right } from '~/shared/styling';
 
 useHead({ title: 'Repositories Information' });
 
 const { color, viewportHeight } = storeToRefs(useStyleStore());
 const tableHeight = computed(() => `${Math.round(viewportHeight.value * 0.8)}px`);
-
-// styling
-const ptColumnCenter = ref({
-  columnHeaderContent: { style: { "justify-content": "center" } },
-  bodyCell: { style: { "text-align": "center" } }
-});
-const ptColumnRight = ref({
-  columnHeaderContent: { style: { "justify-content": "right" } },
-  bodyCell: { style: { "text-align": "right" } }
-});
 
 const summaries = ref<Output[]>([]);
 

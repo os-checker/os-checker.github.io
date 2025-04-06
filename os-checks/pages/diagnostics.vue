@@ -2,6 +2,7 @@
 import type { FetchError } from 'ofetch';
 import type { TreeNode } from 'primevue/treenode';
 import type { Columns, PassCountRepo, PassCountRepos } from '~/shared/types';
+import { rightCell } from '~/shared/styling';
 
 useHead({ title: 'Diagnostics' });
 
@@ -120,7 +121,7 @@ const progressRatio = computed(() => {
         </div>
       </template>
 
-      <Column field="idx" header="序号" expander frozen style="min-width: 80px" />
+      <Column field="idx" header="Idx" expander frozen style="min-width: 80px" />
 
       <Column field="user" header="User" sortable frozen style="min-width: 160px" />
 
@@ -135,9 +136,9 @@ const progressRatio = computed(() => {
 
       <Column field="pkg" header="Package" frozen sortable style="min-width: 180px" />
 
-      <Column field="total_count" header="报告数量" sortable style="min-width: 120px; word-break: keep-all;" />
+      <Column field="total_count" header="Total" sortable style="min-width: 120px;" :pt="rightCell" />
 
-      <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable
+      <Column v-for="col in selectedColumns" :field="col.field" :header="col.header" sortable :pt="rightCell"
         style="min-width: 120px; word-break: keep-all;" />
 
     </TreeTable>
