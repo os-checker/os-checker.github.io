@@ -10,3 +10,8 @@
 
 需设置的环境变量：
 * `DOCS_URL`：rustdoc 部署地址，未设置默认为 `https://os-checker.github.io/docs`。
+
+# Licenses
+
+This project is under dual licensing `GPL-3.0 OR MulanPubL`.
+

@@ -2,6 +2,7 @@
   "name": "nuxt-app",
   "private": true,
   "type": "module",
+  "license": "GPL-3.0 OR MulanPubL",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
