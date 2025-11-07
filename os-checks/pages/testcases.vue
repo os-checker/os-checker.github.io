@@ -75,14 +75,14 @@
       {{ selectedTest!.miri_pass }}
     </div>
 
-    <Accordion value="0">
-      <AccordionPanel value="0" v-if="selectedTest?.test_error">
+    <Accordion :value="[0, 1]" multiple>
+      <AccordionPanel :value="0" v-if="selectedTest?.test_error">
         <AccordionHeader>Test Error</AccordionHeader>
         <AccordionContent>
           <CodeBlock :snippets="selectedTest?.test_error ? [selectedTest.test_error] : []" />
         </AccordionContent>
       </AccordionPanel>
-      <AccordionPanel value="1" v-if="selectedTest?.miri_output">
+      <AccordionPanel :value="1" v-if="selectedTest?.miri_output">
         <AccordionHeader>Miri Output</AccordionHeader>
         <AccordionContent>
           <CodeBlock :snippets="selectedTest?.miri_output ? [selectedTest.miri_output] : []" />
